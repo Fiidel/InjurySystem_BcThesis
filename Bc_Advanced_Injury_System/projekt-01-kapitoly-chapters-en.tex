@@ -1,0 +1,95 @@
+% This file should be replaced with your file with thesis content.
+%=========================================================================
+% Authors: Michal Bidlo, Bohuslav Křena, Jaroslav Dytrych, Petr Veigend and Adam Herout 2019
+
+% For compilation piecewise (see projekt.tex), it is necessary to uncomment it and change
+% \documentclass[../projekt.tex]{subfiles}
+% \begin{document}
+
+\chapter{Introduction}
+
+The goal of this thesis is the design and implementation of a dynamic injury system of game characters in the Godot Engine. The term \emph{character} here describes game characters in general, and is not intended to be limited to humanoids.
+
+This demo is not player-centric, but rather aims to implement a standalone injury system and its effects on the creature's behavior and animation. That is not to say player experience and game design is thrown out of the window, only that the player controller is not the focus of this demo.
+
+The Godot Engine was chosen for this project because 
+
+Chapter 2 dives into 
+
+% ===================================================================
+% ===================================================================
+% ===================================================================
+
+\chapter{Nastudujte problematiku animace herních postav a poškození při boji}
+
+\section{Game Design}
+The injury system has to be integrated into the game design and have an \emph{actual effect on the gameplay}.
+Game Feel: good game mechanics quotes / possibly sth from Advanced Game Mechanics book
+
+\section{Systems of Locomotion}
+simulating movement, procedural movement and animation, possible techniques (like IK), adjusting based on centroid (e.g., different foot placement and leaning if a leg is gone)
+
+The injury system has to be dynamic, adapting to whichever injuries are applied to the character's body. Hence procedural animation fits this goal of adaptibility well. Rather than traditional animation with preset model movements, procedural animation can account for and adapt to injuries on the run, and make for a more believable and immersive interaction with the injured character.
+
+\subsection{Inverse Kinematics}
+\subsection{Other techniques described?}
+
+\section{Simulating Harm and Injury}
+possible systems - HP-based; body-part based; idk
+
+probably going with a joint HP pool where each body part is some fraction of that pool
+
+the problem with critical injuries and instant death -- should we aim to simulate injury realistically and allow instant death in cases of striking a critical body part like the head, or should we enforce a design decision and disallow instant death to preserve game balance?
+
+\section{Enemy AI}
+deciding on actions and movement; limiting options based on harm; procedural animation of actions
+
+\section{Case Studies}
+Nastudujte existující a možná řešení dané problematiky -- jak to resi ostatni hry?
+
+Horizon Zero Dawn/Forbidden West
+Monster Hunter
+Dead Space
+Dragon's Dogma
+The Surge
+Underrail
+Crackdown
+Vagrant Story
+Fallout
+Shadow Tower: Abyss
+Hybrid Heaven
+Wasteland
+Bushido Blade
+Binary Domain
+Phoenix Point
+Xenoblade Chronicles X
+Mechwarrior
+Assassin's Creed Valhalla
+
+% ===================================================================
+% ===================================================================
+% ===================================================================
+
+\chapter{Navrhněte uživatelské rozhraní a výslednou funkcionalitu aplikace, která demonstruje pokročilé reakce herní postavy na zranění.}
+
+
+% ===================================================================
+% ===================================================================
+% ===================================================================
+
+\chapter{Implementace a demonstrace její použití na různých typech dat (v různých situacích).}
+
+
+% ===================================================================
+% ===================================================================
+% ===================================================================
+
+\chapter{uživatelské či výkonnostní měření výsledku}
+
+
+% ===================================================================
+% ===================================================================
+% ===================================================================
+
+\chapter{Dokumentace aplikace a publikace}
++ video
