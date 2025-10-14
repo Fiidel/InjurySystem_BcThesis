@@ -8,7 +8,7 @@
 
 \chapter{Introduction}
 
-The goal of this thesis is the design and implementation of a dynamic injury system of game characters in the Godot Engine. The term \emph{character} here describes game characters in general, and is not intended to be limited to humanoids.
+The goal of this thesis is the design and implementation of a dynamic injury system of game characters in the Godot Engine. The term \emph{character} here describes game characters in general, and is not intended to be limited to anthropomorphs.
 
 This demo is not player-centric, but rather aims to implement a standalone injury system and its effects on the creature's behavior and animation. That is not to say player experience and game design is thrown out of the window, only that the player controller is not the focus of this demo.
 
@@ -32,7 +32,27 @@ simulating movement, procedural movement and animation, possible techniques (lik
 The injury system has to be dynamic, adapting to whichever injuries are applied to the character's body. Hence procedural animation fits this goal of adaptibility well. Rather than traditional animation with preset model movements, procedural animation can account for and adapt to injuries on the run, and make for a more believable and immersive interaction with the injured character.
 
 \subsection{Inverse Kinematics}
-\subsection{Other techniques described?}
+\textbf{![TODO]} Describe IK from survey\_IK!
+
+Inverse kinematics is "rotational and translational motion of
+points, bodies (objects) and systems of bodies (groups of objects)
+without consideration of what causes the motion or any reference
+to mass, force or torque"
+
+It had originally been used in robotics for moving arms to targets, but has also expanded into animation in computer graphics. In the latter field, it is very useful for animating \emph{articulated figures} (figures with a specific, solid form like humans, animals, and generally creatures with limbs, as opposed to blobs of jelly, for example). These models are often complicated, and require efficient calculation of complex and multi-link models that can have specified constraints (e.g., a maximum angle that a link can turn by).
+
+[description of IK basic mechanisms and illustrative images - end effectors, end points and target points, joints and links] The multi-link models in inverse kinematics are usually calculated by points (target positions to reach and the model's joints, known as \emph{end effectors}) and their potential constraints. These end effectors are specified by the model (the joints, the links between them, and the constraints limiting their movement) or by the animation system (the target points that a multi-link model, such as an arm, needs to reach to accomplish its task).
+
+A model is a series of links connected by joints. Joints are the main component allowing movement -- their positions determine the positions and orientations of the links. Links are the "connective tissue" between joints and are defined by their length, shape, volume, and mass properties. A \emph{posture} is the skeletal configuration of the figure and must most often satisfy constraints to adhere to realistic movement, such as the torque limitations of each joint or the links not intersecting with other models in their path. A skeletal configuration is usually separated into \emph{chains}, standalone parts attached to a static point on the model (e.g., the limbs of animals and anthropomorphs). The chains usually work in a hierarchy, and the movement of one joint affects the movement of the ones before it.
+
+[illustration image of chained movement effects]
+
+\subsubsection{Usage of Inverse Kinematics}
+
+Forward kinematics (traditional animation where known, predefined transformations are applied to the model) can fall short in situations where we might need to dynamically adjust the target locations, such as characters standing on slopes or an appandage reaching for a target that can be a variable distance or height away. Inverse kinematics is adaptive, the movement of the links (such as limbs) is dynamically calculated and placed, making for natural-looking movement. This quality is what makes it an ideal animation method for our dynamic limb-based injury system.
+
+[image example(s) of IK use in video games where an end effector target - legs touching the actual ground, nathan drake touching walls, dynamic walking systems]
+
 
 \section{Simulating Harm and Injury}
 possible systems - HP-based; body-part based; idk
@@ -78,6 +98,8 @@ Assassin's Creed Valhalla
 % ===================================================================
 
 \chapter{Implementace a demonstrace její použití na různých typech dat (v různých situacích).}
+
+No need to reinvent the wheel, just make sure it works well. Using Godot 4's SkeletonIK3D and LookAtModifier3D.
 
 
 % ===================================================================

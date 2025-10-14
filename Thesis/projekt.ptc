@@ -4,14 +4,14 @@
 \contentsline {section}{\numberline {2.1}Game Design}{4}{section.2.1}%
 \contentsline {section}{\numberline {2.2}Systems of Locomotion}{4}{section.2.2}%
 \contentsline {subsection}{\numberline {2.2.1}Inverse Kinematics}{4}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}Other techniques described?}{4}{subsection.2.2.2}%
-\contentsline {section}{\numberline {2.3}Simulating Harm and Injury}{4}{section.2.3}%
-\contentsline {section}{\numberline {2.4}Enemy AI}{4}{section.2.4}%
+\contentsline {subsubsection}{Usage of Inverse Kinematics}{5}{section*.3}%
+\contentsline {section}{\numberline {2.3}Simulating Harm and Injury}{5}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Enemy AI}{5}{section.2.4}%
 \contentsline {section}{\numberline {2.5}Case Studies}{5}{section.2.5}%
 \contentsline {chapter}{\numberline {3}Navrhněte uživatelské rozhraní a výslednou funkcionalitu aplikace, která demonstruje pokročilé reakce herní postavy na zranění.}{6}{chapter.3}%
 \contentsline {chapter}{\numberline {4}Implementace a demonstrace její použití na různých typech dat (v různých situacích).}{7}{chapter.4}%
 \contentsline {chapter}{\numberline {5}uživatelské či výkonnostní měření výsledku}{8}{chapter.5}%
 \contentsline {chapter}{\numberline {6}Dokumentace aplikace a publikace}{9}{chapter.6}%
-\contentsline {chapter}{Bibliography}{10}{chapter*.3}%
+\contentsline {chapter}{Bibliography}{10}{chapter*.4}%
 \ttl@starttoc {chapters@1}
 \contentsfinish 
