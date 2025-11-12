@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://oweoqvhvucdp"]
+
+[ext_resource type="PackedScene" uid="uid://bn1fythv6umc" path="res://Entities/Enemies/Manticore/Model/manticore.glb" id="1_dn13h"]
+[ext_resource type="Script" uid="uid://qjexxb0qcqn4" path="res://Entities/Enemies/Manticore/leg_ik.gd" id="2_dn13h"]
+
+[node name="manticore" instance=ExtResource("1_dn13h")]
+
+[node name="SkeletonIK3D" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="1"]
+root_bone = &"front_shin.R"
+tip_bone = &"front_foot.IK.R"
+target_node = NodePath("../Marker3D")
+script = ExtResource("2_dn13h")
+
+[node name="Marker3D" type="Marker3D" parent="metarig/Skeleton3D" index="2"]
+transform = Transform3D(0.957692, -0.28779516, 1.2579926e-08, -0.28763676, -0.95716494, 0.033172682, -0.009546926, -0.031769224, -0.99944955, -0.8864452, 0.29694173, 0.33737898)
