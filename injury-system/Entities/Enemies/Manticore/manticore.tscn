@@ -1,15 +1,95 @@
-[gd_scene load_steps=3 format=3 uid="uid://oweoqvhvucdp"]
+[gd_scene load_steps=6 format=3 uid="uid://oweoqvhvucdp"]
 
 [ext_resource type="PackedScene" uid="uid://bn1fythv6umc" path="res://Entities/Enemies/Manticore/Model/manticore.glb" id="1_dn13h"]
-[ext_resource type="Script" uid="uid://qjexxb0qcqn4" path="res://Entities/Enemies/Manticore/leg_ik.gd" id="2_dn13h"]
+[ext_resource type="Script" uid="uid://qjexxb0qcqn4" path="res://Entities/Enemies/leg_ik.gd" id="2_dn13h"]
+[ext_resource type="Script" uid="uid://bv81onqtqkorg" path="res://Entities/Enemies/enemy.gd" id="2_skvek"]
+[ext_resource type="Script" uid="uid://clhdfs28ph753" path="res://Entities/Enemies/knee_ik.gd" id="3_gh15t"]
+[ext_resource type="Script" uid="uid://ck1xqispuse5b" path="res://Entities/Enemies/limb_mutex.gd" id="3_o2tbe"]
 
 [node name="manticore" instance=ExtResource("1_dn13h")]
+script = ExtResource("2_skvek")
 
-[node name="SkeletonIK3D" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="1"]
-root_bone = &"front_shin.R"
-tip_bone = &"front_foot.IK.R"
-target_node = NodePath("../Marker3D")
+[node name="Skeleton3D" parent="metarig" index="0"]
+script = ExtResource("3_o2tbe")
+
+[node name="KneeFR" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="1"]
+root_bone = &"front_thigh.R"
+tip_bone = &"foot.IK.R"
+override_tip_basis = false
+target_node = NodePath("Marker3D")
+script = ExtResource("3_gh15t")
+
+[node name="Marker3D" type="Marker3D" parent="metarig/Skeleton3D/KneeFR" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.9999999, -0.7, 1.27, 2.266)
+
+[node name="FootFR" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="2"]
+root_bone = &"front_thigh.R"
+tip_bone = &"front_foot.R"
 script = ExtResource("2_dn13h")
+max_step_distance = 1.0
+step_duration = 0.4
+step_height = 0.4
 
-[node name="Marker3D" type="Marker3D" parent="metarig/Skeleton3D" index="2"]
-transform = Transform3D(0.957692, -0.28779516, 1.2579926e-08, -0.28763676, -0.95716494, 0.033172682, -0.009546926, -0.031769224, -0.99944955, -0.8864452, 0.29694173, 0.33737898)
+[node name="DefaultPosition" type="Marker3D" parent="metarig/Skeleton3D/FootFR" index="0"]
+transform = Transform3D(0.90246207, -0.25555244, -0.34677827, -0.33538482, 0.088361114, -0.9379281, 0.27033153, 0.9627491, -0.0059658587, -0.7, 0.335, 1.169)
+
+[node name="RayCast3D" type="RayCast3D" parent="metarig/Skeleton3D/FootFR" index="1"]
+transform = Transform3D(0.99464166, 0.10338279, 3.5172842e-09, -0.10205118, 0.98183036, 0.1599846, 0.016539657, -0.15912732, 0.9871197, -0.8, 0.25, 2)
+target_position = Vector3(0, -0.5, 0)
+
+[node name="KneeFL" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="3"]
+root_bone = &"front_thigh.L"
+tip_bone = &"foot.IK.L"
+override_tip_basis = false
+target_node = NodePath("Marker3D")
+script = ExtResource("3_gh15t")
+
+[node name="Marker3D" type="Marker3D" parent="metarig/Skeleton3D/KneeFL" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.9999999, 0.7, 1.27, 2.266)
+
+[node name="FootFL" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="4"]
+root_bone = &"front_thigh.L"
+tip_bone = &"front_foot.L"
+script = ExtResource("2_dn13h")
+max_step_distance = 1.0
+step_duration = 0.4
+step_height = 0.4
+limb_group = 1
+
+[node name="DefaultPosition" type="Marker3D" parent="metarig/Skeleton3D/FootFL" index="0"]
+transform = Transform3D(0.90246207, -0.25555244, -0.34677827, -0.33538482, 0.088361114, -0.9379281, 0.27033153, 0.9627491, -0.0059658587, 0.7, 0.335, 1.169)
+
+[node name="RayCast3D" type="RayCast3D" parent="metarig/Skeleton3D/FootFL" index="1"]
+transform = Transform3D(0.9940491, -0.103695825, -0.0333719, 0.107670516, 0.98179734, 0.15646529, 0.016539654, -0.1591273, 0.9871196, 0.8, 0.25, 2)
+target_position = Vector3(0, -0.5, 0)
+
+[node name="FootBR" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="5"]
+root_bone = &"thigh.R"
+tip_bone = &"toe.R"
+script = ExtResource("2_dn13h")
+max_step_distance = 1.0
+step_duration = 0.4
+step_height = 0.1
+limb_group = 1
+
+[node name="DefaultPosition" type="Marker3D" parent="metarig/Skeleton3D/FootBR" index="0"]
+transform = Transform3D(-0.99999994, -8.7422784e-08, 0, 2.2626681e-08, -0.2588191, 0.96592575, -8.444391e-08, 0.96592593, 0.25881904, -0.7, 0.335, -1.673)
+
+[node name="RayCast3D" type="RayCast3D" parent="metarig/Skeleton3D/FootBR" index="1"]
+transform = Transform3D(0.99464166, 0.10338279, 3.5172842e-09, -0.10205118, 0.98183036, 0.1599846, 0.016539657, -0.15912732, 0.9871197, -0.8, 0.25, -1.0843295)
+target_position = Vector3(0, -0.5, 0)
+
+[node name="FootBL" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="6"]
+root_bone = &"thigh.L"
+tip_bone = &"toe.L"
+script = ExtResource("2_dn13h")
+max_step_distance = 1.0
+step_duration = 0.4
+step_height = 0.1
+
+[node name="DefaultPosition" type="Marker3D" parent="metarig/Skeleton3D/FootBL" index="0"]
+transform = Transform3D(-0.99999994, -8.7422805e-08, 0, 2.2626681e-08, -0.25881916, 0.96592575, -8.444391e-08, 0.9659262, 0.25881904, 0.7, 0.335, -1.673)
+
+[node name="RayCast3D" type="RayCast3D" parent="metarig/Skeleton3D/FootBL" index="1"]
+transform = Transform3D(0.9945219, -0.10452848, 0, 0.103183836, 0.98172873, 0.1598812, -0.016712135, -0.15900536, 0.98713636, 0.8, 0.25, -1.084)
+target_position = Vector3(0, -0.5, 0)

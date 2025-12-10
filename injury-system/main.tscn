@@ -1,12 +1,19 @@
-[gd_scene load_steps=2 format=3 uid="uid://b3fjuvv488qok"]
+[gd_scene load_steps=5 format=3 uid="uid://b3fjuvv488qok"]
+
+[ext_resource type="PackedScene" uid="uid://oweoqvhvucdp" path="res://Entities/Enemies/Manticore/manticore.tscn" id="1_ig7tw"]
 
 [sub_resource type="Environment" id="Environment_ig7tw"]
 ambient_light_color = Color(1, 1, 1, 1)
 
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_0xm2m"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_h2yge"]
+size = Vector3(100, 0.1, 100)
+
 [node name="Node3D" type="Node3D"]
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(0.9215992, 0.17797345, -0.34493545, 0, 0.8886813, 0.45852548, 0.38814303, -0.4225767, 0.81900793, -2.6600413, 4.58954, 6.6041603)
+transform = Transform3D(-0.2885961, -0.024680885, -0.9571328, -0.011357648, 0.9996856, -0.02235359, 0.9573836, 0.004419619, -0.2887857, -9.510733, 1.8287139, 3.6768408)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_ig7tw")
@@ -14,3 +21,12 @@ environment = SubResource("Environment_ig7tw")
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
 transform = Transform3D(0.99711937, 0.07584889, 0, -0.07584889, 0.99711937, 0, 0, 0, 1, 9.24181, 9.090382, 6.3265133)
 omni_range = 50.0
+
+[node name="manticore" parent="." instance=ExtResource("1_ig7tw")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+physics_material_override = SubResource("PhysicsMaterial_0xm2m")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("BoxShape3D_h2yge")
+debug_color = Color(0, 0.6597583, 0.76674175, 1)
