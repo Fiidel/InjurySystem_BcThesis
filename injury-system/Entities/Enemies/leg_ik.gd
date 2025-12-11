@@ -3,7 +3,7 @@ extends SkeletonIK3D
 
 @onready var ray_cast_3d: RayCast3D = $RayCast3D
 @onready var default_position: Marker3D = $DefaultPosition
-@export var max_step_distance: float = 1.3
+@export var max_step_distance: float = 1
 @export var step_duration: float = 0.5
 @export var step_height: float = 0.2 # midpoint height during step
 @export var limb_group: int = 0
@@ -61,6 +61,10 @@ func trigger_step():
 	# activate step
 	is_stepping = true
 	limb_mutex.lock_step(limb_group)
+	
+	# randomized delay for less rigid robotic movement
+	var delay = randf_range(0.0, 0.2)
+	await get_tree().create_timer(delay).timeout
 
 	# tween for animation (interpolation of starting point, midpoint and final target)
 	var tween = create_tween()
@@ -75,7 +79,9 @@ func trigger_step():
 			if ray_cast_3d.is_colliding():
 				var current_target = ray_cast_3d.get_collision_point()
 				var dynamic_midpoint = step_start_position.lerp(current_target, 0.65) + Vector3(0, step_height, 0)
-				anchor_point.global_position = step_start_position.lerp(dynamic_midpoint, progress), 0.0, 1.0, step_duration)
+				anchor_point.global_position = step_start_position.lerp(dynamic_midpoint, progress), 
+		0.0, 1.0, step_duration
+	)
 	
 	# to final target - needs to be calculated dynamically via tween_method, otherwise the step is too short
 	tween.tween_method(
@@ -83,7 +89,9 @@ func trigger_step():
 			if ray_cast_3d.is_colliding():
 				var current_target = ray_cast_3d.get_collision_point()
 				var current_midpoint = step_start_position.lerp(current_target, 0.65) + Vector3(0, step_height, 0)
-				anchor_point.global_position = current_midpoint.lerp(current_target, progress), 0.0, 1.0, step_duration)
+				anchor_point.global_position = current_midpoint.lerp(current_target, progress),
+		0.0, 1.0, step_duration
+	)
 	
 	# deactivate step
 	tween.finished.connect(func():

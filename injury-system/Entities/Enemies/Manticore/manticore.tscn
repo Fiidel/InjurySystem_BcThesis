@@ -26,7 +26,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.9999999, -0.7, 1.27, 2.266)
 root_bone = &"front_thigh.R"
 tip_bone = &"front_foot.R"
 script = ExtResource("2_dn13h")
-max_step_distance = 1.0
+max_step_distance = 0.8
 step_duration = 0.4
 step_height = 0.4
 
@@ -51,7 +51,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.9999999, 0.7, 1.27, 2.266)
 root_bone = &"front_thigh.L"
 tip_bone = &"front_foot.L"
 script = ExtResource("2_dn13h")
-max_step_distance = 1.0
+max_step_distance = 0.8
 step_duration = 0.4
 step_height = 0.4
 limb_group = 1
@@ -67,29 +67,29 @@ target_position = Vector3(0, -0.5, 0)
 root_bone = &"thigh.R"
 tip_bone = &"toe.R"
 script = ExtResource("2_dn13h")
-max_step_distance = 1.0
+max_step_distance = 0.6
 step_duration = 0.4
-step_height = 0.1
+step_height = 0.25
 limb_group = 1
 
 [node name="DefaultPosition" type="Marker3D" parent="metarig/Skeleton3D/FootBR" index="0"]
 transform = Transform3D(-0.99999994, -8.7422784e-08, 0, 2.2626681e-08, -0.2588191, 0.96592575, -8.444391e-08, 0.96592593, 0.25881904, -0.7, 0.335, -1.673)
 
 [node name="RayCast3D" type="RayCast3D" parent="metarig/Skeleton3D/FootBR" index="1"]
-transform = Transform3D(0.99464166, 0.10338279, 3.5172842e-09, -0.10205118, 0.98183036, 0.1599846, 0.016539657, -0.15912732, 0.9871197, -0.8, 0.25, -1.0843295)
+transform = Transform3D(0.99464166, 0.10338279, 3.5172842e-09, -0.10205118, 0.98183036, 0.1599846, 0.016539657, -0.15912732, 0.9871197, -0.8, 0.25, -1)
 target_position = Vector3(0, -0.5, 0)
 
 [node name="FootBL" type="SkeletonIK3D" parent="metarig/Skeleton3D" index="6"]
 root_bone = &"thigh.L"
 tip_bone = &"toe.L"
 script = ExtResource("2_dn13h")
-max_step_distance = 1.0
+max_step_distance = 0.6
 step_duration = 0.4
-step_height = 0.1
+step_height = 0.25
 
 [node name="DefaultPosition" type="Marker3D" parent="metarig/Skeleton3D/FootBL" index="0"]
 transform = Transform3D(-0.99999994, -8.7422805e-08, 0, 2.2626681e-08, -0.25881916, 0.96592575, -8.444391e-08, 0.9659262, 0.25881904, 0.7, 0.335, -1.673)
 
 [node name="RayCast3D" type="RayCast3D" parent="metarig/Skeleton3D/FootBL" index="1"]
-transform = Transform3D(0.9945219, -0.10452848, 0, 0.103183836, 0.98172873, 0.1598812, -0.016712135, -0.15900536, 0.98713636, 0.8, 0.25, -1.084)
+transform = Transform3D(0.9945219, -0.10452848, 0, 0.103183836, 0.98172873, 0.1598812, -0.016712135, -0.15900536, 0.98713636, 0.8, 0.25, -1)
 target_position = Vector3(0, -0.5, 0)
