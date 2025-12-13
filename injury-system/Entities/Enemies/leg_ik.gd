@@ -14,19 +14,13 @@ var is_initialized: bool = false
 var limb_mutex: LimbMutex
 
 func _ready():
-	var parent = get_parent()
-	if parent is LimbMutex:
-		limb_mutex = parent
-	else:
-		push_error("Parent is not a LimbMutex")
-		return
-	
 	# create marker instances and add them to scene
 	anchor_point = Marker3D.new()
 	get_tree().root.call_deferred("add_child", anchor_point)
 
-	# setup the position markers after adding them	
+	# setup the position markers and ik	
 	call_deferred("setup_markers")
+	call_deferred("setup_ik")
 
 func setup_markers():
 	anchor_point.global_position = default_position.global_position
@@ -39,8 +33,17 @@ func setup_markers():
 	# make the first step for group 0 - alternating legs
 	if limb_group == 0:
 		anchor_point.global_position = ray_cast_3d.get_collision_point()
-	
+
 	is_initialized = true
+
+func setup_ik():
+	# get the limb mutex from the parent
+	var parent = get_parent()
+	if parent is IKController:
+		limb_mutex = parent.limb_mutex
+	else:
+		push_error("Parent is not a IKController")
+		return
 
 func _physics_process(delta: float) -> void:
 	if not is_initialized:
@@ -69,6 +72,8 @@ func trigger_step():
 	# tween for animation (interpolation of starting point, midpoint and final target)
 	var tween = create_tween()
 	tween.set_parallel(false) # sequential
+	tween.set_ease(Tween.EASE_IN)
+	tween.set_trans(Tween.TRANS_SINE)
 	
 	var step_start_position: Vector3
 	step_start_position = anchor_point.global_position
@@ -82,6 +87,8 @@ func trigger_step():
 				anchor_point.global_position = step_start_position.lerp(dynamic_midpoint, progress), 
 		0.0, 1.0, step_duration
 	)
+
+	tween.set_ease(Tween.EASE_OUT)
 	
 	# to final target - needs to be calculated dynamically via tween_method, otherwise the step is too short
 	tween.tween_method(
@@ -99,3 +106,5 @@ func trigger_step():
 		if limb_mutex:
 			limb_mutex.unlock_step(limb_group)
 	)
+	await tween.finished
+	tween.kill()

@@ -4,15 +4,6 @@ extends Skeleton3D
 var current_locked_group: int = -1
 var limb_amount: int = 0
 
-@onready var leg_ik_nodes: Array = get_leg_ik_children()
-
-func get_leg_ik_children():
-	leg_ik_nodes.clear()
-	for child in get_children():
-		if child is LegIK:
-			leg_ik_nodes.append(child)
-	return leg_ik_nodes
-
 # Returns whether the mutex is open for the group (either no active movement or movement of the same group)
 func is_unlocked_for_group(limb_group: int) -> bool:
 	if current_locked_group == -1:
