@@ -46,4 +46,4 @@ func generate_random_rotation_offset() -> Vector3:
 	return Vector3(randfn(0, 0.1), randfn(0, 0.1), randfn(0, 0.1))
 
 func generate_random_time_offset() -> float:
-	return randfn(0, 0.25)
+	return randf_range(0, 0.25)
