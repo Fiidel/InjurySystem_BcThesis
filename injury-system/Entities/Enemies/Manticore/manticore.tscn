@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://oweoqvhvucdp"]
+[gd_scene load_steps=8 format=3 uid="uid://oweoqvhvucdp"]
 
 [ext_resource type="PackedScene" uid="uid://bn1fythv6umc" path="res://Entities/Enemies/Manticore/Model/manticore.glb" id="1_dn13h"]
 [ext_resource type="Script" uid="uid://qjexxb0qcqn4" path="res://Entities/Enemies/leg_ik.gd" id="2_dn13h"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://dkkiafwpuimpv" path="res://Entities/Enemies/ik_controller.gd" id="3_du7mr"]
 [ext_resource type="Script" uid="uid://clhdfs28ph753" path="res://Entities/Enemies/knee_ik.gd" id="3_gh15t"]
 [ext_resource type="Script" uid="uid://c3nvv1y6wntvc" path="res://Entities/Enemies/wing_ik.gd" id="6_du7mr"]
+[ext_resource type="Script" uid="uid://cc7um2p0asiy5" path="res://Entities/Enemies/tail_ik.gd" id="7_fr2v3"]
 
 [node name="manticore" instance=ExtResource("1_dn13h")]
 script = ExtResource("2_skvek")
@@ -118,9 +119,10 @@ transform = Transform3D(-0.5358942, 0.83372635, -0.13310769, -0.21614937, -0.287
 root_bone = &"spine.002"
 tip_bone = &"spine.019"
 target_node = NodePath("Marker3D")
+script = ExtResource("7_fr2v3")
 
 [node name="Marker3D" type="Marker3D" parent="metarig/Skeleton3D/Tail" index="0"]
-transform = Transform3D(1, 0, 0, 0, 0.426553, -0.9044626, 0, 0.9044626, 0.426553, 0, 4.4054627, -3.6668284)
+transform = Transform3D(1, 0, 0, 0, 0.85379624, -0.5206073, 0, 0.5206073, 0.85379624, 0, 4.4054627, -4.5883455)
 
 [node name="HeadLookAt" type="LookAtModifier3D" parent="metarig/Skeleton3D" index="10"]
 target_node = NodePath("LookAtTarget")
