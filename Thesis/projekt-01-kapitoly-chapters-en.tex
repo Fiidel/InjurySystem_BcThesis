@@ -18,7 +18,7 @@ This demo is not player-centric, but rather aims to implement a standalone injur
 
 The Godot Engine was chosen for this project because 
 
-Chapter 2 dives into 
+Chapter 2 
 
 % ===================================================================
 % ===================================================================
@@ -26,11 +26,31 @@ Chapter 2 dives into
 
 \chapter{Game Character Injury Systems and Animation (Theory)}
 
-Combat and injury have been a part of human history even since prehistoric times. Singular fights, epic battles, and strifeful wars riddle our existence in stories -- mythological through modern, in our personal lives, or in large-scale historical real life events.
+Combat and injury have been a part of human history even since prehistoric times. Singular fights, epic battles, and strifeful wars riddle our existence in stories -- mythological through modern, in our personal lives, or in large-scale historical real life events. It is then no wonder that games have used this theme in a myriad of different ways. From mythical, heroic combat with swords and magic to competetive shooters, countless games had to contend with designing and implementing combat and injury systems.
+
+Each game has its budget and own set of priorities based on their design. Sometimes, developers may decide to prioritize other parts of the game like visuals, story, and voice acting, over the implementation of complex combat systems, opting for greater abstraction. The easiest systems are the ones that model characters as a singular entity with no subparts and a pool of hit points that determine its binary state -- alive or dead. However, other designs call for a more complex and varied experience. We will look into those in a later section.
+
+In this chapter, we will delve into the basics of game design and the questions that a designer should answer before creating a system for a game. Next, we will look into the subsystems constituting an advanced injury system of game characters -- systems of locomotion (movement), tracking and simulating harm and injury through subsystems, and having enemy AI reflect the injuries in its behavior.
 
 \section{Game Design}
-The injury system has to be integrated into the game design and have an \emph{actual effect on the gameplay}.
-Game Feel: good game mechanics quotes / possibly sth from Advanced Game Mechanics book
+Before designing a game system, we need to familiarize ourselves with the theory, practice, and questions of game design.
+
+Firstly, what is game design? \emph{Game design is the act of deciding what a game should be. Decisions about rules, look and feel, timing, pacing, risk-taking, rewards, punishments, and everything else the player experiences is the responsibility of the game designer} {[cite Schell book of lenses]}.
+
+\emph{Rules are an essential feature of games. A game's outcome should, to a certain extent, be unpredictable. Games that are fully predictable (a predetermined sequence of events) or fully unpredictable (pure games of chance) aren't engaging. Players want their skills and their strategic decisions to make more of a difference, or else they become frustrated. Skill should also contribute to victory. The longer the game is, the more true this is.}
+
+\emph{In addition to chance, choices made by players and complex gameplay created by the rules are other ways to make games unpredictable. Complex systems usually have many interacting parts, often simple rules that can combine into interwoven and. difficult to foresee situations. In this type of game, the ability to read a game's current state and understand its strategic complexities is the most important game-playing skill.}
+
+\emph{Most games mix these three sources of unpredictability. They include an element of chance, player choices, and complex rules.} {[cite Advanced Game Mechanics]}
+
+Now, we can finally get into the core of this thesis and answer the necessary questions about our game design. The goal is to create a more complex combat experience with less abstractions, where the player can make meaningful choices about where to attack an enemy to cripple its capabilities based on those attacks. For example, a player that prefers melee combat might decide to target an enemy's wings first to make it lose its ability to fly to hinder its maneuverability and disable it from getting out of melee range.
+
+Let's dissect the game design from the perspective of the three sources of unpredictability that should make the game more engaging, as mentioned above. The element of chance comes from the enemy's AI which makes randomized decisions based on weighted transitions in its behavior tree. The player chooses which body parts to attack so that they can disable the enemy's abilities that require those parts to be triggered. The complexity comes from the way body parts serve as requisites for the enemy's capabilities, such as two wings being necessary for flight, at least three limbs for walking, or a stinger tail for poison attacks, and the way they enable and limit what actions it has available in its behavior.
+
+We could also argue that depending on the implementation of the player controller, there are even more elements, such as the player maneuvering around the virtual space to avoid or close in on an enemy, or any of the player's special abilities and attacks with various ranges and cooldowns. However, the player controller is a complex issue of its own. It is not covered by this thesis, but the player's experience is a crucial aspect of games and should be accounted for when discussing of game design ([source book of lenses probably?]).
+
+While assessing, designing, and implementing these features, the goal is also to develop in-engine tools that would make creating such enemies more streamlined in Godot.
+
 
 \section{Systems of Locomotion}
 simulating movement, procedural movement and animation, possible techniques (like IK), adjusting based on centroid (e.g., different foot placement and leaning if a leg is gone)
@@ -92,6 +112,12 @@ Xenoblade Chronicles X
 Mechwarrior
 Assassin's Creed Valhalla
 
+Kingdom Come: Deliverance
+Fear \& Hunger
+Escape from Tarkov
+Project Zomboid
+Neo Scavenger
+
 % ===================================================================
 % ===================================================================
 % ===================================================================
@@ -109,7 +135,11 @@ Godot plugin design and mockups
 % ===================================================================
 
 \chapter{Implementation and Demonstration in Various Test Cases/Situations}
+\section{Creating an Enemy Model}
+Blender. Explain enemy design (body parts) -- that's why it's a custom model.
+sculpting, retopo, rigify addon skeleton edited to fit the model, automatic weight paints with some manual adjustments, exported to Godot.
 
+\section{Inverse Kinematics in Godot}
 No need to reinvent the wheel, just make sure it works well. Using Godot 4's SkeletonIK3D and LookAtModifier3D.
 
 
