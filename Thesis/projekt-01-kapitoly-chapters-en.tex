@@ -24,7 +24,7 @@ Chapter 2
 % ===================================================================
 % ===================================================================
 
-\chapter{Game Character Injury Systems and Animation (Theory)}
+\chapter{Game Character Injury Systems and Animation}
 
 Combat and injury have been a part of human history even since prehistoric times. Singular fights, epic battles, and strifeful wars riddle our existence in stories -- mythological through modern, in our personal lives, or in large-scale historical real life events. It is then no wonder that games have used this theme in a myriad of different ways. From mythical, heroic combat with swords and magic to competetive shooters, countless games had to contend with designing and implementing combat and injury systems.
 
@@ -52,14 +52,56 @@ We could also argue that depending on the implementation of the player controlle
 While assessing, designing, and implementing these features, the goal is also to develop in-engine tools that would make creating such enemies more streamlined in Godot.
 
 
-\section{Systems of Locomotion}
-simulating movement, procedural movement and animation, possible techniques (like IK), adjusting based on centroid (e.g., different foot placement and leaning if a leg is gone)
+\section{Case Studies}
+In this section, we will examine the systems within games that implement a body part injury system and their approaches to the design.
 
-The injury system has to be dynamic, adapting to whichever injuries are applied to the character's body. Hence procedural animation fits this goal of adaptibility well. Rather than traditional animation with preset model movements, procedural animation can account for and adapt to injuries on the run, and make for a more believable and immersive interaction with the injured character.
+In Horizon Zero Dawn and Horizon Forbidden West, components and armor plates can be removed with high tear damage weapons, which deals little to no damage, but reveals weak points or disables attacks.
+[source https://www.polygon.com/horizon-zero-dawn-guide-walkthrough/21357205/machines-fight-rockbreaker-behemoth-thunderjaw-stormbird-deathbringer-tallneck-corrupted-cauldron/]
+
+In Monster Hunter Wilds, removing body parts is a core part of the experience, gathering them as loot or removing the monsters' dangerous abilities. Different weapon types (slashing, blunt, ranged) deal increased damage to specific enemies' body parts. For example, slashing weapons deal extra damage to tails, while blunt weapons can stun, making the enemy roll on the ground for a period of time.
+[https://www.polygon.com/monster-hunter-wilds-guide/528353/monster-tails-fangs-claws-horns-how-to-get-sever-cut-break/]
+
+Dead Space has many enemies with weak spots, different for each enemy type. Attacking those parts can limit an enemy's attack or movement. Some enemies can have armor that protects their weak points, forcing the player to focus on another weak point or to change their position to access weak points hidden on the enemy's back. Enemies can also have weak points that are dangerous to the player, such as explosive sacks damaging the player when destroyed in close proximity, forcing another angle of strategy to the weak point system. The important aspect of this combat system is in how it enforces different strategies that the player needs to apply based on the enemy type's weak point effects.
+[https://www.dualshockers.com/dead-space-remake-necromorph-weakness/]
+
+Fallout offers a slow-motion targeting system that allows players to target specific body parts. Each body part has its own chance of being hit, modified by distance and cover. The number of attacks a player can make is dependent on the player's action points and the weapon type. Body parts have a status that's separate from the target's overall health. A status bar can be worn down until empty, at which point the limb becomes crippled. Crippled limbs have effects like hindered movement, removing a robot's weaponized arm, or shooting an enemy's head (which in most cases kills them outright). 
+[https://www.videogamer.com/guides/a-beginners-guide-to-combat-in-fallout-4/]
+
+In Xenoblade Chronicles X, the player can target appendages which have their own health pool, separate from the overall one. Destroying appendages disables certain attacks and lowers the enemy's defenses.
+[https://deltiasgaming.com/xenoblade-chronicles-x-combat-guide/]
+
+Phoenix Point's "free aim" combat allows the player to hit specific body parts based on projectile collisions. Each body part has their independed values (like health) and features. Disabling parts has various effects, such as hindering mobility, disabling the enemy's main weapon, or triggering a bleeding effect. Each part also has a different armor value which reduces damage.
+[https://www.rockpapershotgun.com/phoenix-point-free-aim-and-part-damage-guide-how-to-use-the-free-aiming-system-for-more-precise-shots]
+
+[illustrative pic?]
+
+\subsection{Summary}
+Body parts most often have a feature bound to them -- an ability (like a weapon attack), protection (armor that protects weak points or targetable body parts from being targeted), or mobility. Attacking such body parts hinders those features, e.g., slowing an enemy down or disabling an attack. Additionally, body parts may serve as weak points, granting the player an advantage when being hit in a particular way (like stunning enemies by hitting their heads with a blunt weapon in Monster Hunter Wilds).
+
+There are also variable values that modify the limbs, such as a to-hit chance (Fallout) or armor that reduces damage taken (Phoenix Point).
+
+Many games model body parts with hit point pools separate from the overall pool.
+
+In our design, we should also think about aiming for variance that enforces different strategies to be employed by the player (like in Dead Space).
+
+We should also be mindful of not overwhelming the player - diagetic combat system (where you hit == that part takes the damage) rather than 8 UI popups.
+
+
+\section{Locomotion}
+Locomotion is the problem of making game characters move. Often, it isn't a single system, but an intertwining of AI, gameplay, physics, and animation systems. {cite [Animation-Driven Locomotion with Locomotion Planning, Jarosław Ciupinski]}
+
+This thesis concerns itself mainly with the enemy AI (behavior tree and pathfinding) and animation. Inverse kinematics is used to make simulated movement look more natural, allowing for end effectors, such as feet, to be placed dynamically based on things like raycast collisions with the terrain mesh (see figure \ref{TheWitcher3}). Inverse kinematics can also be used for attaching end effectors to the ground (preventing sliding walk animations), reaching for an object (preventing awkward static animations when interacting with objects), etc.
+
+The injury system has to be dynamic, adapting to whichever injuries are applied to the character's body. Hence procedural animation fits this goal of adaptibility well. Rather than traditional animation with preset model movements, procedural animation can account for and adapt to injuries on the run, and make for a more realistic and immersive interaction with the injured character.
+
+\begin{figure}
+    \label{TheWitcher3}
+    \centering
+    \includegraphics[]{obrazky-figures/IK_FootPlacement_TheWitcher3.png}
+    \caption{Dynamic foot placement using inverse kinematics (The Witcher 3)}
+\end{figure}
 
 \subsection{Inverse Kinematics}
-\textbf{![TODO]} Describe IK from survey\_IK!
-
 Inverse kinematics is "rotational and translational motion of
 points, bodies (objects) and systems of bodies (groups of objects)
 without consideration of what causes the motion or any reference
@@ -67,56 +109,52 @@ to mass, force or torque"
 
 It had originally been used in robotics for moving arms to targets, but has also expanded into animation in computer graphics. In the latter field, it is very useful for animating \emph{articulated figures} (figures with a specific, solid form like humans, animals, and generally creatures with limbs, as opposed to blobs of jelly, for example). These models are often complicated, and require efficient calculation of complex and multi-link models that can have specified constraints (e.g., a maximum angle that a link can turn by).
 
-[description of IK basic mechanisms and illustrative images - end effectors, end points and target points, joints and links] The multi-link models in inverse kinematics are usually calculated by points (target positions to reach and the model's joints, known as \emph{end effectors}) and their potential constraints. These end effectors are specified by the model (the joints, the links between them, and the constraints limiting their movement) or by the animation system (the target points that a multi-link model, such as an arm, needs to reach to accomplish its task).
+[description of IK basic mechanisms and illustrative images - end effectors, end points and target points, joints and links]
+
+The multi-link models in inverse kinematics are usually calculated by points (target positions to reach and the model's joints, known as \emph{end effectors}) and their potential constraints. These end effectors are specified by the model (the joints, the links between them, and the constraints limiting their movement) or by the animation system (the target points that a multi-link model, such as an arm, needs to reach to accomplish its task).
 
 A model is a series of links connected by joints. Joints are the main component allowing movement -- their positions determine the positions and orientations of the links. Links are the "connective tissue" between joints and are defined by their length, shape, volume, and mass properties. A \emph{posture} is the skeletal configuration of the figure and must most often satisfy constraints to adhere to realistic movement, such as the torque limitations of each joint or the links not intersecting with other models in their path. A skeletal configuration is usually separated into \emph{chains}, standalone parts attached to a static point on the model (e.g., the limbs of animals and anthropomorphs). The chains usually work in a hierarchy, and the movement of one joint affects the movement of the ones before it.
 
 [illustration image of chained movement effects]
 
 \subsubsection{Usage of Inverse Kinematics}
-
 Forward kinematics (traditional animation where known, predefined transformations are applied to the model) can fall short in situations where we might need to dynamically adjust the target locations, such as characters standing on slopes or an appandage reaching for a target that can be a variable distance or height away. Inverse kinematics is adaptive, the movement of the links (such as limbs) is dynamically calculated and placed, making for natural-looking movement. This quality is what makes it an ideal animation method for our dynamic limb-based injury system.
 
-[image example(s) of IK use in video games where an end effector target - legs touching the actual ground, nathan drake touching walls, dynamic walking systems]
+\subsubsection{Inverse Kinematics in Godot}
+
 
 
 \section{Simulating Harm and Injury}
-possible systems - HP-based; body-part based; idk
+The implementation of injury depends on how we choose to straddle the line between realism and abstraction for the sake of gameplay. One avenue would be to simulate the game character as a physics-based entity with detailed models of musculature and detection of injury precisely where a collision with a weapon happens, and disabling articulated movement that uses the muscles in those parts, etc. However, the goal of this thesis is not to create a perfectly realistic body simulation, but to provide a framework and streamline creating enemies with targetable body parts that serve as requisites for enemy abilities in Godot.
+
+There are many possible implementations of a body part injury system.
+HP-based; body-part based; idk
 
 probably going with a joint HP pool where each body part is some fraction of that pool
 
-the problem with critical injuries and instant death -- should we aim to simulate injury realistically and allow instant death in cases of striking a critical body part like the head, or should we enforce a design decision and disallow instant death to preserve game balance?
+% the problem with critical injuries and instant death -- should we aim to simulate injury realistically and allow instant death in cases of striking a critical body part like the head, or should we enforce a design decision and disallow instant death to preserve game balance?
 
 \section{Enemy AI}
+The enemy AI will require the solving of two main problems -- deciding and executing behavior, and pathfinding. The behavior also needs to be limited
 deciding on actions and movement; limiting options based on harm; procedural animation of actions
 
-\section{Case Studies}
-Nastudujte existující a možná řešení dané problematiky -- jak to resi ostatni hry?
+\subsection{Behavior}
+\subsubsection{Finite State Machine}
+\subsubsection{Behavior Trees}
+\subsubsection{any other ways to implement AI}
 
-Horizon Zero Dawn/Forbidden West
-Monster Hunter
-Dead Space
-Dragon's Dogma
-The Surge
-Underrail
-Crackdown
-Vagrant Story
-Fallout
-Shadow Tower: Abyss
-Hybrid Heaven
-Wasteland
-Bushido Blade
-Binary Domain
-Phoenix Point
-Xenoblade Chronicles X
-Mechwarrior
-Assassin's Creed Valhalla
+\subsubsection{Behvaior Execution}
+what pattern to use when simulating the behavior? something that will change states like "Fly Up", "Descend", "Rake with Claws", but what will take care of the actual behavior? And what is the central brain that manages the state?
 
-Kingdom Come: Deliverance
-Fear \& Hunger
-Escape from Tarkov
-Project Zomboid
-Neo Scavenger
+\subsubsection{Behvaior Limiting}
+patterns to check for available actions? how to limit effectively what the Behavior Tree (or the chosen way to implement behavior) has access to? so that when the random value in the weighted network is generated, so that it doesn't try to execute a branch that cannot be executed due to missing links
+
+[PATTERN DIAGRAMS]
+
+
+\subsection{Pathfinding}
+necessary theory for implementing pathfinding in Godot
+
 
 % ===================================================================
 % ===================================================================
@@ -141,6 +179,8 @@ sculpting, retopo, rigify addon skeleton edited to fit the model, automatic weig
 
 \section{Inverse Kinematics in Godot}
 No need to reinvent the wheel, just make sure it works well. Using Godot 4's SkeletonIK3D and LookAtModifier3D.
+
+adjusting based on centroid (e.g., different foot placement and leaning if a leg is gone)
 
 
 % ===================================================================

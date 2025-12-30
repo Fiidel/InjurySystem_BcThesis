@@ -1,19 +1,28 @@
 \babel@toc {english}{}\relax 
 \contentsline {chapter}{\numberline {1}Introduction}{3}{chapter.1}%
-\contentsline {chapter}{\numberline {2}Game Character Injury Systems and Animation (Theory)}{4}{chapter.2}%
+\contentsline {chapter}{\numberline {2}Game Character Injury Systems and Animation}{4}{chapter.2}%
 \contentsline {section}{\numberline {2.1}Game Design}{4}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Systems of Locomotion}{5}{section.2.2}%
-\contentsline {subsection}{\numberline {2.2.1}Inverse Kinematics}{5}{subsection.2.2.1}%
-\contentsline {subsubsection}{Usage of Inverse Kinematics}{6}{section*.3}%
-\contentsline {section}{\numberline {2.3}Simulating Harm and Injury}{6}{section.2.3}%
-\contentsline {section}{\numberline {2.4}Enemy AI}{6}{section.2.4}%
-\contentsline {section}{\numberline {2.5}Case Studies}{7}{section.2.5}%
-\contentsline {chapter}{\numberline {3}Injury System Design}{8}{chapter.3}%
-\contentsline {chapter}{\numberline {4}Implementation and Demonstration in Various Test Cases/Situations}{9}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Creating an Enemy Model}{9}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Inverse Kinematics in Godot}{9}{section.4.2}%
-\contentsline {chapter}{\numberline {5}User/Performance testing of the resulting implemented design}{10}{chapter.5}%
-\contentsline {chapter}{\numberline {6}Documentation and Publication}{11}{chapter.6}%
-\contentsline {chapter}{Bibliography}{12}{chapter*.4}%
+\contentsline {section}{\numberline {2.2}Case Studies}{5}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Summary}{6}{subsection.2.2.1}%
+\contentsline {section}{\numberline {2.3}Locomotion}{6}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Inverse Kinematics}{7}{subsection.2.3.1}%
+\contentsline {subsubsection}{Usage of Inverse Kinematics}{8}{section*.3}%
+\contentsline {subsubsection}{Inverse Kinematics in Godot}{8}{section*.4}%
+\contentsline {section}{\numberline {2.4}Simulating Harm and Injury}{8}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Enemy AI}{8}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Behavior}{9}{subsection.2.5.1}%
+\contentsline {subsubsection}{Finite State Machine}{9}{section*.5}%
+\contentsline {subsubsection}{Behavior Trees}{9}{section*.6}%
+\contentsline {subsubsection}{any other ways to implement AI}{9}{section*.7}%
+\contentsline {subsubsection}{Behvaior Execution}{9}{section*.8}%
+\contentsline {subsubsection}{Behvaior Limiting}{9}{section*.9}%
+\contentsline {subsection}{\numberline {2.5.2}Pathfinding}{9}{subsection.2.5.2}%
+\contentsline {chapter}{\numberline {3}Injury System Design}{10}{chapter.3}%
+\contentsline {chapter}{\numberline {4}Implementation and Demonstration in Various Test Cases/Situations}{11}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Creating an Enemy Model}{11}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Inverse Kinematics in Godot}{11}{section.4.2}%
+\contentsline {chapter}{\numberline {5}User/Performance testing of the resulting implemented design}{12}{chapter.5}%
+\contentsline {chapter}{\numberline {6}Documentation and Publication}{13}{chapter.6}%
+\contentsline {chapter}{Bibliography}{14}{chapter*.10}%
 \ttl@starttoc {chapters@1}
 \contentsfinish 
