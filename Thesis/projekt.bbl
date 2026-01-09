@@ -1,5 +1,103 @@
 \makeatletter
 \makeatother
-\begin{thebibliography}{}
+\begin{thebibliography}{10}
+
+\bibitem{adams2012AdvancedGameDesign}
+{\sc\bgroup}Adams{\egroup}, E. and~{\sc\bgroup}Dormans{\egroup}, J.
+\newblock {\em Game Mechanics: Advanced Game Design}.
+\newblock New Riders, 2012.
+\newblock Voices That Matter Series.
+\newblock ISBN 9780321820273.
+
+\bibitem{Amir_XC}
+{\sc\bgroup}Amir{\egroup}, A.
+\newblock Xenoblade Chronicles X: Combat Guide.
+\newblock {\em Deltia's Gaming} online.
+\newblock 26. March 2025.
+\newblock Available at: ~{\small\url{https://deltiasgaming.com/xenoblade-chronicles-x-combat-guide/}}.
+\newblock [cit. 2026-01-08].
+
+\bibitem{Aristidou2018IKSurvey}
+{\sc\bgroup}Aristidou{\egroup}, A.; {\sc\bgroup}Lasenby{\egroup}, J.; {\sc\bgroup}Chrysanthou{\egroup}, Y. and~{\sc\bgroup}Shamir{\egroup}, A.
+\newblock Inverse kinematics techniques in computer graphics: A survey.
+\newblock {\em Comput. Graph. Forum} online.
+\newblock Wiley, September 2018, vol.~37, no.~6, p.~35--58.
+\newblock ISSN 0167-7055.
+\newblock Available at: ~{\small\url{https://doi.org/10.1111/cgf.13310}}.
+\newblock [cit. 2026-01-08].
+
+\bibitem{Bell_Fallout}
+{\sc\bgroup}Bell{\egroup}, A.
+\newblock A Beginner’s Guide to Combat in Fallout 4.
+\newblock {\em Videogamer} online.
+\newblock 17. November 2025.
+\newblock Available at: ~{\small\url{https://www.videogamer.com/guides/a-beginners-guide-to-combat-in-fallout-4/}}.
+\newblock [cit. 2026-01-08].
+
+\bibitem{Champandard_BTStarterKit}
+{\sc\bgroup}Champandard{\egroup}, A.~J. and~{\sc\bgroup}Dunstan{\egroup}, P.
+\newblock The Behavior Tree Starter Kit.
+\newblock In: {\sc\bgroup}Rabin{\egroup}, S.,  ed.~{\em Game AI Pro} online.
+\newblock 1st ed.
+\newblock CRC Press, September 2013.
+\newblock ISBN 9781466565975.
+\newblock Available at: ~{\small\url{https://www.gameaipro.com/GameAIPro/GameAIPro_Chapter06_The_Behavior_Tree_Starter_Kit.pdf}}.
+
+\bibitem{Ciupinski_locomotion}
+{\sc\bgroup}Ciupinski{\egroup}, J.
+\newblock Animation-Driven Locomotion with Locomotion Planning.
+\newblock In: {\sc\bgroup}Rabin{\egroup}, S.,  ed.~{\em Game AI Pro} online.
+\newblock 1st ed.
+\newblock CRC Press, September 2013.
+\newblock ISBN 9781466565975.
+\newblock Available at: ~{\small\url{http://www.gameaipro.com/GameAIPro/GameAIPro_Chapter25_Animation-Driven_Locomotion_with_Locomotion_Planning.pdf}}.
+
+\bibitem{Fay_DS}
+{\sc\bgroup}Fay{\egroup}, R.
+\newblock Dead Space Remake: Best Limbs To Cut Off Each Necromorph.
+\newblock {\em DualShockers} online.
+\newblock 1. February 2023.
+\newblock Available at: ~{\small\url{https://www.dualshockers.com/dead-space-remake-necromorph-weakness/}}.
+\newblock [cit. 2026-01-08].
+
+\bibitem{Gilliam_MHW}
+{\sc\bgroup}Gilliam{\egroup}, R.
+\newblock How to cut monster tails and fangs in Monster Hunter Wilds.
+\newblock {\em Polygon} online.
+\newblock 28. February 2025.
+\newblock Available at: ~{\small\url{https://www.polygon.com/monster-hunter-wilds-guide/528353/monster-tails-fangs-claws-horns-how-to-get-sever-cut-break/}}.
+\newblock [cit. 2026-01-08].
+
+\bibitem{Graham_FSMlight}
+{\sc\bgroup}Graham{\egroup}, D.
+\newblock A Reusable, Light-Weight Finite-State Machine.
+\newblock In: {\sc\bgroup}Rabin{\egroup}, S.,  ed.~{\em Game AI Pro 3} online.
+\newblock 1st ed.
+\newblock CRC Press, June 2017.
+\newblock ISBN 9781498742580.
+\newblock Available at: ~{\small\url{https://www.gameaipro.com/GameAIPro3/GameAIPro3_Chapter12_A_Reusable_Light-Weight_Finite-State_Machine.pdf}}.
+
+\bibitem{Parkin_HZD}
+{\sc\bgroup}Parkin{\egroup}, J.
+\newblock Horizon Zero Dawn guide: Murdering machines.
+\newblock {\em Polygon} online.
+\newblock 1. March 2017.
+\newblock Available at: ~{\small\url{https://www.polygon.com/horizon-zero-dawn-guide-walkthrough/21357205/machines-fight-rockbreaker-behemoth-thunderjaw-stormbird-deathbringer-tallneck-corrupted-cauldron/}}.
+\newblock [cit. 2026-01-08].
+
+\bibitem{schell2019art}
+{\sc\bgroup}Schell{\egroup}, J.
+\newblock {\em The Art of Game Design: A Book of Lenses}.
+\newblock CRC Press, Taylor \& Francis Group, 2019.
+\newblock Computer graphics / Game design.
+\newblock ISBN 9781138632097.
+
+\bibitem{Toms_PP}
+{\sc\bgroup}Toms{\egroup}, O.
+\newblock Phoenix Point Free Aim and Part Damage guide - how to use the Free Aiming system for more precise shots.
+\newblock {\em Rock Paper Shotgun} online.
+\newblock 3. December 2019.
+\newblock Available at: ~{\small\url{https://www.rockpapershotgun.com/phoenix-point-free-aim-and-part-damage-guide-how-to-use-the-free-aiming-system-for-more-precise-shots}}.
+\newblock [cit. 2026-01-08].
 
 \end{thebibliography}
