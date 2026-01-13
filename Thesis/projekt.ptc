@@ -1,22 +1,22 @@
 \babel@toc {english}{}\relax 
-\contentsline {chapter}{\numberline {1}Introduction}{3}{chapter.1}%
-\contentsline {chapter}{\numberline {2}Game Character Injury Systems and Animation}{4}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Game Design}{4}{section.2.1}%
-\contentsline {subsubsection}{Simulating Harm and Injury}{5}{section*.3}%
-\contentsline {section}{\numberline {2.2}Case Studies}{5}{section.2.2}%
-\contentsline {subsubsection}{Summary}{6}{section*.4}%
-\contentsline {section}{\numberline {2.3}Locomotion}{7}{section.2.3}%
-\contentsline {subsubsection}{Inverse Kinematics}{7}{section*.5}%
-\contentsline {subsubsection}{Usage of Inverse Kinematics}{8}{section*.6}%
+\contentsline {chapter}{\numberline {1}Introduction}{2}{chapter.1}%
+\contentsline {chapter}{\numberline {2}Game Character Injury Systems and Animation}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Game Design}{3}{section.2.1}%
+\contentsline {subsubsection}{Simulating Harm and Injury}{4}{section*.2}%
+\contentsline {section}{\numberline {2.2}Case Studies}{4}{section.2.2}%
+\contentsline {subsubsection}{Summary}{6}{section*.3}%
+\contentsline {section}{\numberline {2.3}Locomotion}{6}{section.2.3}%
+\contentsline {subsubsection}{Inverse Kinematics}{6}{section*.4}%
+\contentsline {subsubsection}{Usage of Inverse Kinematics}{7}{section*.5}%
 \contentsline {section}{\numberline {2.4}Enemy AI}{9}{section.2.4}%
 \contentsline {subsection}{\numberline {2.4.1}Finite State Machine}{9}{subsection.2.4.1}%
 \contentsline {subsection}{\numberline {2.4.2}Behavior Tree}{9}{subsection.2.4.2}%
-\contentsline {chapter}{\numberline {3}Injury System Design}{13}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Enemy Design}{13}{section.3.1}%
+\contentsline {chapter}{\numberline {3}Injury System Design}{12}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Enemy Design}{12}{section.3.1}%
 \contentsline {section}{\numberline {3.2}Enemy AI Based on Body Parts}{13}{section.3.2}%
 \contentsline {subsection}{\numberline {3.2.1}Behavior Execution}{13}{subsection.3.2.1}%
 \contentsline {subsection}{\numberline {3.2.2}Behavior Limiting}{13}{subsection.3.2.2}%
 \contentsline {section}{\numberline {3.3}UI Mockup}{13}{section.3.3}%
-\contentsline {chapter}{Bibliography}{14}{chapter*.7}%
+\contentsline {chapter}{Bibliography}{14}{chapter*.6}%
 \ttl@starttoc {chapters@1}
 \contentsfinish 

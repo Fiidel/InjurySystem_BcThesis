@@ -14,9 +14,9 @@ The goal of this thesis is the design and implementation of a dynamic injury sys
 
 % The Godot Engine was chosen for this project because 
 
-Chapter 2 explores existing injury systems from a design perspective and explains the basics of the mechanisms that will be used in the implementation of the final product, which include inverse kinematics (for character animation) and AI patterns (specifically the finite state machine and the behavior tree).
+Chapter \ref{chap:theory} explores existing injury systems from a design perspective and explains the basics of the mechanisms that are used in the implementation of the final product, which include inverse kinematics (for character animation) and AI patterns (specifically the finite state machine and the behavior tree).
 
-Chapter 3 details the design of the game demo. It explains the design of the enemy model, the subsystems necessary for implementing a cohesive enemy with a specialized injury system, and showcases mockups of the in-engine tools' user interface.
+Chapter \ref{chap:design} details the design of the game demo. It explains the design of the enemy model, the subsystems necessary for implementing a cohesive enemy with a specialized injury system, and showcases mockups of the in-engine tools' user interface.
 
 % @TODO ch4, ch5, etc.
 
@@ -25,67 +25,74 @@ Chapter 3 details the design of the game demo. It explains the design of the ene
 % ===================================================================
 
 \chapter{Game Character Injury Systems and Animation}
+\label{chap:theory}
 
-Combat and injury have been a part of human history even since prehistoric times. Physical conflict accompanies many stories, large-scale historical events, and even our modern times. It is then no wonder that games have used this theme in a myriad of ways. From mythical, heroic combat with swords and magic to competetive shooters, countless games had to contend with designing and implementing combat and injury systems.
+Combat and injury have been a part of human history even since prehistoric times. Physical conflict accompanies many stories, large-scale historical events, and even modern times. It is then no wonder that games have used this theme in a myriad of ways. From mythical, heroic combat with swords and magic to competetive shooters, countless games had to contend with designing and implementing combat and injury systems.
 
 Each game has its budget and own set of priorities based on their design. Sometimes, developers may decide to prioritize other parts of the game like visuals, story, and voice acting over the implementation of complex combat systems, opting for greater abstraction. The easiest systems are the ones that model characters as a singular entity with no subparts and a number representing hit points that determines its binary state -- alive or dead. However, other designs call for a more complex and varied experience.
 
-In this chapter, we will delve into the basics of game design and examine how other games have developed such systems. Next, we will look into the mechanisms constituting an advanced injury system of game characters -- systems of simulating harm and injury, locomotion, and enemy AI that reflects the injuries in its decision making.
+This chapter delves into the basics of game design and examines how other games have developed such systems. Next, it looks into the mechanisms constituting an advanced injury system of game characters -- systems of simulating harm and injury, locomotion, and enemy artificial intelligence (AI) that reflects the injuries in its decision making.
 
 \section{Game Design}
-Before diving into making a design for our game demo, we should familiarize ourselves with what game design is and what games themselves are defined by.
-
-\emph{Game design is the act of deciding what a game should be. Decisions about rules, look and feel, timing, pacing, risk-taking, rewards, punishments, and everything else the player experiences is the responsibility of the game designer} \cite{schell2019art}. Schell proposes a very player-centric definition -- \emph{anything} that the player experiences in the game is part of the game design. It is a fair, but broad explanation. We need a more low-level approach that we can focus on in practice.
+\emph{Game design is the act of deciding what a game should be. Decisions about rules, look and feel, timing, pacing, risk-taking, rewards, punishments, and everything else the player experiences is the responsibility of the game designer} \cite{schell2019art}. Schell proposes a very player-centric definition -- \emph{anything} that the player experiences in the game is part of the game design. It is a fair, but broad explanation. A lower level approach may be more useful in practice when creating a new design.
 
 Adams and Dormans argue that games are built on a set of rules that together define the play experience. There are a few principles to designing rulesets. Firstly, a game should have an extent of unpredictability (but not be too unpredictable nor a predetermined sequence of events). Secondly, the players' skill, strategic decisions, and knowledge of the games should make a difference. The longer the game, the more should skill contribute to victory. Thirdly, complex gameplay facilitated by many interactive parts and interweaving rules adds another layer of unpredictability and creates an opportunity for player skill and game knowledge to matter. The player is incentivized to learn to read and foresee the game state and understand the strategic complexities to make judgement calls based on these observations. Most games combine these three sources of creating engagement -- chance, player choices, and complex rules \cite{adams2012AdvancedGameDesign}.
 
-The goal of our game design is to create a more complex combat experience with less abstractions, where the player can make meaningful choices about where to attack an enemy to cripple its capabilities based on the body part harm. For example, a player that prefers melee combat might decide to target an enemy's wings first to make it lose its ability to fly to disable it from getting out of melee range.
-
-Let's dissect the game design from the perspective of the three sources of unpredictability that should make the game more engaging, as mentioned above. The element of chance comes from the enemy's AI which makes randomized decisions based on a decision-making pattern like a behavior tree. The player chooses which body parts to attack so that they can disable the enemy's abilities that require those parts to be triggered. The complexity comes from the way body parts serve as prerequisites for the enemy's abilities, such as two wings being necessary for flight, at least three limbs for walking, or a stinger tail for poison attacks, and the way they enable and limit what actions it has available in its behavior.
-
-We could also argue that depending on the implementation of the player controller, there are even more elements of player choice and rules complexity, such as the player maneuvering around the virtual space to avoid or close in on an enemy or any of the player's special abilities and attacks with various ranges, cooldowns, and effects. However, the player controller is a complex issue of its own. It is not covered by this thesis, but the player's experience is a crucial aspect of games and should be accounted for when discussing of game design.
-
-While assessing, designing, and implementing these features, the goal is also to develop in-engine tools that would make creating such enemies more streamlined in Godot.
+The game design in this thesis aims to create a more complex combat experience with less abstractions, where the player can make meaningful choices about where to attack an enemy to cripple its capabilities based on the body part harm. This is the lens through which later sections examine existing implementations in games. While assessing, designing, and implementing these features, the goal is also to develop in-engine tools that would make creating such enemies more streamlined in Godot.
 
 \subsubsection{Simulating Harm and Injury}
-The implementation of injury depends on how we choose to straddle the line between realism and abstraction for the sake of gameplay. One avenue would be to simulate the game character as a physics-based entity with detailed models of musculature and detection of injury precisely where a collision with a weapon happens, and disabling articulated movement that uses the muscles in those parts, etc. However, the goal of this thesis is not to create a perfectly realistic body simulation, but to provide a framework and streamline creating enemies with targetable body parts that serve as prerequisites for enemy abilities, and making it publically available to Godot users.
+The implementation of injury depends on where the design lands on the spectrum between realism and abstraction for the sake of gameplay. One avenue would be to simulate the game character as a physics-based entity with detailed models of musculature. Injury would be detected precisely where a collision with a weapon happens, and articulated movement that uses the muscles in those parts disabled. However, the goal of this thesis is not to create a perfectly realistic body simulation, but to provide a framework and streamline creating enemies with targetable body parts that serve as prerequisites for enemy abilities, and making it publically available to Godot users.
 
 % the problem with critical injuries and instant death -- should we aim to simulate injury realistically and allow instant death in cases of striking a critical body part like the head, or should we enforce a design decision and disallow instant death to preserve game balance?
 
 
 \section{Case Studies}
-In this section, we will examine the systems within games that implement a body part injury system and their approach to the design.
+This section examines the systems within games that implement a body part injury system and their approach to the design.
 
-In Horizon Zero Dawn and Horizon Forbidden West, components and armor plates can be removed with high tear damage weapons, which deals little to no damage, but reveals weak points or disables attacks \cite{Parkin_HZD}.
+In Horizon Zero Dawn and Horizon Forbidden West, components and armor plates can be removed with high tear damage weapons, which deals little to no damage, but reveals weak points or disables attacks\footnote{\url{https://www.polygon.com/horizon-zero-dawn-guide-walkthrough/21357205/machines-fight-rockbreaker-behemoth-thunderjaw-stormbird-deathbringer-tallneck-corrupted-cauldron/}}.
 
-In Monster Hunter Wilds, removing body parts is a core part of the experience, gathering them as loot or removing the monsters' dangerous abilities. Different weapon types (slashing, blunt, ranged) deal increased damage to specific enemies' body parts. For example, slashing weapons deal extra damage to tails, while blunt weapons can stun, making the enemy roll on the ground for a period of time \cite{Gilliam_MHW}.
+In Monster Hunter Wilds, removing body parts is a core part of the experience, gathering them as loot or removing the monsters' dangerous abilities. Different weapon types (slashing, blunt, ranged) deal increased damage to specific enemies' body parts. For example, slashing weapons deal extra damage to tails, while blunt weapons can stun, making the enemy roll on the ground for a period of time\footnote{\url{https://www.polygon.com/monster-hunter-wilds-guide/528353/monster-tails-fangs-claws-horns-how-to-get-sever-cut-break/}}.
 
-Dead Space has many enemies with weak spots, different for each enemy type. Attacking those parts can limit an enemy's attack or movement. Some enemies can have armor that protects their weak points, forcing the player to focus on another weak point or to change their position to access weak points hidden on the enemy's back. Enemies can also have weak points that are dangerous to the player, such as explosive sacks damaging the player when destroyed in close proximity, forcing another angle of strategy to the weak point system. The important aspect of this combat system is in how it enforces different strategies that the player needs to apply based on the enemy type's weak point effects \cite{Fay_DS}.
+Dead Space has many enemies with weak spots, different for each enemy type. Attacking those parts can limit an enemy's attack or movement. Some enemies can have armor that protects their weak points, forcing the player to focus on another weak point or to change their position to access weak points hidden on the enemy's back. Enemies can also have weak points that are dangerous to the player, such as explosive sacks damaging the player when destroyed in close proximity, forcing another angle of strategy to the weak point system. The important aspect of this combat system is in how it enforces different strategies that the player needs to apply based on the enemy type's weak point effects\footnote{\url{https://www.dualshockers.com/dead-space-remake-necromorph-weakness/}}.
 
-Fallout offers a slow-motion targeting system that allows players to target specific body parts. Each body part has its own chance of being hit, modified by distance and cover. The number of attacks a player can make is dependent on the player's action points and the weapon type. Body parts have a status that's separate from the target's overall health. A status bar can be worn down until empty, at which point the limb becomes crippled. Crippled limbs have effects like hindered movement, removing a robot's weaponized arm, or shooting an enemy's head (which in most cases kills them outright) \cite{Bell_Fallout}.
+Fallout offers a slow-motion targeting system that allows players to target specific body parts. Each body part has its own chance of being hit, modified by distance and cover. The number of attacks a player can make is dependent on the player's action points and the weapon type. Body parts have a status that's separate from the target's overall health. A status bar can be worn down until empty, at which point the limb becomes crippled. Crippled limbs have effects like hindered movement, removing a robot's weaponized arm, or shooting an enemy's head (which in most cases kills them outright)\footnote{\url{https://www.videogamer.com/guides/a-beginners-guide-to-combat-in-fallout-4/}}.
 
-In Xenoblade Chronicles X, the player can target appendages which have their own health pool, separate from the overall one. Destroying appendages disables certain attacks and lowers the enemy's defenses \cite{Amir_XC}.
+In Xenoblade Chronicles X, the player can target appendages which have their own health pool, separate from the overall one. Destroying appendages disables certain attacks and lowers the enemy's defenses\footnote{\url{https://deltiasgaming.com/xenoblade-chronicles-x-combat-guide/}}.
 
-Phoenix Point's "free aim" combat allows the player to hit specific body parts based on projectile collisions. Each body part has their independed values (like health) and features. Disabling parts has various effects, such as hindering mobility, disabling the enemy's main weapon, or triggering a bleeding effect. Each part also has a different armor value which reduces damage \cite{Toms_PP}.
+Phoenix Point's \q{free aim} combat allows the player to hit specific body parts based on projectile collisions. Each body part has their independed values (like health) and features. Disabling parts has various effects, such as hindering mobility, disabling the enemy's main weapon, or triggering a bleeding effect. Each part also has a different armor value which reduces damage\footnote{\url{https://www.rockpapershotgun.com/phoenix-point-free-aim-and-part-damage-guide-how-to-use-the-free-aiming-system-for-more-precise-shots}}.
+
+\addtocounter{footnote}{-3}
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{obrazky-figures/game_case_studies.png}
+    \caption{First row: Dead Space's necromorph enemies with harmable limbs highlighted red\protect\footnotemark. Second row, left to right: Fallout's V.A.T.S.\protect\footnotemark and Phoenix Point's free aim targeting\protect\footnotemark.}
+    \label{GameCaseStudies}
+\end{figure}
+
+\footnotetext[7]{Image taken from \url{https://vulkk.com/2023/02/03/dead-space-remake-combat-tips-how-to-defeat-each-type-of-necromorph/}.}
+
+\footnotetext[8]{Image taken from \url{https://www.thegamer.com/fallout-3-vats-bethesda-nearly-cut/}.}
+
+\footnotetext[9]{Image taken from \url{https://www.rockpapershotgun.com/phoenix-point-free-aim-and-part-damage-guide-how-to-use-the-free-aiming-system-for-more-precise-shots}.}
 
 \subsubsection{Summary}
 Body parts most often have a feature bound to them -- an ability (like a weapon attack), protection (armor that protects weak points or targetable body parts from being targeted), or mobility. Attacking such body parts hinders those features, e.g., slowing an enemy down or disabling an attack. Additionally, body parts may serve as weak points, granting the player an advantage when being hit in a particular way (like stunning enemies by hitting their heads with a blunt weapon in Monster Hunter Wilds).
 
 There are also variable values that modify the way limbs take damage, such as a hit chance (Fallout) or armor that reduces damage taken (Phoenix Point).
 
-In our design, we should also think about aiming for enemy variance that enforces different strategies to be employed by the player (like in Dead Space).
+The designs also aim for enemy variance that enforces different strategies to be employed by the player (like in Dead Space).
 
-We should also be mindful of not overwhelming the player. This can be solved by making combat systems more diegetic, meaning embedding mechanics into to the "narrative world" (the game world as perceived by the game characters). For example, whichever body part the player shoots, that part takes damage, as opposed to the player choosing from several invasive UI popups.
+Game designs should also be mindful of not overwhelming the player. This can be solved by making combat systems more diegetic, meaning embedding mechanics into to the \q{narrative world} (the game world as perceived by the game characters). For example, whichever body part the player shoots, that part takes damage, as opposed to the player choosing from several invasive UI popups.
 
 
 % \section{Godot}
 % @TODO I should probably talk about Godot too, at least an overview of what it is and what it can do/what it offers since I'll be working in it
-.
+
 
 \section{Locomotion}
-Locomotion is the problem of making game characters move. Often, it isn't a single system, but an intertwining of AI, gameplay, physics, and animation systems \cite{Ciupinski_locomotion}.
+Locomotion is the problem of making game characters move. Often, it is not a single system, but an intertwining of AI, gameplay, physics, and animation systems \cite{Ciupinski_locomotion}.
 
-This thesis concerns itself mainly with enemy AI and animation. Inverse kinematics is used to make simulated movement look more natural, allowing for end effectors, such as feet, to be placed dynamically based on things like raycast collisions with the terrain mesh (see adjusted foot height in figure \ref{TheWitcher3}). Inverse kinematics can also be used for attaching end effectors to the ground (preventing sliding walk animations), correctly aiming for the target (preventing awkward animations when reaching for an object or attacking with a bite is offset from the actual target due to its static animation), etc.
+This thesis concerns itself mainly with enemy AI and animation. Inverse kinematics is used to make simulated movement look more natural, allowing for end effectors, such as feet, to be placed dynamically based on things like raycast collisions with the terrain mesh (see adjusted foot height in Figure \ref{TheWitcher3}). Inverse kinematics can also be used for attaching end effectors to a point on the ground, correctly aiming for a target, etc. This can prevent awkward inconsistencies like sliding walk animations or animations when reaching for an object is offset from the actual target due to a static animation.
 
 The injury system has to be dynamic, adapting to whichever injuries are applied to the character's body. Hence procedural animation fits this goal of adaptibility well. Rather than traditional animation with preset model movements, procedural animation can account for and adapt to injuries on the run, and make for a more realistic and immersive interaction with the injured character.
 
@@ -93,7 +100,7 @@ The injury system has to be dynamic, adapting to whichever injuries are applied 
     \label{TheWitcher3}
     \centering
     \includegraphics[]{obrazky-figures/IK_FootPlacement_TheWitcher3.png}
-    \caption{Dynamic foot placement using inverse kinematics (The Witcher 3)}
+    \caption{Dynamic foot placement using inverse kinematics (The Witcher 3).}
 \end{figure}
 
 \subsubsection{Inverse Kinematics}
@@ -104,55 +111,57 @@ to mass, force or torque} \cite{Aristidou2018IKSurvey}. In short, it is about mo
 
 It had originally been used in robotics for moving arms to targets, but has also expanded into animation in computer graphics. In the latter field, it is very useful for animating \emph{articulated figures} (figures with a specific, solid form like humans, animals, and generally creatures with limbs). These models are often complicated, and require efficient calculation of complex and multi-link models that can have specified constraints (e.g., a maximum angle that a link can turn by). The multi-link models of articulated figures in inverse kinematics are calculated using the positions of the model's joints, known as \emph{end effectors} (often the end joints), their potential constraints, and the target positions to be reached \cite{Aristidou2018IKSurvey}.
 
-A \emph{model} is a series of \emph{links} connected by \emph{joints}. Joints are the main component allowing movement -- their positions determine the positions and orientations of the links. Links are the "connective tissue" between joints and are defined by their length, shape, volume, and mass. A \emph{posture} is the skeletal configuration of the figure and must most often satisfy constraints to adhere to realistic movement, such as the torque limitations of each joint or the links not intersecting with other models in their path. A skeletal configuration is usually separated into \emph{chains}, standalone parts attached to a static point on the model (e.g., the limbs of animals and anthropomorphs). The chains usually work in a hierarchy, and the movement of one joint affects the movement of the ones before it \cite{Aristidou2018IKSurvey}. The way the movements of joints affect each other is illustrated in figure \ref{IK_illustrations} -- the end effector tries to reach the red dot target in each case. The target is reachable in (b) and (c), while (d) showcases the attempt of the chain to reach an unreachable target. The specific way these links bend depends on the concrete inverse kinematics solver implementation.
+A \emph{model} is a series of \emph{links} connected by \emph{joints}. Joints are the main component allowing movement -- their positions determine the positions and orientations of the links. Links are the \q{connective tissue} between joints and are defined by their length, shape, volume, and mass. A \emph{posture} is the skeletal configuration of the figure and must most often satisfy constraints to adhere to realistic movement, such as the torque limitations of each joint or the links not intersecting with other models in their path. A skeletal configuration is usually separated into \emph{chains}, standalone parts attached to a static point on the model (e.g., the limbs of animals and anthropomorphs). The chains usually work in a hierarchy, and the movement of one joint affects the movement of the ones before it \cite{Aristidou2018IKSurvey}. An example model can be seen in Figure \ref{IK_model_example}. The way the movements of joints affect each other is illustrated in Figure \ref{IK_illustrations}. The target is reachable in (b) and (c), while (d) showcases the attempt of the chain to reach an unreachable target. The specific way these links bend depends on the concrete inverse kinematics solver implementation.
 
 \begin{figure}
     \label{IK_model_example}
     \centering
     \includegraphics[width=\textwidth]{obrazky-figures/IK_model_example.png}
-    \caption{An inverse kinematics \emph{model} (a skeleton rig of the game character that allows its mesh to be deformed to reach a target point using IK, consisting of \emph{chains} like the limbs, the tail, or the wings)}
+    \caption{An inverse kinematics \emph{model} -- a skeleton rig of the game character consisting of \emph{chains} like the limbs, the tail, or the wings.}
 \end{figure}
 
 \begin{figure}
     \label{IK_illustrations}
     \centering
     \includegraphics[width=\textwidth]{obrazky-figures/IK_illustrations.pdf}
-    \caption{Inverse kinematics chain description and bending examples showing two reachable and one unreachable target points}
+    \caption{An inverse kinematics chain description and examples of the chain bending so that the end effector reaches the red dot target, showing two reachable and one unreachable target point positions.}
 \end{figure}
 
 % \subsubsection{IK Solvers}
 % @TODO ?
 
 \subsubsection{Usage of Inverse Kinematics}
-Forward kinematics (traditional animation where known, predefined transformations are applied to the model) can fall short in situations where we might need to dynamically adjust the target locations, such as characters standing on slopes or an appandage reaching for a target that can be a variable distance or height away. The bending of the links (such as limbs) is dynamically calculated, making for more natural-looking and adaptive movement, which is a desirable trait for our dynamic body part injury system that needs to account for the injuries made.
+Forward kinematics (traditional animation where known, predefined transformations are applied to the model) can fall short in situations where dynamic adjustment of the target locations may be needed, such as characters standing on slopes or an appandage reaching for a target that can be a variable distance or height away. The bending of the links (such as limbs) is dynamically calculated, making for more natural-looking and adaptive movement, which is a desirable trait for our dynamic body part injury system that needs to account for the injuries made.
 
 %\subsubsection{Animation Blending in Godot}
 % @TODO
 % since this work is also about animation, add anim blending section?
 
+\newpage
 \section{Enemy AI}
-The enemy AI will require the solving of two main problems -- deciding and executing behavior, and pathfinding. The behavior also needs to be limited
-deciding on actions and movement; limiting options based on harm; procedural animation of actions
+The enemy AI requires the solving of two main problems -- deciding and executing behavior, and pathfinding.
 
 \subsection{Finite State Machine}
-One of the possible implementations of enemy AI is a finite state machine (FSM). FSMs are an architectural structurethat can encapsulate enemy behavior into separate states, such as \emph{Patrol} or \emph{Attack}. A central directing \emph{state machine} controls which state is active and allows for the state to be changed. The \emph{state} itself has the encapsulated behavior logic (e.g., a patroling enemy walking between two points) and the transition logic with methods like \texttt{OnEnter} and \texttt{OnExit} \cite{Graham_FSMlight}.
+One of the possible implementations of enemy AI is a finite state machine (FSM). FSMs are an architectural structure that can encapsulate enemy behavior into separate states, such as \emph{Patrol} or \emph{Attack}. A central directing \emph{state machine} controls which state is active and allows for the state to be changed. The \emph{state} itself has the encapsulated behavior logic (e.g., a patroling enemy walking between two points) and the transition logic like methods to be executed when entering or exiting a state \cite{Graham_FSMlight}. A simple FSM implementation is illustrated in Figure \ref{FSM_illustration}.
 
-\begin{figure}
+Finite state machines are a quick and easy implementation of enemy AI where the behavior can be separated into states and where there are clear transitions in each state. It can get convoluted if the transition requirements are complex -- in the most extreme cases, it would be FSMs where each state can transition to any other state.
+
+\begin{figure}[H]
     \label{FSM_illustration}
     \centering
     \includegraphics[width=\textwidth]{obrazky-figures/FSM_illustration.pdf}
-    \caption{An example of a finite state machine implementing a simple enemy AI}
+    \caption{An example of a finite state machine implementing a simple enemy AI.}
 \end{figure}
 
-Finite state machines are a quick and easy implementation of enemy AI where you can separate the behavior into states and where you have clear transitions in each state. It can get messy if the transition requirements are complex -- in the most extreme cases, it would be FSMs where each state can transition to any other state.
-
 \subsection{Behavior Tree}
-Another option for enemy AI implementation is the behavior tree (BT), a way to structure decision making logic into a more streamlined form. BTs follow the traditional node-based architecture of trees, but contains special node types that serve the node traversal and behavior logic. The most often used nodes are as follows.
+Another option for enemy AI implementation is the behavior tree (BT), a way to structure decision making logic into a more streamlined form. BTs follow the traditional node-based architecture of trees, but contain special node types that serve the node traversal and behavior logic. A sample BT and its traversal is illustrated in Figure \ref{BT_illustration}.
+
+The node type and implementation descriptions from this section are taken from \cite{Champandard_BTStarterKit}. The most commonly used nodes are as follows:
 \begin{itemize}
-    \item \emph{Behavior} is an abstract interface that can be activated, run, and deactivated, and passes back a \emph{return status} (explained below). The concrete implementations of this interface are \emph{actions} (accessing information and making changes to the world) and \emph{conditions} (a primary way of checking information from the world).
-    \item \emph{Sequences} can be thought of as sequential \texttt{AND} gates -- each of its children nodes are executed in order one after another, until all have executed successfully or until one of the children fails. Not only is this useful for chaining behavior, but also for setting up conditions on whether to execute this branch at all -- if a condition node is added as its first child, it must return \texttt{true} for the sequence to continue executing. 
-    \item \emph{Selectors} can be thought of as sequential \texttt{OR} gates or fallbacks. It executes its children in order until one returns \texttt{SUCCESS} or \texttt{RUNNING}. If a child fails, the next one is its "fallback" behavior.
-    \item \emph{Parellels} execute all of their child nodes simultaneously. It is important to clearly define these nodes' return states (e.g., returns \texttt{SUCCESS} only if all of the child nodes succeed). When exiting, the termination of all child nodes must also be handled cleanly (although in some cases, like animations and sound effects, we may want to delay the child's terminatation to after it has finished its action).
+    \item \emph{Behavior} is an abstract interface that can be activated, run, and deactivated, and passes back a \emph{return status}. The concrete implementations of this interface are \emph{actions} (accessing information and making changes to the world) and \emph{conditions} (a primary way of checking information from the world).
+    \item \emph{Sequences} can be thought of as sequential \texttt{AND} gates -- each of their children nodes are executed in order one after another, until all have executed successfully or until one of the children fails. Not only is this useful for chaining behavior, but also for setting up conditions for whether to execute this branch at all -- if a condition node is added as its first child, it must return \texttt{true} for the sequence to continue executing. 
+    \item \emph{Selectors} can be thought of as sequential \texttt{OR} gates or fallbacks. It executes its children in order until one returns \texttt{SUCCESS} or \texttt{RUNNING}. If a child fails, the next one is its \q{fallback} behavior.
+    \item \emph{Parallels} execute all of their child nodes simultaneously. It is important to clearly define these nodes' return states (e.g., returns \texttt{SUCCESS} only if all of the child nodes succeed). When exiting, the termination of all child nodes must also be handled cleanly (although in some cases, like animations and sound effects, a delay in the child's terminatation to after it has finished its action may be desired).
 \end{itemize}
 
 \emph{Return statuses} are crucial for tree traversal. Most often, behavior nodes return whether they completed their run as expected or not, or that they're still running -- \texttt{SUCCESS}, \texttt{RUNNING}, or \texttt{FAILURE}. However, BTs can also leverage the return status for more efficient implementations, such as the \texttt{SUSPENDED} status code in event-driven BTs.
@@ -168,15 +177,11 @@ This basic BT implementation can then be extended by more specialized nodes.
 It is useful to have a \texttt{BehaviorTree} object that is built by a \texttt{BehaviorTreeBuilder}. This will serve as the central point for storing and updating the tree.
 The BT has an \texttt{update} method which performs the traversal of the tree and is the entry point of the BT. It is called whenever an update is needed, though it need not be every game frame -- every other frame or 5 frames per second can suffice (to lighten or spread out the processing load). For a more efficient approach, an event-based node traversal implementation is possible where a central scheduler manages the traversal using the observer pattern.
 
-The behavior tree node types and the description of the implementation from this section were taken from \cite{Champandard_BTStarterKit}.
-
-To illustrate the traversal of a BT, we will traverse the example tree in figure \ref{BT_illustration}. We will examine a situation where a player is not seen and the enemy should patrol. The \texttt{GuardBaseDecision} seletor enters its first child -- \texttt{AttackPlayer}. As a sequence, this node has to run all of its children in order to succeed. The tree enters the \texttt{IsPlayerSpotted?} condition. Because the player is not seen in this case, it returns \texttt{false} and thus the whole sequence returns the \texttt{FAILURE} return state. The \texttt{GuardBaseDecision} selector then enters its next child (the fallback), which is a parallel node with two action children. The enemy then simultaneously starts executing both the \texttt{WalkPatrolRoute} and the \texttt{LookAroundRandomly} actions.
-
-\begin{figure}
+\begin{figure}[H]
     \label{BT_illustration}
     \centering
     \includegraphics[width=\textwidth]{obrazky-figures/BT_illustration.pdf}
-    \caption{An example of an enemy AI behavior tree}
+    \caption{An example of an enemy AI behavior tree. A possible traversal in a situation where the player is not seen would go as described: The \texttt{GuardBaseDecision} seletor enters \texttt{AttackPlayer} (its first child). As a sequence, this node has to run all of its children in order to succeed. The \texttt{IsPlayerSpotted?} condition is false, and thus the whole sequence returns the \texttt{FAILURE} return state. The \texttt{GuardBaseDecision} selector then enters its next child (the fallback), which is a parallel node with two action children. The \texttt{WalkPatrolRoute} and the \texttt{LookAroundRandomly} actions start simultaneously executing.}
 \end{figure}
 
 % \subsection{Utility}
@@ -192,7 +197,16 @@ To illustrate the traversal of a BT, we will traverse the example tree in figure
 % ===================================================================
 
 \chapter{Injury System Design}
+\label{chap:design}
 Navrhněte uživatelské rozhraní a výslednou funkcionalitu aplikace, která demonstruje pokročilé reakce herní postavy na zranění.
+
+
+The player should be able to make meaningful choices that have a real impact on what happens next \cite{schell2019art}. For example, a player that prefers melee combat might target an enemy's wings to prevent it from flying and getting out of melee range.
+
+The game should combine the three sources of unpredictability mentioned in Chapter \ref{chap:theory} to make it more engaging to players. The element of chance comes from the enemy's AI which makes randomized decisions based on a decision-making pattern like a behavior tree. The player chooses which body parts to attack so that they can disable the enemy's abilities that require those parts to be triggered. The complexity comes from the way body parts serve as prerequisites for the enemy's abilities, such as two wings being necessary for flight, at least three limbs for walking, or a stinger tail for poison attacks, and the way they enable and limit what actions it has available in its behavior.
+
+Depending on the implementation of the player controller, there are even more elements of player choice and rules complexity. Such cases could include the player maneuvering around the virtual space to avoid or close in on an enemy, or any of the player's special abilities and attacks with various cooldowns and effects. However, the player controller is a complex issue of its own. It is not covered by this thesis, but the player's experience is a crucial aspect of games and should be accounted for when discussing game design.
+
 
 Design justified by design principles (books).
 
@@ -206,14 +220,24 @@ losing a body part needs to have a gameplay effect (quote games)
 \section{Enemy Design}
 4 limbs, wings, tail -- targetable body parts
 
+a skeleton rig that allows its mesh to be deformed to reach a target point using IK
+
 \section{Enemy AI Based on Body Parts}
 \subsection{Behavior Execution}
-what pattern to use when simulating the behavior? something that will change states like "Fly Up", "Descend", "Rake with Claws", but what will take care of the actual behavior? And what is the central brain that manages the state?
+what pattern to use when simulating the behavior? something that will change states like \q{Fly Up}, \q{Descend}, \q{Rake with Claws}, but what will take care of the actual behavior? And what is the central brain that manages the state?
 
 chosen Behavior Tree
 
 \subsection{Behavior Limiting}
 patterns to check for available actions? how to limit effectively what the Behavior Tree (or the chosen way to implement behavior) has access to? so that when the random value in the weighted network is generated, so that it doesn't try to execute a branch that cannot be executed due to missing links
+
+The behavior also needs to be limited
+
+deciding on actions and movement;
+
+limiting options based on harm;
+
+procedural animation of actions
 
 
 \section{UI Mockup}
