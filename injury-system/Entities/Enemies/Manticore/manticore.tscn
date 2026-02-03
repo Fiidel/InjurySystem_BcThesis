@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://7busd4k4r3ee"]
 
 [ext_resource type="PackedScene" uid="uid://oweoqvhvucdp" path="res://Entities/Enemies/Manticore/ManticoreModel.tscn" id="1_q1kcb"]
+[ext_resource type="Script" uid="uid://cj8oqqrn3x07e" path="res://Entities/Enemies/Manticore/bt_manticore.gd" id="2_843wh"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_843wh"]
 radius = 0.4
@@ -13,5 +14,8 @@ transform = Transform3D(1, 0, 0, 0, -0.002705257, -0.99999636, 0, 0.99999636, -0
 shape = SubResource("CapsuleShape3D_843wh")
 
 [node name="ManticoreModel" parent="." unique_id=928091982 instance=ExtResource("1_q1kcb")]
+
+[node name="BT" type="Node" parent="." unique_id=71581397]
+script = ExtResource("2_843wh")
 
 [editable path="ManticoreModel"]
