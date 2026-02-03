@@ -1,32 +1,59 @@
-[gd_scene load_steps=5 format=3 uid="uid://b3fjuvv488qok"]
+[gd_scene format=3 uid="uid://b3fjuvv488qok"]
 
-[ext_resource type="PackedScene" uid="uid://oweoqvhvucdp" path="res://Entities/Enemies/Manticore/manticore.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://bja4qnnjwtn7p" path="res://Stages/Environments/Plateau.tscn" id="1_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://7busd4k4r3ee" path="res://Entities/Enemies/Manticore/Manticore.tscn" id="2_h2yge"]
+
+[sub_resource type="Sky" id="Sky_0xm2m"]
 
 [sub_resource type="Environment" id="Environment_ig7tw"]
-ambient_light_color = Color(1, 1, 1, 1)
+background_mode = 2
+sky = SubResource("Sky_0xm2m")
+ambient_light_color = Color(0.8491881, 0.7965733, 0.5508114, 1)
+ambient_light_sky_contribution = 0.7
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_0xm2m"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_h2yge"]
 size = Vector3(100, 0.1, 100)
 
-[node name="Node3D" type="Node3D"]
+[sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
+size = Vector3(5, 1.46, 25)
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(-0.2885961, -0.024680885, -0.9571328, -0.011357648, 0.9996856, -0.02235359, 0.9573836, 0.004419619, -0.2887857, -9.510733, 1.8287139, 3.6768408)
+[sub_resource type="BoxShape3D" id="BoxShape3D_0xm2m"]
+size = Vector3(5, 1.46, 25)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="Node3D" type="Node3D" unique_id=626739966]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1150494319]
+transform = Transform3D(-0.030659296, -0.022692671, -0.9992723, -0.011357649, 0.99968565, -0.022353588, 0.99946535, 0.010664038, -0.030907394, 22.342272, 83.20275, 24.953762)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=480537609]
 environment = SubResource("Environment_ig7tw")
 
-[node name="OmniLight3D" type="OmniLight3D" parent="."]
-transform = Transform3D(0.99711937, 0.07584889, 0, -0.07584889, 0.99711937, 0, 0, 0, 1, 9.24181, 9.090382, 6.3265133)
-omni_range = 50.0
-
-[node name="manticore" parent="." instance=ExtResource("1_ig7tw")]
-
-[node name="StaticBody3D" type="StaticBody3D" parent="."]
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=497145296]
 physics_material_override = SubResource("PhysicsMaterial_0xm2m")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=756669252]
 shape = SubResource("BoxShape3D_h2yge")
 debug_color = Color(0, 0.6597583, 0.76674175, 1)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=345370510]
+transform = Transform3D(1, 0, 0, 0, 0.8654139, 0.5010577, 0, -0.5010577, 0.8654139, 0, 149.84317, 0)
+
+[node name="Plateau" parent="." unique_id=1765579111 instance=ExtResource("1_0xm2m")]
+
+[node name="Manticore" parent="." unique_id=1224527632 instance=ExtResource("2_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.36542, 79.61208, 12.1189785)
+floor_stop_on_slope = false
+floor_max_angle = 2.3561945
+floor_snap_length = 1.0
+
+[node name="StaticBody3D2" type="StaticBody3D" parent="." unique_id=703926303]
+
+[node name="CSGMesh3D" type="CSGMesh3D" parent="StaticBody3D2" unique_id=1326918348]
+transform = Transform3D(1, 0, 0, 0, 0.9778601, 0.20926021, 0, -0.20926021, 0.9778601, 34.813354, 79.737625, 24.781767)
+mesh = SubResource("BoxMesh_0xm2m")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D2" unique_id=1621310139]
+transform = Transform3D(1, 0, 0, 0, 0.9778601, 0.20926021, 0, -0.20926021, 0.9778601, 34.813354, 79.737625, 24.781767)
+shape = SubResource("BoxShape3D_0xm2m")

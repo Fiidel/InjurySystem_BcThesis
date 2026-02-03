@@ -34,9 +34,22 @@ animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
-materials/extract=0
+materials/extract=1
 materials/extract_format=0
-materials/extract_path=""
-_subresources={}
+materials/extract_path="res://Entities/Enemies/Manticore/Model"
+_subresources={
+"materials": {
+"Body": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://Entities/Enemies/Manticore/Model/Body.tres",
+"use_external/path": "uid://cjd8tems2yhu5"
+},
+"Details": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://Entities/Enemies/Manticore/Model/Details.tres",
+"use_external/path": "uid://dnabdcnhrn7oy"
+}
+}
+}
 gltf/naming_version=2
 gltf/embedded_image_handling=1

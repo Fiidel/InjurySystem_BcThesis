@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dnabdcnhrn7oy"]
+
+[ext_resource type="Texture2D" uid="uid://borgh7ck7xijr" path="res://Entities/Enemies/Manticore/Model/manticore_tongue eyes.png" id="1_fr6ta"]
+
+[resource]
+resource_name = "Details"
+cull_mode = 2
+albedo_texture = ExtResource("1_fr6ta")
+metallic = 1.0

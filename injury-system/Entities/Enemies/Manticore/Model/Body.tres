@@ -1,0 +1,12 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cjd8tems2yhu5"]
+
+[ext_resource type="Texture2D" uid="uid://d0nasvsi56vxd" path="res://Entities/Enemies/Manticore/Model/manticore_Material Layer.png" id="1_genc4"]
+[ext_resource type="Texture2D" uid="uid://b1o3s2b83rk7d" path="res://Entities/Enemies/Manticore/Model/manticore_Manticore_Normal.png" id="2_ogx7n"]
+
+[resource]
+resource_name = "Body"
+cull_mode = 2
+albedo_texture = ExtResource("1_genc4")
+metallic = 1.0
+normal_enabled = true
+normal_texture = ExtResource("2_ogx7n")
