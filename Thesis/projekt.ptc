@@ -11,12 +11,14 @@
 \contentsline {section}{\numberline {2.4}Enemy AI}{9}{section.2.4}%
 \contentsline {subsection}{\numberline {2.4.1}Finite State Machine}{9}{subsection.2.4.1}%
 \contentsline {subsection}{\numberline {2.4.2}Behavior Tree}{9}{subsection.2.4.2}%
-\contentsline {chapter}{\numberline {3}Injury System Design}{12}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Enemy Design}{12}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Enemy AI Based on Body Parts}{13}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}Behavior Execution}{13}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}Behavior Limiting}{13}{subsection.3.2.2}%
-\contentsline {section}{\numberline {3.3}UI Mockup}{13}{section.3.3}%
-\contentsline {chapter}{Bibliography}{14}{chapter*.6}%
+\contentsline {subsection}{\numberline {2.4.3}Utility}{11}{subsection.2.4.3}%
+\contentsline {section}{\numberline {2.5}Pathfinding and Navigation}{12}{section.2.5}%
+\contentsline {chapter}{\numberline {3}Injury System Design}{13}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Enemy Design}{13}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Enemy AI Based on Body Parts}{14}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Behavior Execution}{14}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Behavior Limiting}{14}{subsection.3.2.2}%
+\contentsline {section}{\numberline {3.3}UI Mockup}{14}{section.3.3}%
+\contentsline {chapter}{Bibliography}{15}{chapter*.6}%
 \ttl@starttoc {chapters@1}
 \contentsfinish 

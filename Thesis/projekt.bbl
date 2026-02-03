@@ -18,24 +18,6 @@
 \newblock Available at: ~{\small\url{https://doi.org/10.1111/cgf.13310}}.
 \newblock [cit. 2026-01-08].
 
-\bibitem{Champandard_BTStarterKit}
-{\sc\bgroup}Champandard{\egroup}, A.~J. and~{\sc\bgroup}Dunstan{\egroup}, P.
-\newblock The Behavior Tree Starter Kit.
-\newblock In: {\sc\bgroup}Rabin{\egroup}, S.,  ed.~{\em Game AI Pro} online.
-\newblock 1st ed.
-\newblock CRC Press, September 2013.
-\newblock ISBN 9781466565975.
-\newblock Available at: ~{\small\url{https://www.gameaipro.com/GameAIPro/GameAIPro_Chapter06_The_Behavior_Tree_Starter_Kit.pdf}}.
-
-\bibitem{Ciupinski_locomotion}
-{\sc\bgroup}Ciupinski{\egroup}, J.
-\newblock Animation-Driven Locomotion with Locomotion Planning.
-\newblock In: {\sc\bgroup}Rabin{\egroup}, S.,  ed.~{\em Game AI Pro} online.
-\newblock 1st ed.
-\newblock CRC Press, September 2013.
-\newblock ISBN 9781466565975.
-\newblock Available at: ~{\small\url{http://www.gameaipro.com/GameAIPro/GameAIPro_Chapter25_Animation-Driven_Locomotion_with_Locomotion_Planning.pdf}}.
-
 \bibitem{Graham_FSMlight}
 {\sc\bgroup}Graham{\egroup}, D.
 \newblock A Reusable, Light-Weight Finite-State Machine.
@@ -45,11 +27,26 @@
 \newblock ISBN 9781498742580.
 \newblock Available at: ~{\small\url{https://www.gameaipro.com/GameAIPro3/GameAIPro3_Chapter12_A_Reusable_Light-Weight_Finite-State_Machine.pdf}}.
 
+\bibitem{GameAIPro1}
+{\sc\bgroup}Rabin{\egroup}, S.
+\newblock {\em Game AI Pro: Collected Wisdom of Game AI Professionals} online.
+\newblock 1st ed.
+\newblock CRC Press, 2013.
+\newblock ISBN 9781466565975.
+\newblock Available at: ~{\small\url{https://www.gameaipro.com}}.
+
 \bibitem{schell2019art}
 {\sc\bgroup}Schell{\egroup}, J.
 \newblock {\em The Art of Game Design: A Book of Lenses}.
 \newblock CRC Press, Taylor \& Francis Group, 2019.
 \newblock Computer graphics / Game design.
 \newblock ISBN 9781138632097.
+
+\bibitem{navmesh}
+{\sc\bgroup}Toll{\egroup}, W. van; {\sc\bgroup}Triesscheijn{\egroup}, R.; {\sc\bgroup}Kallmann{\egroup}, M.; {\sc\bgroup}Oliva{\egroup}, R.; {\sc\bgroup}Pelechano{\egroup}, N. et~al.
+\newblock A comparative study of navigation meshes.
+\newblock In:~{\em Proceedings of the 9th International Conference on Motion in Games} online.
+\newblock New York, NY, USA: ACM, 2016, p.~91--100.
+\newblock Available at: ~{\small\url{https://inria.hal.science/hal-01392267/file/comparative_study_of_navigation_meshes_main.pdf}}.
 
 \end{thebibliography}

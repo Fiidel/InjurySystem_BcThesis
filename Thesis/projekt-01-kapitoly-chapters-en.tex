@@ -90,7 +90,7 @@ Game designs should also be mindful of not overwhelming the player. This can be 
 
 
 \section{Locomotion}
-Locomotion is the problem of making game characters move. Often, it is not a single system, but an intertwining of AI, gameplay, physics, and animation systems \cite{Ciupinski_locomotion}.
+Locomotion is the problem of making game characters move. Often, it is not a single system, but an intertwining of AI, gameplay, physics, and animation systems \cite[Chapter~25]{GameAIPro1}.
 
 This thesis concerns itself mainly with enemy AI and animation. Inverse kinematics is used to make simulated movement look more natural, allowing for end effectors, such as feet, to be placed dynamically based on things like raycast collisions with the terrain mesh (see adjusted foot height in Figure \ref{TheWitcher3}). Inverse kinematics can also be used for attaching end effectors to a point on the ground, correctly aiming for a target, etc. This can prevent awkward inconsistencies like sliding walk animations or animations when reaching for an object is offset from the actual target due to a static animation.
 
@@ -139,7 +139,7 @@ Forward kinematics (traditional animation where known, predefined transformation
 
 \newpage
 \section{Enemy AI}
-The enemy AI requires the solving of two main problems -- deciding and executing behavior, and pathfinding.
+There are many ways to implement decision making in games. This section explains finite state machines, behavior trees, and utility theory.
 
 \subsection{Finite State Machine}
 One of the possible implementations of enemy AI is a finite state machine (FSM). FSMs are an architectural structure that can encapsulate enemy behavior into separate states, such as \emph{Patrol} or \emph{Attack}. A central directing \emph{state machine} controls which state is active and allows for the state to be changed. The \emph{state} itself has the encapsulated behavior logic (e.g., a patroling enemy walking between two points) and the transition logic like methods to be executed when entering or exiting a state \cite{Graham_FSMlight}. A simple FSM implementation is illustrated in Figure \ref{FSM_illustration}.
@@ -156,7 +156,7 @@ Finite state machines are a quick and easy implementation of enemy AI where the 
 \subsection{Behavior Tree}
 Another option for enemy AI implementation is the behavior tree (BT), a way to structure decision making logic into a more streamlined form. BTs follow the traditional node-based architecture of trees, but contain special node types that serve the node traversal and behavior logic. A sample BT and its traversal is illustrated in Figure \ref{BT_illustration}.
 
-The node type and implementation descriptions from this section are taken from \cite{Champandard_BTStarterKit}. The most commonly used nodes are as follows:
+The node type and implementation descriptions from this section are taken from \cite[Chapter~6]{GameAIPro1}. The most commonly used nodes are as follows:
 \begin{itemize}
     \item \emph{Behavior} is an abstract interface that can be activated, run, and deactivated, and passes back a \emph{return status}. The concrete implementations of this interface are \emph{actions} (accessing information and making changes to the world) and \emph{conditions} (a primary way of checking information from the world).
     \item \emph{Sequences} can be thought of as sequential \texttt{AND} gates -- each of their children nodes are executed in order one after another, until all have executed successfully or until one of the children fails. Not only is this useful for chaining behavior, but also for setting up conditions for whether to execute this branch at all -- if a condition node is added as its first child, it must return \texttt{true} for the sequence to continue executing. 
@@ -184,13 +184,22 @@ The BT has an \texttt{update} method which performs the traversal of the tree an
     \caption{An example of an enemy AI behavior tree. A possible traversal in a situation where the player is not seen would go as described: The \texttt{GuardBaseDecision} seletor enters \texttt{AttackPlayer} (its first child). As a sequence, this node has to run all of its children in order to succeed. The \texttt{IsPlayerSpotted?} condition is false, and thus the whole sequence returns the \texttt{FAILURE} return state. The \texttt{GuardBaseDecision} selector then enters its next child (the fallback), which is a parallel node with two action children. The \texttt{WalkPatrolRoute} and the \texttt{LookAroundRandomly} actions start simultaneously executing.}
 \end{figure}
 
-% \subsection{Utility}
-% Utility calculations
-% @TODO later down the line when implementing
+\subsection{Utility}
+Utility theory in enemy AI design refers to the evaluation of \emph{utility} across multiple choices. Utility is the usefulness of the choice within the given context. The AI calculates a utility score for each action, and the action with the highest score is then chosen. The calculation of utility can be simple if the decision factors are comparable, like only taking into account a price of the same item from two sellers. However, more complex situation require the conversion and revaluation of values from one context to another, unified context. Utility scores should also be consistent and on the same scale, as they are directly compared to each other. Normalized utility scores are a good baseline for consistency \cite[Chapter~9]{GameAIPro1}.
 
-% \subsection{Pathfinding and Navigation}
-% Navmesh
+Utility calculations can also be integrated into behavior tree traversal. The behavior tree implementation can be extended by a \emph{utility selector} node. It first queries its children for a utility score, and then decides which child to enter based on that score. For an AI aimed towards optimal decision making, the child with the highest score would be picked. Alternatively, the choice could be randomized, but still weighted towards the higher scored children \cite[Chapter~10]{GameAIPro1}.
 
+
+\section{Pathfinding and Navigation}
+A virtual environment can be sectioned into connected areas to map where a game character can move. The aggregation of these areas and how they are connected is known as a \emph{navigation mesh}, and it allows agents to plan paths to reach a point in the environment. Even if the virtual environment is 3D, characters are usually constrained to surfaces flat enough to walk on. Each character needs to calculate a suitable geometric route through the areas that avoids collisions with objects \cite{navmesh}. A 3D navigation mesh of an environment consisting of two platforms and a walkable ramp is showcased in Figure \ref{navmesh_example}.
+
+\begin{figure}[H]
+    \label{navmesh_example}
+    \centering
+    \includegraphics[width=\textwidth]{obrazky-figures/navmesh_example.png}
+    \caption{The visualized polygons of a 3D navigation mesh\protect\footnotemark.}
+\end{figure}
+\footnotetext{Image taken from \url{https://docs.godotengine.org/en/latest/tutorials/navigation/navigation_using_navigationmeshes.html}.}
 
 % ===================================================================
 % ===================================================================
