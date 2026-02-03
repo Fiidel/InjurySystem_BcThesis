@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://7busd4k4r3ee"]
 
-[ext_resource type="Script" uid="uid://g31ec3xx3v4r" path="res://Entities/Enemies/Manticore/manticore.gd" id="1_843wh"]
 [ext_resource type="PackedScene" uid="uid://oweoqvhvucdp" path="res://Entities/Enemies/Manticore/ManticoreModel.tscn" id="1_q1kcb"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_843wh"]
@@ -8,7 +7,6 @@ radius = 0.4
 height = 2.2
 
 [node name="Manticore" type="CharacterBody3D" unique_id=1310202999]
-script = ExtResource("1_843wh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1068089642]
 transform = Transform3D(1, 0, 0, 0, -0.002705257, -0.99999636, 0, 0.99999636, -0.002705257, 0, 0.4, -0.077)
