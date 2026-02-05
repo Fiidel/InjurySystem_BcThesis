@@ -45,7 +45,7 @@ func setup_ik():
 		push_error("Parent is not a IKController")
 		return
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if not is_initialized:
 		return
 	

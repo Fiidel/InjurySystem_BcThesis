@@ -15,6 +15,7 @@ var child_nodes: Array[BTNode] = []
 
 func add_bt_child(node: BTNode) -> void:
 	child_nodes.append(node)
+	add_child(node)
 
 func remove_bt_child(node: BTNode) -> void:
 	var index: int = child_nodes.find(node)

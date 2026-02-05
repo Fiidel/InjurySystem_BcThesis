@@ -1,17 +1,23 @@
 class_name BTRoot
 extends BTNode
 
+var current_child_idx: int = 0
+
 func _ready() -> void:
+	for child in child_nodes:
+		child.finished.connect(_on_child_finished)
 	# initialize blackboard
 	blackboard = {}
-	# add children to scene tree
-	for child in child_nodes:
-		add_child(child)
 
 func execute() -> void:
-	while true:
-		for child in child_nodes:
-			child.execute()
-			await child.finished
-	# Root node should never stop while the Behavior Tree is active
-	finished.emit(ReturnStatus.FAILURE)
+	# Execute first child
+	current_child_idx = 0
+	child_nodes[current_child_idx].execute()
+	current_child_idx += 1
+
+func _on_child_finished(return_status: ReturnStatus) -> void:
+	# keep executing children infinitely
+	if current_child_idx == len(child_nodes):
+		current_child_idx = 0
+	child_nodes[current_child_idx].execute()
+	current_child_idx += 1
