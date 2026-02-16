@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://c5hswb3bqmoxd"]
+
+[ext_resource type="Script" uid="uid://q7hkaxovgbj0" path="res://Entities/Player/player.gd" id="1_mv1ah"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
+radius = 0.4
+height = 1.5
+
+[node name="Player" type="CharacterBody3D" unique_id=1339924766]
+script = ExtResource("1_mv1ah")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=310288960]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+shape = SubResource("CapsuleShape3D_0xm2m")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=863646441]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+
+[node name="AbilityUI" type="CanvasLayer" parent="." unique_id=1909721364]
+
+[node name="PanelContainer" type="PanelContainer" parent="AbilityUI" unique_id=600822319]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -91.75
+offset_top = -64.0
+offset_right = 91.75
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="AbilityLabel" type="Label" parent="AbilityUI/PanelContainer" unique_id=747298207]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Ability"
+horizontal_alignment = 1

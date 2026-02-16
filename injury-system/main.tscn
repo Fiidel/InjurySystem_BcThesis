@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://bja4qnnjwtn7p" path="res://Stages/Environments/Plateau.tscn" id="1_0xm2m"]
 [ext_resource type="PackedScene" uid="uid://7busd4k4r3ee" path="res://Entities/Enemies/Manticore/Manticore.tscn" id="2_h2yge"]
-[ext_resource type="Script" uid="uid://q7hkaxovgbj0" path="res://Entities/Player/player.gd" id="3_h2yge"]
+[ext_resource type="PackedScene" uid="uid://c5hswb3bqmoxd" path="res://Entities/Player/player.tscn" id="3_h2yge"]
 
 [sub_resource type="Sky" id="Sky_0xm2m"]
 
@@ -22,10 +22,6 @@ size = Vector3(5, 1.46, 25)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_0xm2m"]
 size = Vector3(5, 1.46, 25)
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
-radius = 0.4
-height = 1.5
 
 [node name="Node3D" type="Node3D" unique_id=626739966]
 
@@ -60,13 +56,5 @@ mesh = SubResource("BoxMesh_0xm2m")
 transform = Transform3D(1, 0, 0, 0, 0.9778601, 0.20926021, 0, -0.20926021, 0.9778601, 34.813354, 79.737625, 24.781767)
 shape = SubResource("BoxShape3D_0xm2m")
 
-[node name="Player" type="CharacterBody3D" parent="." unique_id=708859689]
+[node name="Player" parent="." unique_id=1339924766 instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 81.02006, 0)
-script = ExtResource("3_h2yge")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Player" unique_id=1766435321]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
-shape = SubResource("CapsuleShape3D_0xm2m")
-
-[node name="Camera3D" type="Camera3D" parent="Player" unique_id=1150494319]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
