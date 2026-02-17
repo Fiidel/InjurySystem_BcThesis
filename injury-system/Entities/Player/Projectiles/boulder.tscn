@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://c6vo1skq0umfj"]
+
+[ext_resource type="PackedScene" uid="uid://b5k0h3m8npi41" path="res://Entities/Player/Projectiles/boulder.glb" id="1_113bm"]
+[ext_resource type="Script" uid="uid://d0y3cjmkqy645" path="res://Entities/Player/Projectiles/projectile.gd" id="2_l55lv"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_l55lv"]
+radius = 0.25
+
+[node name="boulder" unique_id=1649867148 instance=ExtResource("1_113bm")]
+script = ExtResource("2_l55lv")
+speed = 12.0
+is_affected_by_gravity = true
+
+[node name="Area3D" type="Area3D" parent="." index="1" unique_id=2040654682]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" index="0" unique_id=2014174311]
+shape = SubResource("SphereShape3D_l55lv")

@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cj7dw47a2y8gt"]
+
+[ext_resource type="PackedScene" uid="uid://dfkkmmrw7iipb" path="res://Entities/Player/Projectiles/star.glb" id="1_gmpkb"]
+[ext_resource type="Script" uid="uid://d0y3cjmkqy645" path="res://Entities/Player/Projectiles/projectile.gd" id="2_v84vg"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_v84vg"]
+height = 0.005
+radius = 0.03
+
+[node name="star" unique_id=707349287 instance=ExtResource("1_gmpkb")]
+script = ExtResource("2_v84vg")
+speed = 30.0
+
+[node name="Area3D" type="Area3D" parent="." index="1" unique_id=548490098]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" index="0" unique_id=1473529221]
+shape = SubResource("CylinderShape3D_v84vg")

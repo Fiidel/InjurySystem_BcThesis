@@ -1,3 +1,4 @@
+class_name Player
 extends CharacterBody3D
 
 @onready var camera: Camera3D = $Camera3D
@@ -5,6 +6,9 @@ extends CharacterBody3D
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
 const SENSITIVITY = 0.01
+const SLASH = preload("res://Entities/Player/Projectiles/slash.tscn")
+const BOULDER = preload("res://Entities/Player/Projectiles/boulder.tscn")
+const STAR = preload("res://Entities/Player/Projectiles/star.tscn")
 var abilities: Dictionary
 var current_ability: int
 
@@ -23,11 +27,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 	if event.is_action_pressed("activate_ability"):
 		if current_ability == 1:
-			print("Ability 1 fired")
+			spawn_projectile(SLASH)
 		if current_ability == 2:
-			print("Ability 2 fired")
+			spawn_projectile(BOULDER)
 		if current_ability == 3:
-			print("Ability 3 fired")
+			spawn_projectile(STAR)
 	if event.is_action_pressed("ability_1"):
 		current_ability = 1
 		ability_label.text = "1. " + abilities[1]
@@ -60,3 +64,9 @@ func _physics_process(delta: float) -> void:
 		velocity.z = move_toward(velocity.z, 0, SPEED)
 
 	move_and_slide()
+
+func spawn_projectile(projectile_type: PackedScene) -> void:
+	var projectile = projectile_type.instantiate() as Projectile
+	projectile.direction = -camera.global_transform.basis.z
+	get_tree().root.add_child(projectile)
+	projectile.global_position = global_position + Vector3(0,1.25,0)
