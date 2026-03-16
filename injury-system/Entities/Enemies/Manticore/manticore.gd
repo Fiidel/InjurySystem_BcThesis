@@ -22,6 +22,8 @@ func _ready() -> void:
 	mat.set("shader_parameter/hit_count", 0)
 	mat.set("shader_parameter/hit_positions", PackedVector3Array())
 	mat.set("shader_parameter/hit_normals", PackedVector3Array())
+	mat.set("shader_parameter/hit_radius", PackedFloat32Array())
+	mat.set("shader_parameter/hit_strength", PackedFloat32Array())
 
 
 func _process(_delta: float) -> void:
@@ -37,7 +39,13 @@ func _physics_process(delta: float) -> void:
 
 
 # record a hit on the enemy, apply deformation and spawn decal
-func record_hit(world_point: Vector3, world_normal: Vector3, hitbox_area: Area3D, decal_texture: Texture2D = null, apply_deformation: bool = true, decal_width: float = 1.0, decal_height: float = 1.0, decal_depth: float = 0.5) -> void:
+func record_hit(
+		world_point: Vector3,
+		world_normal: Vector3,
+		hitbox_area: Area3D,
+		decal_params: DecalParameters = null,
+		deformation_params: DeformationParameters = null
+	) -> void:
 	# get the bone attachment parent
 	var attachment := hitbox_area.get_parent() as BoneAttachment3D
 	if attachment == null:
@@ -50,18 +58,22 @@ func record_hit(world_point: Vector3, world_normal: Vector3, hitbox_area: Area3D
 	var local_normal := (bone_inv.basis * world_normal).normalized()
 
 	# update deformation array and shader
-	if apply_deformation:
+	var do_deform := deformation_params != null and deformation_params.apply_deformation
+	if do_deform:
 		if hit_locations.size() >= MAX_HITS:
 			hit_locations.pop_front()
 		hit_locations.append({
 			"attachment": attachment,
 			"pos": local_point,
-			"normal": local_normal
+			"normal": local_normal,
+			"radius": deformation_params.hit_radius,
+			"strength": deformation_params.hit_strength
 		})
 		update_deformation_shader()
 
 	# spawn hit decal
-	spawn_hit_decal(attachment, local_point, local_normal, decal_texture, decal_width, decal_height, decal_depth)
+	if decal_params:
+		spawn_hit_decal(attachment, local_point, local_normal, decal_params)
 
 
 # update the deformation shader with the hit locations and normals
@@ -69,6 +81,8 @@ func update_deformation_shader() -> void:
 	var mesh_inv := body_mesh.global_transform.affine_inverse()
 	var positions := PackedVector3Array()
 	var normals := PackedVector3Array()
+	var radius := PackedFloat32Array()
+	var strength := PackedFloat32Array()
 
 	# iterate through all the hit locations and normals
 	for hit in hit_locations:
@@ -79,15 +93,19 @@ func update_deformation_shader() -> void:
 		positions.append(attachment_to_mesh * hit["pos"])
 		var mesh_normal = (attachment_to_mesh.basis.inverse().transposed() * hit["normal"]).normalized()
 		normals.append(mesh_normal)
+		radius.append(float(hit["radius"]))
+		strength.append(float(hit["strength"]))
 
 	var mat := body_mesh.get_surface_override_material(0)
 	mat.set("shader_parameter/hit_count", hit_locations.size())
 	mat.set("shader_parameter/hit_positions", positions)
 	mat.set("shader_parameter/hit_normals", normals)
+	mat.set("shader_parameter/hit_radius", radius)
+	mat.set("shader_parameter/hit_strength", strength)
 
 
 # spawn a hit decal at the given position, oriented by the given normal
-func spawn_hit_decal(attachment: BoneAttachment3D, local_point: Vector3, local_normal: Vector3, decal_texture: Texture2D = null, decal_width: float = 1.0, decal_height: float = 1.0, decal_depth: float = 0.5) -> void:
+func spawn_hit_decal(attachment: BoneAttachment3D, local_point: Vector3, local_normal: Vector3, decal_params: DecalParameters = null) -> void:
 	# limit the number of decals
 	if decals.size() >= MAX_DECALS:
 		var old: Decal = decals.pop_front()
@@ -95,11 +113,11 @@ func spawn_hit_decal(attachment: BoneAttachment3D, local_point: Vector3, local_n
 
 	# create a new decal and set its parameters
 	var decal := Decal.new()
-	decal.texture_albedo = decal_texture
-	decal.size = Vector3(decal_width, decal_depth, decal_height)
-	decal.upper_fade = 0.8
-	decal.lower_fade = 0.8
-	decal.normal_fade = 0.4
+	decal.texture_albedo = decal_params.texture
+	decal.size = Vector3(decal_params.width, decal_params.depth, decal_params.height)
+	decal.upper_fade = 0.5
+	decal.lower_fade = 0.5
+	decal.normal_fade = 0.2
 	
 	# parent to the bone attachment so the decal moves with the bone deformations
 	attachment.add_child(decal)

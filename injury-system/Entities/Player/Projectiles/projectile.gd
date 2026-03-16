@@ -15,10 +15,10 @@ enum ProjectileTypeEnum {
 
 # Decal applied on hit
 @export_group("Hit Decal")
-@export var decal: Texture2D
-@export var decal_width: float = 1
-@export var decal_height: float = 1
-@export var decal_depth: float = 0.5
+@export var decal_params: DecalParameters
+
+@export_group("Bludgeoning Deformation")
+@export var deformation_params: DeformationParameters
 
 # Raycast settings for SLASHING projectiles to detect hits along its arc
 @export_group("Slash Detection Raycasts")
@@ -130,8 +130,7 @@ func cast_hitbox_and_record_hit(enemy: Enemy, hitbox_area: Area3D) -> void:
 	# get the collision info and record hit in enemy script
 	var collision := space_state.get_rest_info(params)
 	if not collision.is_empty() and "point" in collision and "normal" in collision:
-		var apply_deformation: bool = type == ProjectileTypeEnum.BLUDGEONING # set deformation flag to true for bludgeoning projectiles
-		enemy.record_hit(collision.point, collision.normal, hitbox_area, decal, apply_deformation, decal_width, decal_height, decal_depth)
+		enemy.record_hit(collision.point, collision.normal, hitbox_area, decal_params, deformation_params)
 		_hit_recorded = true
 
 
@@ -211,9 +210,9 @@ func record_hit_from_raycast(enemy: Enemy, area: Area3D) -> void:
 	if _hit_recorded:
 		return
 	# use the detected hit position and normal, or the projectile hitbox's position and normal if the projectile has collided with the enemy's hitbox but no hit was detected
-	var pos: Vector3 = raycast_hit_position if _has_raycast_hit else hitbox.global_position
-	var nrm: Vector3 = raycast_hit_normal if _has_raycast_hit else (-projectile_direction.normalized())
-	enemy.record_hit(pos, nrm, area, decal, false, decal_width, decal_height, decal_depth)
+	var position: Vector3 = raycast_hit_position if _has_raycast_hit else hitbox.global_position
+	var normal: Vector3 = raycast_hit_normal if _has_raycast_hit else (-projectile_direction.normalized())
+	enemy.record_hit(position, normal, area, decal_params)
 	_hit_recorded = true
 
 

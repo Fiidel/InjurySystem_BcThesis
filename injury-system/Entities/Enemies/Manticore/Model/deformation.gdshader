@@ -29,8 +29,8 @@ uniform vec3 uv2_offset;
 uniform int hit_count = 0;
 uniform vec3 hit_positions[16];
 uniform vec3 hit_normals[16];
-uniform float hit_radius = 1;
-uniform float hit_strength = 0.75;
+uniform float hit_radius[16];
+uniform float hit_strength[16];
 // end of added code
 
 void vertex() {
@@ -38,11 +38,13 @@ void vertex() {
 	// added code
 	float deformation_magnitude = COLOR.r; // taken from the vertex colors, which has the magnitude coded in
 	for (int i = 0; i < hit_count; i++) {
+		float radius = hit_radius[i];
+		float strength = hit_strength[i];
 		float dist = distance(VERTEX, hit_positions[i]);
-		if (dist < hit_radius) {
-			float falloff = 1.0 - (dist / hit_radius);
+		if (dist < radius) {
+			float falloff = 1.0 - (dist / radius);
 			falloff = falloff * falloff; // smooth
-			VERTEX -= normalize(hit_normals[i]) * falloff * hit_strength * deformation_magnitude;
+			VERTEX -= normalize(hit_normals[i]) * falloff * strength * deformation_magnitude;
 		}
 	}
 	// end of added code
