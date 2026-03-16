@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://b3fjuvv488qok"]
 
-[ext_resource type="PackedScene" uid="uid://bja4qnnjwtn7p" path="res://Stages/Environments/Plateau.tscn" id="1_0xm2m"]
-[ext_resource type="PackedScene" uid="uid://7busd4k4r3ee" path="res://Entities/Enemies/Manticore/Manticore.tscn" id="2_h2yge"]
+[ext_resource type="PackedScene" uid="uid://cph5iw2hp2sas" path="res://Entities/Enemies/Manticore/manticore.scn" id="3_1bvp3"]
 [ext_resource type="PackedScene" uid="uid://c5hswb3bqmoxd" path="res://Entities/Player/player.tscn" id="3_h2yge"]
 
 [sub_resource type="Sky" id="Sky_0xm2m"]
@@ -17,18 +16,14 @@ ambient_light_sky_contribution = 0.7
 [sub_resource type="BoxShape3D" id="BoxShape3D_h2yge"]
 size = Vector3(100, 0.1, 100)
 
-[sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
-size = Vector3(5, 1.46, 25)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_0xm2m"]
-size = Vector3(5, 1.46, 25)
-
 [node name="Node3D" type="Node3D" unique_id=626739966]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=480537609]
 environment = SubResource("Environment_ig7tw")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=497145296]
+collision_layer = 4
+collision_mask = 7
 physics_material_override = SubResource("PhysicsMaterial_0xm2m")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=756669252]
@@ -38,23 +33,9 @@ debug_color = Color(0, 0.6597583, 0.76674175, 1)
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=345370510]
 transform = Transform3D(1, 0, 0, 0, 0.8654139, 0.5010577, 0, -0.5010577, 0.8654139, 0, 149.84317, 0)
 
-[node name="Plateau" parent="." unique_id=1765579111 instance=ExtResource("1_0xm2m")]
-
-[node name="Manticore" parent="." unique_id=1224527632 instance=ExtResource("2_h2yge")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.36542, 79.61208, 12.1189785)
-floor_stop_on_slope = false
-floor_max_angle = 2.3561945
-floor_snap_length = 1.0
-
-[node name="StaticBody3D2" type="StaticBody3D" parent="." unique_id=703926303]
-
-[node name="CSGMesh3D" type="CSGMesh3D" parent="StaticBody3D2" unique_id=1326918348]
-transform = Transform3D(1, 0, 0, 0, 0.9778601, 0.20926021, 0, -0.20926021, 0.9778601, 34.813354, 79.737625, 24.781767)
-mesh = SubResource("BoxMesh_0xm2m")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D2" unique_id=1621310139]
-transform = Transform3D(1, 0, 0, 0, 0.9778601, 0.20926021, 0, -0.20926021, 0.9778601, 34.813354, 79.737625, 24.781767)
-shape = SubResource("BoxShape3D_0xm2m")
-
 [node name="Player" parent="." unique_id=1339924766 instance=ExtResource("3_h2yge")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 81.02006, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.875679, 2.0888424, 12.356348)
+
+[node name="Manticore" parent="." unique_id=1310202999 instance=ExtResource("3_1bvp3")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 10.981531, 0.8411999, 8.363481)
+floor_constant_speed = true

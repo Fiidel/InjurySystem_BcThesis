@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://dh4mkol804jed" path="res://Entities/Player/Projectiles/slash.glb" id="1_0shb3"]
 [ext_resource type="Script" uid="uid://d0y3cjmkqy645" path="res://Entities/Player/Projectiles/projectile.gd" id="2_2lnad"]
+[ext_resource type="Texture2D" uid="uid://7a4j88xh7w55" path="res://Entities/Player/Projectiles/slash_decal.png" id="3_coqll"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_2lnad"]
 radius = 0.01
@@ -32,7 +33,7 @@ emission_point_texture = SubResource("ImageTexture_u4k6h")
 emission_point_count = 128
 angle_min = 1.0728835e-05
 angle_max = 1.0728835e-05
-gravity = Vector3(0, 0, 0)
+gravity = Vector3(0, -0.5, 0)
 alpha_curve = SubResource("CurveTexture_coqll")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lqqlu"]
@@ -46,13 +47,22 @@ size = Vector2(0.01, 0.25)
 center_offset = Vector3(0, 0, 0.175)
 orientation = 1
 
-[node name="slash" unique_id=1389751508 instance=ExtResource("1_0shb3")]
+[node name="slash" unique_id=2078985384 instance=ExtResource("1_0shb3")]
+collision_layer = 2
+collision_mask = 4
+gravity_scale = 0.0
+continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 4
 script = ExtResource("2_2lnad")
 speed = 20.0
+decal = ExtResource("3_coqll")
+decal_width = 0.5
+decal_height = 0.1
+decal_depth = 0.75
+slash_detection_width = 1.0
 
-[node name="Area3D" type="Area3D" parent="." index="1" unique_id=355108309]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" index="0" unique_id=453685820]
+[node name="PhysicsCollisionShape" type="CollisionShape3D" parent="." index="1" unique_id=453685820]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
 shape = SubResource("CapsuleShape3D_2lnad")
 
@@ -60,3 +70,11 @@ shape = SubResource("CapsuleShape3D_2lnad")
 amount = 80
 process_material = SubResource("ParticleProcessMaterial_udtx8")
 draw_pass_1 = SubResource("QuadMesh_grsd0")
+
+[node name="Hitbox" type="Area3D" parent="." index="3" unique_id=981674212]
+collision_layer = 2
+collision_mask = 2
+
+[node name="HitCollisionShape" type="CollisionShape3D" parent="Hitbox" index="0" unique_id=2082760101]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CapsuleShape3D_2lnad")

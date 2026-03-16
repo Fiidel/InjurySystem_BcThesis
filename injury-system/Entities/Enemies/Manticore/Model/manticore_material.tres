@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://rm2e6liuvtjq"]
+
+[ext_resource type="Texture2D" uid="uid://d0nasvsi56vxd" path="res://Entities/Enemies/Manticore/Model/manticore_Material Layer.png" id="1_lgp5v"]
+[ext_resource type="Texture2D" uid="uid://b1o3s2b83rk7d" path="res://Entities/Enemies/Manticore/Model/manticore_Manticore_Normal.png" id="2_lq21r"]
+
+[resource]
+albedo_texture = ExtResource("1_lgp5v")
+normal_enabled = true
+normal_texture = ExtResource("2_lq21r")

@@ -2,16 +2,36 @@
 
 [ext_resource type="PackedScene" uid="uid://b5k0h3m8npi41" path="res://Entities/Player/Projectiles/boulder.glb" id="1_113bm"]
 [ext_resource type="Script" uid="uid://d0y3cjmkqy645" path="res://Entities/Player/Projectiles/projectile.gd" id="2_l55lv"]
+[ext_resource type="Texture2D" uid="uid://dlcemm6bn8cdi" path="res://Entities/Player/Projectiles/boulder_decal.png" id="3_i6d0d"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l55lv"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_l55lv"]
 radius = 0.25
 
-[node name="boulder" unique_id=1649867148 instance=ExtResource("1_113bm")]
+[node name="boulder" unique_id=1536789314 instance=ExtResource("1_113bm")]
+collision_layer = 2
+collision_mask = 4
+continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 4
 script = ExtResource("2_l55lv")
-speed = 12.0
+type = 1
+speed = 10.0
 is_affected_by_gravity = true
+decal = ExtResource("3_i6d0d")
+decal_depth = 0.75
+slash_ray_count = 0
 
-[node name="Area3D" type="Area3D" parent="." index="1" unique_id=2040654682]
+[node name="Boulder" parent="." index="0" unique_id=97695005]
+surface_material_override/0 = SubResource("StandardMaterial3D_l55lv")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" index="0" unique_id=2014174311]
+[node name="PhysicsCollisionShape" type="CollisionShape3D" parent="." index="1" unique_id=1022929276]
+shape = SubResource("SphereShape3D_l55lv")
+
+[node name="Hitbox" type="Area3D" parent="." index="2" unique_id=1283198870]
+collision_layer = 2
+collision_mask = 2
+
+[node name="HitCollisionShape" type="CollisionShape3D" parent="Hitbox" index="0" unique_id=2014174311]
 shape = SubResource("SphereShape3D_l55lv")

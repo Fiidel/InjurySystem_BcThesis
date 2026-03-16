@@ -2,16 +2,40 @@
 
 [ext_resource type="PackedScene" uid="uid://dfkkmmrw7iipb" path="res://Entities/Player/Projectiles/star.glb" id="1_gmpkb"]
 [ext_resource type="Script" uid="uid://d0y3cjmkqy645" path="res://Entities/Player/Projectiles/projectile.gd" id="2_v84vg"]
+[ext_resource type="Texture2D" uid="uid://7qr50r78uvfq" path="res://Entities/Player/Projectiles/star_decal.png" id="3_mdmfb"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_v84vg"]
 height = 0.005
 radius = 0.03
 
-[node name="star" unique_id=707349287 instance=ExtResource("1_gmpkb")]
+[node name="star" unique_id=1292609874 instance=ExtResource("1_gmpkb")]
+collision_layer = 2
+collision_mask = 4
+gravity_scale = 0.0
+continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 4
 script = ExtResource("2_v84vg")
+type = 2
 speed = 30.0
+decal = ExtResource("3_mdmfb")
+decal_width = 0.15
+decal_height = 0.15
+decal_depth = 1.0
+slash_width = 0.0
+slash_ray_count = 0
 
-[node name="Area3D" type="Area3D" parent="." index="1" unique_id=548490098]
+[node name="Star" parent="." index="0" unique_id=1689158539]
+transform = Transform3D(0.86508805, -0.5006238, -0.03159833, 0.25840366, 0.3907634, 0.88347685, -0.4299422, -0.7724503, 0.46740776, 0, -0.00042319298, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" index="0" unique_id=1473529221]
+[node name="PhysicsCollisionShape" type="CollisionShape3D" parent="." index="1" unique_id=1473529221]
+transform = Transform3D(0.7703798, -0.5607557, 0.30342716, -3.499432e-08, 0.4759005, 0.87949926, -0.63758534, -0.6775483, 0.3666241, -0.002347231, 0, -0.0013651475)
+shape = SubResource("CylinderShape3D_v84vg")
+
+[node name="Hitbox" type="Area3D" parent="." index="2" unique_id=44173266]
+collision_layer = 2
+collision_mask = 2
+
+[node name="HitCollisionShape" type="CollisionShape3D" parent="Hitbox" index="0" unique_id=1101793501]
+transform = Transform3D(0.7703798, -0.5607557, 0.30342716, -3.499432e-08, 0.4759005, 0.87949926, -0.63758534, -0.6775483, 0.3666241, -0.002347231, 0, -0.0013651475)
 shape = SubResource("CylinderShape3D_v84vg")
