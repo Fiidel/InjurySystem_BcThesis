@@ -80,6 +80,7 @@ script = ExtResource("2_2lnad")
 speed = 20.0
 decal_params = SubResource("Resource_u4k6h")
 slash_detection_width = 1.0
+slash_ray_count = 7
 
 [node name="Slash" parent="." index="0" unique_id=843048054]
 surface_material_override/0 = SubResource("StandardMaterial3D_u4k6h")
