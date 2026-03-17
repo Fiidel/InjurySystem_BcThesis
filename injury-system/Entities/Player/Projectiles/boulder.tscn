@@ -4,7 +4,10 @@
 [ext_resource type="Script" uid="uid://d0y3cjmkqy645" path="res://Entities/Player/Projectiles/projectile.gd" id="2_l55lv"]
 [ext_resource type="Texture2D" uid="uid://dlcemm6bn8cdi" path="res://Entities/Player/Projectiles/boulder_decal.png" id="3_i6d0d"]
 [ext_resource type="Script" uid="uid://ce0xv445unln3" path="res://Entities/Player/Projectiles/decal_parameters.gd" id="3_qqg1s"]
+[ext_resource type="PackedScene" uid="uid://dg20oqwvfcbnf" path="res://Entities/Player/Projectiles/boulder_dust_particles.tscn" id="5_h33bd"]
+[ext_resource type="PackedScene" uid="uid://b1g1l23sinh3n" path="res://Entities/Player/Projectiles/boulder_fragments.tscn" id="5_jgwp4"]
 [ext_resource type="Script" uid="uid://dmpacokjs7bi3" path="res://Entities/Player/Projectiles/deformation_parameters.gd" id="5_u3rqu"]
+[ext_resource type="Material" uid="uid://d32csblxij13p" path="res://Entities/Player/Projectiles/boulder_material.tres" id="7_h33bd"]
 
 [sub_resource type="Resource" id="Resource_h33bd"]
 script = ExtResource("3_qqg1s")
@@ -13,12 +16,10 @@ texture = ExtResource("3_i6d0d")
 [sub_resource type="Resource" id="Resource_jgwp4"]
 script = ExtResource("5_u3rqu")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l55lv"]
-
 [sub_resource type="SphereShape3D" id="SphereShape3D_l55lv"]
 radius = 0.25
 
-[node name="boulder" unique_id=1536789314 instance=ExtResource("1_113bm")]
+[node name="boulder" unique_id=733347736 instance=ExtResource("1_113bm")]
 collision_layer = 2
 collision_mask = 4
 continuous_cd = true
@@ -29,12 +30,14 @@ type = 1
 speed = 10.0
 is_affected_by_gravity = true
 decal_params = SubResource("Resource_h33bd")
+projectile_fragments_scene = ExtResource("5_jgwp4")
+impact_particles_scene = ExtResource("5_h33bd")
 deformation_params = SubResource("Resource_jgwp4")
 slash_detection_width = 0.0
 slash_ray_count = 0
 
-[node name="Boulder" parent="." index="0" unique_id=97695005]
-surface_material_override/0 = SubResource("StandardMaterial3D_l55lv")
+[node name="Boulder" parent="." index="0" unique_id=325232826]
+surface_material_override/0 = ExtResource("7_h33bd")
 
 [node name="PhysicsCollisionShape" type="CollisionShape3D" parent="." index="1" unique_id=1022929276]
 shape = SubResource("SphereShape3D_l55lv")

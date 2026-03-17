@@ -80,6 +80,7 @@ activate_ability={
 3d_physics/layer_1="Character"
 3d_physics/layer_2="Harmspace"
 3d_physics/layer_3="Environment"
+3d_physics/layer_4="VFX"
 
 [physics]
 

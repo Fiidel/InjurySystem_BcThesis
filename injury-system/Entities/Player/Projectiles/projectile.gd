@@ -17,6 +17,11 @@ enum ProjectileTypeEnum {
 @export_group("Hit Decal")
 @export var decal_params: DecalParameters
 
+# Impact particles
+@export_group("Impact VFX")
+@export var projectile_fragments_scene: PackedScene
+@export var impact_particles_scene: PackedScene
+
 @export_group("Bludgeoning Deformation")
 @export var deformation_params: DeformationParameters
 
@@ -94,15 +99,15 @@ func _on_hitbox_entered(area: Area3D) -> void:
 			ProjectileTypeEnum.PIERCING, ProjectileTypeEnum.SLASHING:
 				record_hit_from_raycast(enemy, area)
 
-	# bounce off enemy and delete after some time
-	if type == ProjectileTypeEnum.BLUDGEONING:
-		# only bounce off of the enemy once
-		if !_has_bounced_off:
-			linear_velocity = linear_velocity.bounce(linear_velocity.normalized()) * 0.2
-			_has_bounced_off = true
-		start_delete_timer()
+	# # bounce off enemy and delete after some time
+	# if type == ProjectileTypeEnum.BLUDGEONING:
+	# 	# only bounce off of the enemy once
+	# 	if !_has_bounced_off:
+	# 		linear_velocity = linear_velocity.bounce(linear_velocity.normalized()) * 0.2
+	# 		_has_bounced_off = true
+	# 	start_delete_timer()
 	# delete non-bludgeoning projectiles instantly
-	else:
+	if type != ProjectileTypeEnum.BLUDGEONING:
 		queue_free()
 
 
@@ -132,6 +137,20 @@ func cast_hitbox_and_record_hit(enemy: Enemy, hitbox_area: Area3D) -> void:
 	if not collision.is_empty() and "point" in collision and "normal" in collision:
 		enemy.record_hit(collision.point, collision.normal, hitbox_area, decal_params, deformation_params)
 		_hit_recorded = true
+
+		# spawn boulder fragment scene and impact particles in hitbox position (breaking vfx)
+		if projectile_fragments_scene:
+			queue_free() # delete the projectile, replace with fragments
+			var fragments: Node3D = projectile_fragments_scene.instantiate()
+			enemy.add_child(fragments)
+			fragments.global_position = hitbox.global_position
+		if impact_particles_scene:
+			var impact_particles: GPUParticles3D = impact_particles_scene.instantiate()
+			enemy.add_child(impact_particles)
+			impact_particles.global_position = hitbox.global_position
+			impact_particles.emitting = true
+			await get_tree().create_timer(impact_particles.lifetime).timeout
+			impact_particles.queue_free()
 
 
 # update the raycast for PIERCING projectiles
