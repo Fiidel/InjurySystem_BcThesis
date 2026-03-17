@@ -21,7 +21,7 @@ emission = Color(0.3043166, 0.7528114, 0.9999998, 1)
 render_priority = 0
 shader = ExtResource("5_u4k6h")
 shader_parameter/trail_color = Color(0.26244882, 0.9380818, 0.9275367, 1)
-shader_parameter/tail_falloff = 2.5
+shader_parameter/tail_falloff = 3.0
 shader_parameter/width_falloff = 2.0
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_2lnad"]

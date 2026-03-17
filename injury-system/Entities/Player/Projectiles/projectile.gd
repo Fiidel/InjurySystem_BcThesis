@@ -81,7 +81,7 @@ func _physics_process(_delta: float) -> void:
 func _on_physics_body_entered(_body: Node3D) -> void:
 	# delete bludgeoning projectiles after impact
 	if type == ProjectileTypeEnum.BLUDGEONING:
-		start_delete_timer()
+		destroy_bludgeoning_projectile()
 	# delete non-bludgeoning projectiles instantly
 	else:
 		queue_free()
@@ -95,6 +95,7 @@ func _on_hitbox_entered(area: Area3D) -> void:
 			# shapecast hitbox shape for bludgeoning projectiles and record the shapecast's hit
 			ProjectileTypeEnum.BLUDGEONING:
 				cast_hitbox_and_record_hit(enemy, area)
+				destroy_bludgeoning_projectile()
 			# the projectile has collided with an enemy's hitbox -> record the projectile's hit position that was detected by its raycast(s)
 			ProjectileTypeEnum.PIERCING, ProjectileTypeEnum.SLASHING:
 				record_hit_from_raycast(enemy, area)
@@ -138,19 +139,22 @@ func cast_hitbox_and_record_hit(enemy: Enemy, hitbox_area: Area3D) -> void:
 		enemy.record_hit(collision.point, collision.normal, hitbox_area, decal_params, deformation_params)
 		_hit_recorded = true
 
-		# spawn boulder fragment scene and impact particles in hitbox position (breaking vfx)
-		if projectile_fragments_scene:
-			queue_free() # delete the projectile, replace with fragments
-			var fragments: Node3D = projectile_fragments_scene.instantiate()
-			enemy.add_child(fragments)
-			fragments.global_position = hitbox.global_position
-		if impact_particles_scene:
-			var impact_particles: GPUParticles3D = impact_particles_scene.instantiate()
-			enemy.add_child(impact_particles)
-			impact_particles.global_position = hitbox.global_position
-			impact_particles.emitting = true
-			await get_tree().create_timer(impact_particles.lifetime).timeout
-			impact_particles.queue_free()
+
+# spawn boulder fragment scene and impact particles in projectile's hitbox position (breaking vfx)
+func destroy_bludgeoning_projectile() -> void:
+	var world_root := get_tree().current_scene
+	if projectile_fragments_scene:
+		queue_free() # delete the projectile, replace with fragments
+		var fragments: Node3D = projectile_fragments_scene.instantiate()
+		world_root.add_child(fragments)
+		fragments.global_position = hitbox.global_position
+	if impact_particles_scene:
+		var impact_particles: GPUParticles3D = impact_particles_scene.instantiate()
+		world_root.add_child(impact_particles)
+		impact_particles.global_position = hitbox.global_position
+		impact_particles.emitting = true
+		await get_tree().create_timer(impact_particles.lifetime).timeout
+		impact_particles.queue_free()
 
 
 # update the raycast for PIERCING projectiles
