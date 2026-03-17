@@ -12,6 +12,11 @@ texture = ExtResource("3_coqll")
 height = 0.1
 depth = 0.75
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u4k6h"]
+albedo_color = Color(0.37853703, 0.99826294, 0.99999994, 1)
+emission_enabled = true
+emission = Color(0.3043166, 0.7528114, 0.9999998, 1)
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_u4k6h"]
 render_priority = 0
 shader = ExtResource("5_u4k6h")
@@ -76,7 +81,10 @@ speed = 20.0
 decal_params = SubResource("Resource_u4k6h")
 slash_detection_width = 1.0
 
-[node name="Slash_Trail" parent="Slash" parent_id_path=PackedInt32Array(843048054) index="0" unique_id=1431967413]
+[node name="Slash" parent="." index="0" unique_id=843048054]
+surface_material_override/0 = SubResource("StandardMaterial3D_u4k6h")
+
+[node name="Slash_Trail" parent="Slash" index="0" unique_id=1431967413]
 surface_material_override/0 = SubResource("ShaderMaterial_u4k6h")
 
 [node name="PhysicsCollisionShape" type="CollisionShape3D" parent="." index="1" unique_id=453685820]
