@@ -99,15 +99,10 @@ func _on_hitbox_entered(area: Area3D) -> void:
 			# the projectile has collided with an enemy's hitbox -> record the projectile's hit position that was detected by its raycast(s)
 			ProjectileTypeEnum.PIERCING, ProjectileTypeEnum.SLASHING:
 				record_hit_from_raycast(enemy, area)
+				# spawn impact particle vfx
+				await get_tree().create_timer(0.25).timeout # wait a little before the blood flows
+				spawn_impact_particles(enemy, raycast_hit_position)
 
-	# # bounce off enemy and delete after some time
-	# if type == ProjectileTypeEnum.BLUDGEONING:
-	# 	# only bounce off of the enemy once
-	# 	if !_has_bounced_off:
-	# 		linear_velocity = linear_velocity.bounce(linear_velocity.normalized()) * 0.2
-	# 		_has_bounced_off = true
-	# 	start_delete_timer()
-	# delete non-bludgeoning projectiles instantly
 	if type != ProjectileTypeEnum.BLUDGEONING:
 		queue_free()
 
@@ -148,10 +143,15 @@ func destroy_bludgeoning_projectile() -> void:
 		var fragments: Node3D = projectile_fragments_scene.instantiate()
 		world_root.add_child(fragments)
 		fragments.global_position = hitbox.global_position
+	spawn_impact_particles(world_root, hitbox.global_position)
+
+
+# spawn impact particles at a given position
+func spawn_impact_particles(attach_node: Node3D, position: Vector3) -> void:
 	if impact_particles_scene:
 		var impact_particles: GPUParticles3D = impact_particles_scene.instantiate()
-		world_root.add_child(impact_particles)
-		impact_particles.global_position = hitbox.global_position
+		attach_node.add_child(impact_particles)
+		impact_particles.global_position = position
 		impact_particles.emitting = true
 		await get_tree().create_timer(impact_particles.lifetime).timeout
 		impact_particles.queue_free()
