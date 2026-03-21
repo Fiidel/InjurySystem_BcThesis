@@ -1,10 +1,12 @@
+@icon("uid://c1lqbffssicjv")
+
 class_name BTCondition
 extends BTDecorator
 
 var condition: Callable
 
 func _ready() -> void:
-	assert(condition != null, "BTCondition node %s requires a condition function." % node_name)
+	assert(condition != null, "BTCondition node %s requires a condition function." % name)
 	assert(condition.is_valid(), "Invalid condition Callable.")
 	for child in child_nodes:
 		child.finished.connect(_on_child_finished)

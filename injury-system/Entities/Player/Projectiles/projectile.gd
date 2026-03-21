@@ -33,7 +33,6 @@ enum ProjectileTypeEnum {
 # General variables
 var mesh: MeshInstance3D
 var projectile_direction: Vector3 = Vector3.ZERO # direction that the projectile is traveling in
-var _has_bounced_off: bool = false # prevent bouncing off of the same enemy multiple times
 var _hit_recorded: bool = false # limit to 1 hit location recorded per projectile
 
 # Raycast settings for non-BLUDGEONING projectiles to detect hits

@@ -1,3 +1,5 @@
+@icon("uid://mjhf4md8bf2a")
+
 class_name BTSequence
 extends BTNode
 
@@ -8,19 +10,19 @@ func _ready() -> void:
 		child.finished.connect(_on_child_finished)
 
 func execute() -> void:
-	# Execute first child
+	if child_nodes.is_empty():
+		finished.emit(ReturnStatus.SUCCESS)
+		return
 	current_child_idx = 0
 	child_nodes[current_child_idx].execute()
-	current_child_idx += 1
+
 
 func _on_child_finished(return_status: ReturnStatus) -> void:
-	# Last child - node is finished, return the result of the last child
+	if return_status == ReturnStatus.FAILURE:
+		finished.emit(ReturnStatus.FAILURE)
+		return
+	current_child_idx += 1
 	if current_child_idx == len(child_nodes):
-		finished.emit(return_status)
-	# Failure of any child results in the immediate failure of the node
+		finished.emit(ReturnStatus.SUCCESS)
 	else:
-		if return_status == ReturnStatus.FAILURE:
-			finished.emit(ReturnStatus.FAILURE)
-		elif return_status == ReturnStatus.SUCCESS:
-			child_nodes[current_child_idx].execute()
-			current_child_idx += 1
+		child_nodes[current_child_idx].execute()

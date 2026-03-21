@@ -7,4 +7,3 @@ var child: BTNode
 func add_bt_child(node: BTNode) -> void:
 	child = node
 	child_nodes = [node]
-	add_child(node)

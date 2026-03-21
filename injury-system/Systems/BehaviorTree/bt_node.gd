@@ -9,16 +9,37 @@ enum ReturnStatus {
 	FAILURE
 }
 
-@export var node_name: String = ""
-var blackboard: Dictionary
 var child_nodes: Array[BTNode] = []
+
 
 func add_bt_child(node: BTNode) -> void:
 	child_nodes.append(node)
-	add_child(node)
+
 
 func remove_bt_child(node: BTNode) -> void:
 	var index: int = child_nodes.find(node)
 	child_nodes.remove_at(index)
+
+
+func construct_tree() -> void:
+	var scene_child_nodes = get_children()
+	# add children to array and call their own construct func
+	for child in scene_child_nodes:
+		if child is BTNode:
+			add_bt_child(child)
+			child.construct_tree()
+		# error: child not based on BTNode
+		else:
+			push_error("Child " + child.name + " is not a BTNode.")
+			return
+	# connect the finished signals of each child
+	for child in child_nodes:
+		child.finished.connect(_on_child_finished)
+
+
+# to be overridden by subclasses
+func _on_child_finished(_return_status: ReturnStatus) -> void:
+	pass
+
 
 @abstract func execute() -> void
