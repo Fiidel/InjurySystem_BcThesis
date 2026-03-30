@@ -9,6 +9,7 @@ enum ReturnStatus {
 	FAILURE
 }
 
+var blackboard: Blackboard
 var child_nodes: Array[BTNode] = []
 
 
@@ -21,13 +22,14 @@ func remove_bt_child(node: BTNode) -> void:
 	child_nodes.remove_at(index)
 
 
-func construct_tree() -> void:
+func construct_tree(bb: Blackboard) -> void:
+	blackboard = bb
 	var scene_child_nodes = get_children()
 	# add children to array and call their own construct func
 	for child in scene_child_nodes:
 		if child is BTNode:
 			add_bt_child(child)
-			child.construct_tree()
+			child.construct_tree(bb)
 		# error: child not based on BTNode
 		else:
 			push_error("Child " + child.name + " is not a BTNode.")
@@ -39,6 +41,11 @@ func construct_tree() -> void:
 
 # to be overridden by subclasses
 func _on_child_finished(_return_status: ReturnStatus) -> void:
+	pass
+
+
+## cleanup func for interruptable nodes; to be overridden by subclasses
+func abort() -> void:
 	pass
 
 

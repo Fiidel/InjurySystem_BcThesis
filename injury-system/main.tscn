@@ -34,7 +34,7 @@ debug_color = Color(0, 0.6597583, 0.76674175, 1)
 transform = Transform3D(1, 0, 0, 0, 0.8654139, 0.5010577, 0, -0.5010577, 0.8654139, 0, 149.84317, 0)
 
 [node name="Player" parent="." unique_id=1339924766 instance=ExtResource("3_h2yge")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.875679, 2.0888424, 12.356348)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.833927, 2.0888424, 12.356348)
 
 [node name="Manticore" parent="." unique_id=1310202999 instance=ExtResource("3_1bvp3")]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 10.981531, 0.8411999, 8.363481)

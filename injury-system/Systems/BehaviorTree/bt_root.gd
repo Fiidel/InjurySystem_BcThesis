@@ -1,16 +1,19 @@
-@icon("uid://dfe3o2gbxl7pw")
+@icon("uid://enle37qryp01")
 
 class_name BTRoot
 extends BTNode
 
-var blackboard: Blackboard
 var current_child_idx: int = 0
 
 
-func _ready() -> void:
+func _init() -> void:
 	blackboard = Blackboard.new()
-	construct_tree()
+
+
+func _ready() -> void:
+	construct_tree(blackboard)
 	execute()
+
 
 func execute() -> void:
 	if child_nodes.is_empty():
