@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://c5hswb3bqmoxd"]
 
 [ext_resource type="Script" uid="uid://q7hkaxovgbj0" path="res://Entities/Player/player.gd" id="1_mv1ah"]
+[ext_resource type="Texture2D" uid="uid://c6fa28p1wggn" path="res://Entities/Player/damage_screen_effect.png" id="2_3uyv8"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 radius = 0.4
@@ -16,6 +17,19 @@ shape = SubResource("CapsuleShape3D_0xm2m")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=863646441]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+
+[node name="FlashEffect" type="CanvasLayer" parent="." unique_id=1203607145]
+
+[node name="FlashTexture" type="TextureRect" parent="FlashEffect" unique_id=1529971860]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_3uyv8")
+expand_mode = 3
 
 [node name="AbilityUI" type="CanvasLayer" parent="." unique_id=1909721364]
 

@@ -11,12 +11,15 @@ const SLASH = preload("uid://bo6hoxdtu4dff")
 const BOULDER = preload("uid://c6vo1skq0umfj")
 const STAR = preload("uid://cj7dw47a2y8gt")
 
+@onready var camera: Camera3D = $Camera3D
+@onready var ability_label: Label = %AbilityLabel
+@onready var flash_texture: TextureRect = %FlashTexture
+
 # ability variables
 var abilities: Dictionary
 var current_ability: int
-
-@onready var camera: Camera3D = $Camera3D
-@onready var ability_label: Label = %AbilityLabel
+# effect variables
+var flash_effect_tween: Tween
 
 
 func _ready() -> void:
@@ -88,3 +91,13 @@ func spawn_projectile(projectile_type: PackedScene) -> void:
 	projectile.projectile_direction = -camera.global_transform.basis.z
 	get_tree().root.add_child(projectile)
 	projectile.global_position = global_position + Vector3(0,1.25,0)
+
+
+func take_damage(_amount: float) -> void:
+	# just flash, no player health implemented
+	if flash_effect_tween:
+		flash_effect_tween.kill()
+	flash_effect_tween = create_tween()
+	flash_effect_tween.set_ease(Tween.EASE_IN_OUT)
+	flash_effect_tween.tween_property(flash_texture, "modulate", Color.WHITE, 0.2)
+	flash_effect_tween.tween_property(flash_texture, "modulate", Color.TRANSPARENT, 0.2)

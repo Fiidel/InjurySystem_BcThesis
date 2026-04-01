@@ -10,3 +10,7 @@ func store(key: Variant, value: Variant) -> void:
 
 func read(key: Variant) -> Variant:
 	return data.get(key)
+
+
+func remove(key: Variant) -> void:
+	data.erase(key)
