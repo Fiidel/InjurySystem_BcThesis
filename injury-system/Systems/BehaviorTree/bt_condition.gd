@@ -5,11 +5,13 @@ extends BTDecorator
 
 var condition: Callable
 
+
 func _ready() -> void:
 	assert(condition != null, "BTCondition node %s requires a condition function." % name)
 	assert(condition.is_valid(), "Invalid condition Callable.")
 	for bt_child in child_nodes:
 		bt_child.finished.connect(_on_child_finished)
+
 
 func execute() -> void:
 	# If the condition is true, continue to the child node. Otherwise, return a failure.
@@ -19,6 +21,7 @@ func execute() -> void:
 		child.execute()
 	else:
 		finished.emit(ReturnStatus.FAILURE)
+
 
 func _on_child_finished(return_status: ReturnStatus) -> void:
 	finished.emit(return_status)
