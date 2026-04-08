@@ -93,7 +93,7 @@ func spawn_projectile(projectile_type: PackedScene) -> void:
 	projectile.global_position = global_position + Vector3(0,1.25,0)
 
 
-func take_damage(_amount: float) -> void:
+func take_damage(_amount: int) -> void:
 	# just flash, no player health implemented
 	if flash_effect_tween:
 		flash_effect_tween.kill()

@@ -7,9 +7,9 @@ const KNOCKBACK_SPEED: float = 8.0
 var active_knockbacks = {}  # bone_idx -> {target_offset, progress, is_returning}
 
 
-func add_knockback(bone_index: int, hit_direction: Vector3, strength: float):
+func add_knockback(bone_index: int, direction: Vector3, strength: float):
 	active_knockbacks[bone_index] = {
-		"target_offset": hit_direction * strength,
+		"target_offset": direction * strength,
 		"progress": 0.0,
 		"is_returning": false
 	}

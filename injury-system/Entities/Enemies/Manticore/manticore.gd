@@ -6,9 +6,10 @@ extends CharacterBody3D
 const MAX_HITS: int = 16
 const MAX_DECALS: int = 16
 
-# arrays to store hit locations and decals
+# arrays to store hitboxes, hit locations, and decals
+var body_part_hitboxes: Array[Hitbox] = []
 var hit_locations: Array = []
-var decals: Array = []
+var decals: Array[Decal] = []
 
 # get the necessary child nodes
 @onready var look_at_target: Marker3D = %LookAtTarget
@@ -24,6 +25,9 @@ func _ready() -> void:
 	mat.set("shader_parameter/hit_normals", PackedVector3Array())
 	mat.set("shader_parameter/hit_radius", PackedFloat32Array())
 	mat.set("shader_parameter/hit_strength", PackedFloat32Array())
+	get_hitboxes(self)
+	for hitbox in body_part_hitboxes:
+		hitbox.hitbox_hit.connect(record_hit)
 
 
 func _process(_delta: float) -> void:
@@ -38,32 +42,30 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 
+func get_hitboxes(node: Node) -> void:
+	for child in node.get_children():
+		if child is BodyPart:
+			body_part_hitboxes.append_array(child.hitboxes)
+		get_hitboxes(child)
+
+
 # record a hit on the enemy, apply deformation and spawn decal
 func record_hit(
-		world_point: Vector3,
-		world_normal: Vector3,
-		hitbox_area: Area3D,
+		_damage_amount: int,
+		local_point: Vector3,
+		local_normal: Vector3,
+		_projectile_direction: Vector3,
+		bone_attachment: BoneAttachment3D,
 		decal_params: DecalParameters = null,
 		deformation_params: DeformationParameters = null
 	) -> void:
-	# get the bone attachment parent
-	var attachment := hitbox_area.get_parent() as BoneAttachment3D
-	if attachment == null:
-		push_warning("Hit area has no BoneAttachment3D parent")
-		return
-
-	# convert the world point and normal to local space as attached to the bone
-	var bone_inv := attachment.global_transform.affine_inverse() # affine_inverse() rather than inverse() is used so that the hits are detected correctly when the character is scaled
-	var local_point := bone_inv * world_point
-	var local_normal := (bone_inv.basis * world_normal).normalized()
-
 	# update deformation array and shader
 	var do_deform := deformation_params != null and deformation_params.apply_deformation
 	if do_deform:
 		if hit_locations.size() >= MAX_HITS:
 			hit_locations.pop_front()
 		hit_locations.append({
-			"attachment": attachment,
+			"attachment": bone_attachment,
 			"pos": local_point,
 			"normal": local_normal,
 			"radius": deformation_params.hit_radius,
@@ -71,9 +73,8 @@ func record_hit(
 		})
 		update_deformation_shader()
 
-	# spawn hit decal
 	if decal_params:
-		spawn_hit_decal(attachment, local_point, local_normal, decal_params)
+		spawn_hit_decal(bone_attachment, local_point, local_normal, decal_params)
 
 
 # update the deformation shader with the hit locations and normals
@@ -104,33 +105,33 @@ func update_deformation_shader() -> void:
 	mat.set("shader_parameter/hit_strength", strength)
 
 
-# spawn a hit decal at the given position, oriented by the given normal
-func spawn_hit_decal(attachment: BoneAttachment3D, local_point: Vector3, local_normal: Vector3, decal_params: DecalParameters = null) -> void:
-	# limit the number of decals
+func spawn_hit_decal(attachment: BoneAttachment3D, local_point: Vector3, local_normal: Vector3, hit_decal_params: DecalParameters) -> void:
+	if hit_decal_params == null or hit_decal_params.texture == null:
+		return
 	if decals.size() >= MAX_DECALS:
 		var old: Decal = decals.pop_front()
 		old.queue_free()
 
 	# create a new decal and set its parameters
 	var decal := Decal.new()
-	decal.texture_albedo = decal_params.texture
-	decal.size = Vector3(decal_params.width, decal_params.depth, decal_params.height)
+	decal.texture_albedo = hit_decal_params.texture
+	decal.size = Vector3(hit_decal_params.width, hit_decal_params.depth, hit_decal_params.height)
 	decal.upper_fade = 0.5
 	decal.lower_fade = 0.5
 	decal.normal_fade = 0.2
-	
-	# parent to the bone attachment so the decal moves with the bone deformations
+
+	# parent to the attachment node
 	attachment.add_child(decal)
 
 	# offset the decal position slightly so that the look_at position is different from the decal position
 	var pos_local := local_point - local_normal * 0.02
 	var target_local := local_point + local_normal
+
 	# set the decal's position and orientation
 	decal.global_position = attachment.global_transform * pos_local
 	decal.look_at(attachment.global_transform * target_local, Vector3.UP)
 	decal.rotate_object_local(Vector3(1, 0, 0), -PI / 2.0) # rotate the decal along the X axis by -90 degrees so that the decal texture is the correct orientation on the surface
 
-	# add the decal to the decals array
 	decals.append(decal)
 
 
@@ -156,3 +157,37 @@ func _spawn_debug_sphere(hit_pos: Vector3, attachment: BoneAttachment3D) -> void
 	add_child(sphere)
 	sphere.global_position = attachment.global_transform * hit_pos
 
+
+
+#@onready var raycast_front: RayCast3D = $ManticoreModel/metarig/Skeleton3D/FootFR/RayCast3D
+#@onready var raycast_back: RayCast3D = $ManticoreModel/metarig/Skeleton3D/FootBR/RayCast3D
+#@onready var model: Node3D = $ManticoreModel
+#
+#func _physics_process(delta: float) -> void:
+	#align_to_ground_pitch()
+	#velocity.y -= 9.81 * delta
+	#move_and_slide()
+#
+#func align_to_ground_pitch():
+	#if not raycast_front.is_colliding():
+		#return
+	#if not raycast_back.is_colliding():
+		#return
+#
+	#var front_hit := raycast_front.get_collision_point()
+	#var back_hit  := raycast_back.get_collision_point()
+#
+	## Direction from back to front foot
+	#var slope_vector := front_hit - back_hit
+#
+	## Remove sideways influence (XZ plane alignment)
+	#slope_vector = slope_vector.project(Vector3.FORWARD)
+#
+	## Angle between slope and flat ground
+	#var angle := atan2(slope_vector.y, slope_vector.z)
+#
+	#model.rotation.x = lerp_angle(
+		#model.rotation.x,
+		#angle + deg_to_rad(-5),
+		#0.15
+	#)

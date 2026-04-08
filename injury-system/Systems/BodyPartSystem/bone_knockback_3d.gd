@@ -30,9 +30,11 @@ func _validate_property(property: Dictionary) -> void:
 
 
 func apply_knockback(direction: Vector3) -> void:
-	if skeleton == null:
+	if skeleton == null or knockback_modifier == null:
 		return
-	var bone_index = skeleton.find_bone(bone_name)
+	var bone_index := skeleton.find_bone(bone_name)
 	if bone_index == -1:
 		return
-	knockback_modifier.add_knockback(bone_index, direction, knockback_strength)
+	var dir_world := direction.normalized()
+	var dir_skeleton := skeleton.global_transform.basis.inverse() * dir_world
+	knockback_modifier.add_knockback(bone_index, dir_skeleton.normalized(), knockback_strength)

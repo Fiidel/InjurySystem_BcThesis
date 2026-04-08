@@ -10,6 +10,7 @@ enum ProjectileTypeEnum {
 
 # General settings
 @export var type: ProjectileTypeEnum
+@export var hit_damage: int = 1
 @export var speed: float = 50.0
 @export var is_affected_by_gravity: bool
 
@@ -41,7 +42,7 @@ var _has_raycast_hit: bool = false # whether the raycast has detected a hit
 var raycast_hit_position: Vector3 = Vector3.ZERO # stored position of the hit
 var raycast_hit_normal: Vector3 = Vector3.ZERO # stored normal of the hit
 
-@onready var hitbox: Area3D = $Hitbox
+@onready var projectile_hitbox: Area3D = $Hitbox
 
 
 func _ready() -> void:
@@ -54,7 +55,7 @@ func _ready() -> void:
 	_ray_length = speed * 0.1
 	# connect signals
 	body_entered.connect(_on_physics_body_entered)
-	hitbox.area_entered.connect(_on_hitbox_entered)
+	projectile_hitbox.area_entered.connect(_on_hitbox_entered)
 	# set the facing direction
 	look_at(global_position + projectile_direction)
 	# offset for gravity-based projectiles to start the arc at an upwards angle
@@ -87,33 +88,37 @@ func _on_physics_body_entered(_body: Node3D) -> void:
 
 
 # for enemy hitbox Area3D hit detection
-func _on_hitbox_entered(area: Area3D) -> void:
-	var enemy: Enemy = _get_enemy_from_hitbox_area(area)
-	if enemy:
-		match type:
-			# shapecast hitbox shape for bludgeoning projectiles and record the shapecast's hit
-			ProjectileTypeEnum.BLUDGEONING:
-				cast_hitbox_and_record_hit(enemy, area)
-				destroy_bludgeoning_projectile()
-			# the projectile has collided with an enemy's hitbox -> record the projectile's hit position that was detected by its raycast(s)
-			ProjectileTypeEnum.PIERCING, ProjectileTypeEnum.SLASHING:
-				record_hit_from_raycast(enemy, area)
-				# spawn impact particle vfx
-				await get_tree().create_timer(0.25).timeout # wait a little before the blood flows
-				spawn_impact_particles(enemy, raycast_hit_position)
+func _on_hitbox_entered(detected_area: Area3D) -> void:
+	# projectile entered an area - check if it's an enemy hitbox
+	if not (detected_area is Hitbox):
+		return
+	
+	# handle different types of projectile hits
+	var enemy_hitbox: Hitbox = detected_area as Hitbox
+	match type:
+		# shapecast hitbox shape for bludgeoning projectiles and record the shapecast's hit
+		ProjectileTypeEnum.BLUDGEONING:
+			cast_hitbox_and_record_hit(enemy_hitbox)
+			destroy_bludgeoning_projectile()
+		# the projectile has collided with an enemy's hitbox -> record the projectile's hit position that was detected by its raycast(s)
+		ProjectileTypeEnum.PIERCING, ProjectileTypeEnum.SLASHING:
+			record_hit_from_raycast(enemy_hitbox)
+			# spawn impact particle vfx
+			await get_tree().create_timer(0.25).timeout # wait a little before the blood flows
+			spawn_impact_particles(enemy_hitbox, raycast_hit_position)
 
 	if type != ProjectileTypeEnum.BLUDGEONING:
 		queue_free()
 
 
 # shapecast hitbox shape for bludgeoning projectiles and record the shapecast's hit
-func cast_hitbox_and_record_hit(enemy: Enemy, hitbox_area: Area3D) -> void:
+func cast_hitbox_and_record_hit(enemy_hitbox: Hitbox) -> void:
 	# allow only 1 hit
 	if _hit_recorded:
 		return
 	
 	# get the hitbox's collision shape
-	var collision_shape: CollisionShape3D = _get_hitbox_collision_shape()
+	var collision_shape: CollisionShape3D = _get_projectile_collision_shape()
 	if not collision_shape or not collision_shape.shape:
 		return
 	
@@ -121,16 +126,24 @@ func cast_hitbox_and_record_hit(enemy: Enemy, hitbox_area: Area3D) -> void:
 	var space_state := get_world_3d().direct_space_state
 	var params := PhysicsShapeQueryParameters3D.new()
 	params.shape = collision_shape.shape
-	params.transform = hitbox.global_transform
+	params.transform = projectile_hitbox.global_transform
 	params.collide_with_bodies = false
 	params.collide_with_areas = true
-	params.collision_mask = hitbox.collision_mask
-	params.exclude = [get_rid(), hitbox.get_rid()] # exclude the projectile and self's hitbox
+	params.collision_mask = projectile_hitbox.collision_mask
+	params.exclude = [get_rid(), projectile_hitbox.get_rid()] # exclude the projectile and self's hitbox
 
 	# get the collision info and record hit in enemy script
 	var collision := space_state.get_rest_info(params)
 	if not collision.is_empty() and "point" in collision and "normal" in collision:
-		enemy.record_hit(collision.point, collision.normal, hitbox_area, decal_params, deformation_params)
+		var hit_data := ProjectileHitData.new(
+			hit_damage,
+			collision.point,
+			collision.normal,
+			projectile_direction,
+			decal_params,
+			deformation_params
+		)
+		enemy_hitbox.receive_hit(hit_data)
 		_hit_recorded = true
 
 
@@ -141,32 +154,33 @@ func destroy_bludgeoning_projectile() -> void:
 		queue_free() # delete the projectile, replace with fragments
 		var fragments: Node3D = projectile_fragments_scene.instantiate()
 		world_root.add_child(fragments)
-		fragments.global_position = hitbox.global_position
-	spawn_impact_particles(world_root, hitbox.global_position)
+		fragments.global_position = projectile_hitbox.global_position
+	spawn_impact_particles(world_root, projectile_hitbox.global_position)
 
 
 # spawn impact particles at a given position
-func spawn_impact_particles(attach_node: Node3D, position: Vector3) -> void:
-	if impact_particles_scene:
-		var impact_particles: GPUParticles3D = impact_particles_scene.instantiate()
-		attach_node.add_child(impact_particles)
-		impact_particles.global_position = position
-		impact_particles.emitting = true
-		await get_tree().create_timer(impact_particles.lifetime).timeout
-		impact_particles.queue_free()
+func spawn_impact_particles(attach_node: Node3D, spawn_position: Vector3) -> void:
+	if not impact_particles_scene:
+		return
+	var impact_particles: GPUParticles3D = impact_particles_scene.instantiate()
+	attach_node.add_child(impact_particles)
+	impact_particles.global_position = spawn_position
+	impact_particles.emitting = true
+	await get_tree().create_timer(impact_particles.lifetime).timeout
+	impact_particles.queue_free()
 
 
 # update the raycast for PIERCING projectiles
 func update_piercing_raycast() -> void:
 	# construct the raycast
 	var dir_norm := projectile_direction.normalized()
-	var origin := hitbox.global_position - dir_norm * _ray_length * 0.5
-	var target := hitbox.global_position + dir_norm * _ray_length
+	var origin := projectile_hitbox.global_position - dir_norm * _ray_length * 0.5
+	var target := projectile_hitbox.global_position + dir_norm * _ray_length
 	var params := PhysicsRayQueryParameters3D.create(origin, target)
-	params.exclude = [get_rid(), hitbox.get_rid()]
+	params.exclude = [get_rid(), projectile_hitbox.get_rid()]
 	params.collide_with_bodies = false
 	params.collide_with_areas = true
-	params.collision_mask = hitbox.collision_mask
+	params.collision_mask = projectile_hitbox.collision_mask
 	
 	# perform the raycast
 	var space_state: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
@@ -198,20 +212,20 @@ func update_slashing_raycast() -> void:
 		var centered_normalized_index := float(i) / index_max - 0.5 # normalize to 0-1 and shift by 0.5 (half to the left of the center of the projectile, half to the right)
 		var offset := centered_normalized_index * slash_detection_width # calculate the offset based on the slash arc's width
 		# create the raycast query and perform the raycast
-		var origin := hitbox.global_position + arc_axis * offset - dir * _ray_length
-		var target := hitbox.global_position + arc_axis * offset + dir * _ray_length
+		var origin := projectile_hitbox.global_position + arc_axis * offset - dir * _ray_length
+		var target := projectile_hitbox.global_position + arc_axis * offset + dir * _ray_length
 		var params := PhysicsRayQueryParameters3D.create(origin, target)
-		params.exclude = [get_rid(), hitbox.get_rid()]
+		params.exclude = [get_rid(), projectile_hitbox.get_rid()]
 		params.collide_with_bodies = false
 		params.collide_with_areas = true
-		params.collision_mask = hitbox.collision_mask
+		params.collision_mask = projectile_hitbox.collision_mask
 		var collision := space_state.intersect_ray(params)
 		# if the raycast didn't hit anything, continue to next raycast
 		if collision.is_empty():
 			continue
 		# if the raycast didn't hit an enemy's hitbox, continue to next raycast
 		var collider = collision.get("collider")
-		if not (collider is Area3D) or not _get_enemy_from_hitbox_area(collider):
+		if not (collider is Hitbox):
 			continue
 		# record hit; prefer the middle ray's hit over side hits
 		var dist_from_center = abs(float(i) - center_ray_index)
@@ -228,13 +242,15 @@ func update_slashing_raycast() -> void:
 
 
 # record the non-bludgeoning projectile's hit through the enemy script
-func record_hit_from_raycast(enemy: Enemy, area: Area3D) -> void:
+func record_hit_from_raycast(enemy_hitbox: Hitbox) -> void:
+	# allow only 1 hit per projectile
 	if _hit_recorded:
 		return
 	# use the detected hit position and normal, or the projectile hitbox's position and normal if the projectile has collided with the enemy's hitbox but no hit was detected
-	var position: Vector3 = raycast_hit_position if _has_raycast_hit else hitbox.global_position
-	var normal: Vector3 = raycast_hit_normal if _has_raycast_hit else (-projectile_direction.normalized())
-	enemy.record_hit(position, normal, area, decal_params)
+	var hit_position: Vector3 = raycast_hit_position if _has_raycast_hit else projectile_hitbox.global_position
+	var hit_normal: Vector3 = raycast_hit_normal if _has_raycast_hit else (-projectile_direction.normalized())
+	var hit_data := ProjectileHitData.new(hit_damage, hit_position, hit_normal, projectile_direction, decal_params)
+	enemy_hitbox.receive_hit(hit_data)
 	_hit_recorded = true
 
 
@@ -259,19 +275,10 @@ func _get_mesh_instance() -> MeshInstance3D:
 			return child as MeshInstance3D
 	return null
 
+
 # get the Area3D hitbox's collision shape
-func _get_hitbox_collision_shape() -> CollisionShape3D:
-	for child in hitbox.get_children():
+func _get_projectile_collision_shape() -> CollisionShape3D:
+	for child in projectile_hitbox.get_children():
 		if child is CollisionShape3D:
 			return child as CollisionShape3D
-	return null
-
-
-# search through the node's parents until the Enemy node is found
-func _get_enemy_from_hitbox_area(area: Area3D) -> Enemy:
-	var node: Node = area
-	while node:
-		if node is Enemy:
-			return node as Enemy
-		node = node.get_parent()
 	return null
