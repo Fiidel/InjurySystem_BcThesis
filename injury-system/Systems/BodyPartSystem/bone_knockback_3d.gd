@@ -4,6 +4,7 @@
 class_name BoneKnockback3D
 extends Node
 
+@export var knockback_strength: float = 0.5
 @export var knockback_modifier: BodyPartKnockback3D
 @export var skeleton: Skeleton3D:
 	set(value):
@@ -34,4 +35,4 @@ func apply_knockback(direction: Vector3) -> void:
 	var bone_index = skeleton.find_bone(bone_name)
 	if bone_index == -1:
 		return
-	knockback_modifier.add_knockback(bone_index, direction)
+	knockback_modifier.add_knockback(bone_index, direction, knockback_strength)

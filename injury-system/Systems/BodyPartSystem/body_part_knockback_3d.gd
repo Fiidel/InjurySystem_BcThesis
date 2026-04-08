@@ -7,7 +7,7 @@ const KNOCKBACK_SPEED: float = 8.0
 var active_knockbacks = {}  # bone_idx -> {target_offset, progress, is_returning}
 
 
-func add_knockback(bone_index: int, hit_direction: Vector3, strength: float = 0.5):
+func add_knockback(bone_index: int, hit_direction: Vector3, strength: float):
 	active_knockbacks[bone_index] = {
 		"target_offset": hit_direction * strength,
 		"progress": 0.0,
@@ -25,7 +25,7 @@ func _process_modification_with_delta(delta: float) -> void:
 	for bone_index in active_knockbacks:
 		var kb = active_knockbacks[bone_index]
 		if kb.is_returning:
-			kb.progress -= delta * KNOCKBACK_SPEED
+			kb.progress -= delta * KNOCKBACK_SPEED * 0.5 # slower when returning
 			if kb.progress <= 0:
 				to_remove.append(bone_index)
 		else:
