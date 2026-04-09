@@ -1,3 +1,5 @@
+@tool
+
 class_name Projectile
 extends RigidBody3D
 ## Projectile class for the player's abilities.
@@ -9,7 +11,10 @@ enum ProjectileTypeEnum {
 }
 
 # General settings
-@export var type: ProjectileTypeEnum
+@export var type: ProjectileTypeEnum:
+	set(value):
+		type = value
+		notify_property_list_changed()
 @export var hit_damage: int = 1
 @export var speed: float = 50.0
 @export var is_affected_by_gravity: bool
@@ -43,6 +48,15 @@ var raycast_hit_position: Vector3 = Vector3.ZERO # stored position of the hit
 var raycast_hit_normal: Vector3 = Vector3.ZERO # stored normal of the hit
 
 @onready var projectile_hitbox: Area3D = $Hitbox
+
+
+func _validate_property(property: Dictionary) -> void:
+	if property.name in ["deformation_params"]:
+		if type != ProjectileTypeEnum.BLUDGEONING:
+			property.usage = PROPERTY_USAGE_NO_EDITOR
+	if property.name in ["slash_detection_width", "slash_ray_count"]:
+		if type != ProjectileTypeEnum.SLASHING:
+			property.usage = PROPERTY_USAGE_NO_EDITOR
 
 
 func _ready() -> void:
