@@ -27,3 +27,8 @@ func _on_child_finished(_return_status: ReturnStatus) -> void:
 	if current_child_idx == child_nodes.size():
 		current_child_idx = 0
 	child_nodes[current_child_idx].execute()
+
+
+func abort() -> void:
+	if not child_nodes.is_empty() and current_child_idx >= 0 and current_child_idx < child_nodes.size():
+		child_nodes[current_child_idx].abort()

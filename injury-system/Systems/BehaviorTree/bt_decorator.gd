@@ -8,3 +8,8 @@ var child: BTNode
 func add_bt_child(node: BTNode) -> void:
 	child = node
 	child_nodes = [node]
+
+
+func abort() -> void:
+	if child != null:
+		child.abort()

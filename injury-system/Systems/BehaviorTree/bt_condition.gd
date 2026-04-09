@@ -25,8 +25,3 @@ func execute() -> void:
 
 func _on_child_finished(return_status: ReturnStatus) -> void:
 	finished.emit(return_status)
-
-
-func abort() -> void:
-	if child != null:
-		child.abort()

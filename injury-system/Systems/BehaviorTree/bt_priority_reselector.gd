@@ -62,6 +62,12 @@ func on_recheck_conditions() -> void:
 			return
 
 
+func abort() -> void:
+	cleanup_recheck_timer()
+	if not child_nodes.is_empty() and current_child_idx >= 0 and current_child_idx < child_nodes.size():
+		child_nodes[current_child_idx].abort()
+
+
 func cleanup_recheck_timer() -> void:
 	if recheck_timer == null:
 		return
