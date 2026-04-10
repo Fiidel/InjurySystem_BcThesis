@@ -15,7 +15,7 @@ enum ProjectileTypeEnum {
 	set(value):
 		type = value
 		notify_property_list_changed()
-@export var hit_damage: int = 1
+@export var hit_damage: float = 1.0
 @export var speed: float = 50.0
 @export var is_affected_by_gravity: bool
 

@@ -3,9 +3,11 @@
 class_name BodyPart
 extends Node
 
+signal damage_central_health(amount: float)
 signal zero_health_reached
 
-@export var health: int = 1
+@export var health: float = 1
+@export var only_damage_central_health: bool = false
 @export var hitboxes: Array[Hitbox]
 var knockback_component: BoneKnockback3D
 var is_destroyed: bool
@@ -22,7 +24,7 @@ func _ready() -> void:
 
 
 func on_hitbox_hit(
-		damage_amount: int,
+		damage_amount: float,
 		_local_point: Vector3,
 		_local_normal: Vector3,
 		projectile_direction: Vector3,
@@ -35,8 +37,11 @@ func on_hitbox_hit(
 		knockback_component.apply_knockback(projectile_direction)
 
 
-func take_damage(amount: int) -> void:
+func take_damage(amount: float) -> void:
 	if is_destroyed:
+		return
+	if only_damage_central_health:
+		damage_central_health.emit(amount)
 		return
 	health -= amount
 	if health <= 0:

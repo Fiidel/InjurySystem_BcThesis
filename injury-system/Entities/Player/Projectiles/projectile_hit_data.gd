@@ -1,7 +1,7 @@
 class_name ProjectileHitData
 extends Resource
 
-var damage_amount: int = 0
+var damage_amount: float = 0.0
 var world_position: Vector3 = Vector3.ZERO
 var world_normal: Vector3 = Vector3.UP
 var projectile_direction: Vector3 = Vector3.ZERO
@@ -10,7 +10,7 @@ var deformation_params: DeformationParameters
 
 
 func _init(
-	damage: int = 0,
+	damage: float = 0.0,
 	world_position: Vector3 = Vector3.ZERO,
 	world_normal: Vector3 = Vector3.UP,
 	projectile_direction: Vector3 = Vector3.ZERO,

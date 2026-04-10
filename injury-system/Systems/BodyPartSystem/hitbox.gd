@@ -4,7 +4,7 @@ class_name Hitbox
 extends Area3D
 
 signal hitbox_hit(
-	damage_amount: int,
+	damage_amount: float,
 	local_point: Vector3,
 	local_normal: Vector3,
 	projectile_direction: Vector3,

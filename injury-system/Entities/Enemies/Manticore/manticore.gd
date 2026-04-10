@@ -51,7 +51,7 @@ func get_hitboxes(node: Node) -> void:
 
 # record a hit on the enemy, apply deformation and spawn decal
 func record_hit(
-		_damage_amount: int,
+		_damage_amount: float,
 		local_point: Vector3,
 		local_normal: Vector3,
 		_projectile_direction: Vector3,

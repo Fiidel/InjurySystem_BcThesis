@@ -4,6 +4,7 @@ class_name BTRoot
 extends BTNode
 
 var current_child_idx: int = 0
+var halted: bool = false
 
 
 func _init() -> void:
@@ -16,6 +17,8 @@ func _ready() -> void:
 
 
 func execute() -> void:
+	if halted:
+		return
 	if child_nodes.is_empty():
 		return
 	current_child_idx = 0
@@ -23,6 +26,8 @@ func execute() -> void:
 
 
 func _on_child_finished(_return_status: ReturnStatus) -> void:
+	if halted:
+		return
 	current_child_idx += 1
 	if current_child_idx == child_nodes.size():
 		current_child_idx = 0
@@ -30,5 +35,8 @@ func _on_child_finished(_return_status: ReturnStatus) -> void:
 
 
 func abort() -> void:
+	if halted:
+		return
+	halted = true
 	if not child_nodes.is_empty() and current_child_idx >= 0 and current_child_idx < child_nodes.size():
 		child_nodes[current_child_idx].abort()
