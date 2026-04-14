@@ -5,6 +5,7 @@ extends CharacterBody3D
 ## Adapted from Godot's base CharacterBody3D template.
 
 const SPEED = 5.0
+const SPRINT_SPEED_MULTIPLIER = 2.5
 const JUMP_VELOCITY = 4.5
 const SENSITIVITY = 0.01
 const SLASH = preload("uid://bo6hoxdtu4dff")
@@ -75,12 +76,13 @@ func _physics_process(delta: float) -> void:
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir := Input.get_vector("left", "right", "forward", "backward")
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	var move_speed := SPEED * (SPRINT_SPEED_MULTIPLIER if Input.is_action_pressed("sprint") else 1.0)
 	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
+		velocity.x = direction.x * move_speed
+		velocity.z = direction.z * move_speed
 	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
+		velocity.x = move_toward(velocity.x, 0, move_speed)
+		velocity.z = move_toward(velocity.z, 0, move_speed)
 
 	move_and_slide()
 
