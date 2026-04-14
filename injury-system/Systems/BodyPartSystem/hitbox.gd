@@ -1,3 +1,4 @@
+@tool
 @icon("uid://b7dwo55g2dku5")
 
 class_name Hitbox

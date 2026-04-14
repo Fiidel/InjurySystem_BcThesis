@@ -1,3 +1,4 @@
+@tool
 @icon("uid://cvv6g76quclal")
 
 class_name BodyPart
@@ -8,9 +9,38 @@ signal zero_health_reached
 
 @export var health: float = 1
 @export var only_damage_central_health: bool = false
+@export var remove_bones_on_destroy: bool = false:
+	set(value):
+		if remove_bones_on_destroy == value:
+			return
+		remove_bones_on_destroy = value
+		notify_property_list_changed()
+@export var skeleton: Skeleton3D:
+	set(value):
+		if skeleton == value:
+			return
+		skeleton = value
+		notify_property_list_changed()
+@export var bone_to_remove: StringName
 @export var hitboxes: Array[Hitbox]
 var knockback_component: BoneKnockback3D
 var is_destroyed: bool
+
+
+func _validate_property(property: Dictionary) -> void:
+	# toggle skeleton and bone based on remove_bones_on_destroy
+	if property.name in ["skeleton", "bone_to_remove"]:
+		if not remove_bones_on_destroy:
+			property.usage = PROPERTY_USAGE_NO_EDITOR
+	
+	# validate the bone_to_destroy property
+	if property.name == &"bone_to_remove" and skeleton != null:
+		# get the bone names and set it as the hint string enum
+		var hint_string := String(skeleton.get_concatenated_bone_names())
+		if hint_string.is_empty():
+			return
+		property.hint = PROPERTY_HINT_ENUM
+		property.hint_string = hint_string
 
 
 func _ready() -> void:
