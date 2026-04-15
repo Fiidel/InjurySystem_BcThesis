@@ -19,6 +19,10 @@ run/main_scene="uid://b3fjuvv488qok"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+SignalBus="*uid://bpwi4d1cvt631"
+
 [dotnet]
 
 project/assembly_name="InjurySystem"

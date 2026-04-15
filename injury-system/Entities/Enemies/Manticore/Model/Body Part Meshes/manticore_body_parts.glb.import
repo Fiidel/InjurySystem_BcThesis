@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bqjrsydevqjgx"
-path="res://.godot/imported/manticore_body_parts.glb-de8ca5373cba9a0f673c20a1e064bb9a.scn"
+path="res://.godot/imported/manticore_body_parts.glb-7c423038cdcd7b2616d5aeb895235589.scn"
 
 [deps]
 
-source_file="res://Entities/Enemies/Manticore/Model/manticore_body_parts.glb"
-dest_files=["res://.godot/imported/manticore_body_parts.glb-de8ca5373cba9a0f673c20a1e064bb9a.scn"]
+source_file="res://Entities/Enemies/Manticore/Model/Body Part Meshes/manticore_body_parts.glb"
+dest_files=["res://.godot/imported/manticore_body_parts.glb-7c423038cdcd7b2616d5aeb895235589.scn"]
 
 [params]
 

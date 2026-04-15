@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://q7hkaxovgbj0" path="res://Entities/Player/player.gd" id="1_mv1ah"]
 [ext_resource type="Texture2D" uid="uid://c6fa28p1wggn" path="res://Entities/Player/damage_screen_effect.png" id="2_3uyv8"]
+[ext_resource type="Script" uid="uid://bqj8w2k4npcam" path="res://Entities/Player/player_camera.gd" id="3_pcam"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 radius = 0.4
@@ -17,6 +18,7 @@ shape = SubResource("CapsuleShape3D_0xm2m")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=863646441]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+script = ExtResource("3_pcam")
 
 [node name="FlashEffect" type="CanvasLayer" parent="." unique_id=1203607145]
 

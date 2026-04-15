@@ -43,7 +43,7 @@ speed = 20.0
 decal_params = SubResource("Resource_u4k6h")
 impact_particles_scene = ExtResource("5_udtx8")
 slash_detection_width = 1.0
-slash_ray_count = 7
+slash_ray_count = 11
 
 [node name="Slash" parent="." index="0" unique_id=843048054]
 surface_material_override/0 = SubResource("StandardMaterial3D_u4k6h")

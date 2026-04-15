@@ -22,14 +22,17 @@ signal zero_health_reached
 		skeleton = value
 		notify_property_list_changed()
 @export var bone_to_remove: StringName
+@export var severed_body_scene: PackedScene
 @export var hitboxes: Array[Hitbox]
 var knockback_component: BoneKnockback3D
 var is_destroyed: bool
 
+const SEVERED_LIMB_BONE_POSE_SCALE := Vector3.ONE * 0.001
+
 
 func _validate_property(property: Dictionary) -> void:
 	# toggle skeleton and bone based on remove_bones_on_destroy
-	if property.name in ["skeleton", "bone_to_remove"]:
+	if property.name in ["skeleton", "bone_to_remove", "severed_body_scene"]:
 		if not remove_bones_on_destroy:
 			property.usage = PROPERTY_USAGE_NO_EDITOR
 	
@@ -80,4 +83,16 @@ func take_damage(amount: float) -> void:
 
 func on_zero_health_reached() -> void:
 	is_destroyed = true
-	print("body part" + name + "destroyed")
+	SignalBus.body_part_destroyed.emit()
+	if remove_bones_on_destroy:
+		if skeleton != null and bone_to_remove != StringName():
+			var bone_idx: int = skeleton.find_bone(bone_to_remove)
+			if bone_idx >= 0:
+				var bone_xform: Transform3D = skeleton.global_transform * skeleton.get_bone_global_pose(bone_idx)
+				skeleton.set_bone_pose_scale(bone_idx, Vector3.ONE * 0.001)
+				if severed_body_scene != null:
+					spawn_severed_limb(bone_xform)
+
+
+func spawn_severed_limb(bone_xform) -> void:
+	pass
