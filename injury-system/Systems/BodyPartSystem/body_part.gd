@@ -85,14 +85,16 @@ func on_zero_health_reached() -> void:
 	is_destroyed = true
 	SignalBus.body_part_destroyed.emit()
 	if remove_bones_on_destroy:
-		if skeleton != null and bone_to_remove != StringName():
+		if skeleton != null and bone_to_remove != "":
 			var bone_idx: int = skeleton.find_bone(bone_to_remove)
 			if bone_idx >= 0:
-				var bone_xform: Transform3D = skeleton.global_transform * skeleton.get_bone_global_pose(bone_idx)
+				var bone_transform: Transform3D = skeleton.global_transform * skeleton.get_bone_global_pose(bone_idx)
 				skeleton.set_bone_pose_scale(bone_idx, Vector3.ONE * 0.001)
 				if severed_body_scene != null:
-					spawn_severed_limb(bone_xform)
+					spawn_severed_limb(bone_transform)
 
 
-func spawn_severed_limb(bone_xform) -> void:
-	pass
+func spawn_severed_limb(bone_transform: Transform3D) -> void:
+	var inst := severed_body_scene.instantiate()
+	add_child(inst)
+	inst.global_transform = bone_transform

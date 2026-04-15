@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://uf33it8w6loj"]
+
+[ext_resource type="ArrayMesh" uid="uid://vbeuodt5xajo" path="res://Entities/Enemies/Manticore/Model/Body Part Meshes/LegBR.mesh" id="1_o0yah"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_oh2t6"]
+radius = 0.12597656
+height = 0.4684143
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qv8n0"]
+size = Vector3(0.17816162, 0.14251709, 0.20898438)
+
+[node name="LegBRSevered" type="RigidBody3D" unique_id=1673909603]
+collision_layer = 4
+collision_mask = 4
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=471764022]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.39986116, 2.3841858e-07, 0.9064534)
+mesh = ExtResource("1_o0yah")
+
+[node name="LegCollisionShape3D" type="CollisionShape3D" parent="." unique_id=673592492]
+transform = Transform3D(0.9859144, 0.15034556, 0.07327322, -0.16725057, 0.88626224, 0.43193346, 0, -0.43810448, 0.8989242, -0.0034064353, 0.31575763, -0.03570277)
+shape = SubResource("CapsuleShape3D_oh2t6")
+
+[node name="FootCollisionShape3D" type="CollisionShape3D" parent="." unique_id=216211191]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.022216797, 0.08121517, 0.14469716)
+shape = SubResource("BoxShape3D_qv8n0")

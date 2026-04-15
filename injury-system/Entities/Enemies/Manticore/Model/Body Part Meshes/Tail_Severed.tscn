@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://cjnu0dxt0osqi"]
+
+[ext_resource type="ArrayMesh" uid="uid://c8i0dsodmkfjr" path="res://Entities/Enemies/Manticore/Model/Body Part Meshes/Tail.mesh" id="1_s15yn"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_70i25"]
+radius = 0.056152344
+height = 1.4399414
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_a325u"]
+radius = 0.1328125
+height = 0.4522705
+
+[node name="TailSevered" type="RigidBody3D" unique_id=1433795430]
+collision_layer = 4
+collision_mask = 4
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2065486523]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.2124853, 1.5737137)
+mesh = ExtResource("1_s15yn")
+
+[node name="TailCollisionShape3D" type="CollisionShape3D" parent="." unique_id=428345148]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.004331303, -0.730955)
+shape = SubResource("CapsuleShape3D_70i25")
+
+[node name="StingerCollisionShape3D" type="CollisionShape3D" parent="." unique_id=1577076512]
+transform = Transform3D(0.9999997, -0.00028271938, 0.0007417547, -0.0007404099, 0.0047336, 0.99998856, -0.00028622287, -0.9999888, 0.0047333897, 0, 0.1154574, -1.6594849)
+shape = SubResource("CapsuleShape3D_a325u")
