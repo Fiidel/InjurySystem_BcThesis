@@ -34,8 +34,6 @@ var decals: Array[Decal] = []
 var knockback_component: BoneKnockback3D
 var is_destroyed: bool
 
-const SEVERED_LIMB_BONE_POSE_SCALE := Vector3.ONE * 0.001
-
 
 func _validate_property(property: Dictionary) -> void:
 	# toggle skeleton and bone based on remove_bones_on_destroy
@@ -126,16 +124,68 @@ func on_zero_health_reached() -> void:
 	is_destroyed = true
 	SignalBus.body_part_destroyed.emit()
 	if remove_bones_on_destroy:
-		#TODO: remove mesh
-		if severed_body_scene != null:
-			#spawn_severed_limb()
-			pass
+		# make the mesh material flash
+		var mat := mesh.get_active_material(0)
+		var tween: Tween = create_tween()
+		tween.tween_property(mat, "shader_parameter/albedo", Color.DARK_RED, 0.1)
+		await tween.finished
+		await get_tree().create_timer(0.8).timeout
+		tween = create_tween()
+		tween.tween_property(mat, "shader_parameter/albedo", Color.WHITE, 0.1)
+		await tween.finished
+		# spawn the severed limb rigidbody and remove the original bones and hitboxes
+		spawn_severed_limb(mesh)
+		remove_bones()
+		for hitbox in hitboxes:
+			hitbox.queue_free()
 
 
-#func spawn_severed_limb(bone_transform: Transform3D) -> void:
-	#var inst := severed_body_scene.instantiate()
-	#add_child(inst)
-	#inst.global_transform = bone_transform
+func spawn_severed_limb(mesh: MeshInstance3D) -> void:
+	mesh.hide()
+
+
+func remove_bones() -> void:
+	if skeleton == null or bone_to_remove == "":
+		return
+	var root_bone_idx := skeleton.find_bone(bone_to_remove)
+	if root_bone_idx < 0:
+		return
+	remove_bone_subtree(root_bone_idx)
+
+
+func remove_bone_subtree(root_bone_idx: int) -> void:
+	var simulator: PhysicalBoneSimulator3D = find_physical_bone_simulator()
+	if simulator == null:
+		push_warning("BodyPart: no PhysicalBoneSimulator3D found for bone removal.")
+		return
+
+	var physical_bones: Dictionary = {} # bone name -> physical bone
+	for child in simulator.get_children():
+		if child is PhysicalBone3D:
+			var physical_bone := child as PhysicalBone3D
+			physical_bones[physical_bone.bone_name] = physical_bone
+	
+	var bones_to_remove: Array[int] = [root_bone_idx]
+	while not bones_to_remove.is_empty():
+		# get current bone
+		var current_bone: int = bones_to_remove.pop_back()
+		# log its children as to be deleted
+		for child_idx in skeleton.get_bone_children(current_bone):
+			bones_to_remove.append(child_idx)
+		# get the physical bone
+		var bone_name: StringName = skeleton.get_bone_name(current_bone)
+		var physical_bone: PhysicalBone3D = physical_bones.get(bone_name, null)
+		if physical_bone != null:
+			physical_bone.queue_free()
+
+
+func find_physical_bone_simulator() -> PhysicalBoneSimulator3D:
+	if skeleton == null:
+		return null
+	for child in skeleton.get_children():
+		if child is PhysicalBoneSimulator3D:
+			return child as PhysicalBoneSimulator3D
+	return null
 
 
 # update the deformation shader with the hit locations and normals
@@ -198,22 +248,22 @@ func spawn_hit_decal(attachment: BoneAttachment3D, local_point: Vector3, local_n
 
 # spawn a debug cylinder matching the decal's transforms
 func _spawn_debug_cylinder(attachment: BoneAttachment3D, decal: Decal) -> void:
-	var mesh := CylinderMesh.new()
-	mesh.top_radius = 0.1
-	mesh.bottom_radius = 0.1
-	mesh.height = 0.2
+	var debug_mesh := CylinderMesh.new()
+	debug_mesh.top_radius = 0.1
+	debug_mesh.bottom_radius = 0.1
+	debug_mesh.height = 0.2
 	var cylinder := MeshInstance3D.new()
-	cylinder.mesh = mesh
+	cylinder.mesh = debug_mesh
 	attachment.add_child(cylinder)
 	cylinder.global_transform = decal.global_transform
 
 
 # spawn a debug sphere at the given hit position
 func _spawn_debug_sphere(hit_pos: Vector3, attachment: BoneAttachment3D) -> void:
-	var mesh := SphereMesh.new()
-	mesh.radius = 0.1
-	mesh.height = 0.2
+	var debug_mesh := SphereMesh.new()
+	debug_mesh.radius = 0.1
+	debug_mesh.height = 0.2
 	var sphere := MeshInstance3D.new()
-	sphere.mesh = mesh
+	sphere.mesh = debug_mesh
 	add_child(sphere)
 	sphere.global_position = attachment.global_transform * hit_pos

@@ -7,7 +7,7 @@ extends Node
 @export var bt_root: BTRoot
 @export var animation_tree: AnimationTree
 @export var skeleton_simulator: PhysicalBoneSimulator3D
-@export var movement_collision: CollisionShape3D
+@export var movement_collision_shapes: Array[CollisionShape3D]
 
 
 func _ready() -> void:
@@ -25,7 +25,8 @@ func take_central_damage(amount: float) -> void:
 func activate_ragdoll() -> void:
 	if animation_tree:
 		animation_tree.active = false
-	movement_collision.disabled = true
+	for shape in movement_collision_shapes:
+		shape.disabled = true
 	skeleton_simulator.physical_bones_start_simulation()
 
 

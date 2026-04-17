@@ -116,10 +116,8 @@ func _on_hitbox_entered(detected_area: Area3D) -> void:
 			destroy_bludgeoning_projectile()
 		# the projectile has collided with an enemy's hitbox -> record the projectile's hit position that was detected by its raycast(s)
 		ProjectileTypeEnum.PIERCING, ProjectileTypeEnum.SLASHING:
-			record_hit_from_raycast(enemy_hitbox)
-			# spawn impact particle vfx
-			await get_tree().create_timer(0.25).timeout # wait a little before the blood flows
 			spawn_impact_particles(enemy_hitbox, raycast_hit_position)
+			record_hit_from_raycast(enemy_hitbox)
 
 	if type != ProjectileTypeEnum.BLUDGEONING:
 		queue_free()
