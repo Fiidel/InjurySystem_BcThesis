@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://riq7pwjvv4rj"]
+
+[ext_resource type="Texture2D" uid="uid://ddqygwu6uccnd" path="res://Entities/Enemies/Manticore/Model/manticore_split_Material Layer.png" id="1_ee3fw"]
+
+[resource]
+resource_name = "DeformMagnitude"
+cull_mode = 2
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_ee3fw")
+metallic = 1.0

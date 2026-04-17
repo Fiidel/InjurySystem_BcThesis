@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://u3d2u4vfino8"]
+
+[ext_resource type="Texture2D" uid="uid://bqpubu0ld5gf4" path="res://Stages/Environments/Desert/desert_env_Stylized_Sand_002_basecolor.png" id="1_fo6qg"]
+[ext_resource type="Texture2D" uid="uid://ckf4dim0m2lv" path="res://Stages/Environments/Desert/desert_env_Stylized_Sand_002_normal.png" id="2_w1jb0"]
+
+[resource]
+resource_name = "Sand"
+cull_mode = 2
+albedo_texture = ExtResource("1_fo6qg")
+normal_enabled = true
+normal_texture = ExtResource("2_w1jb0")

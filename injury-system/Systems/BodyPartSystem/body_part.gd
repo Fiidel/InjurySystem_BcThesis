@@ -7,8 +7,13 @@ extends Node
 signal damage_central_health(amount: float)
 signal zero_health_reached
 
+const MAX_HITS: int = 16
+const MAX_DECALS: int = 16
+
 @export var health: float = 1
 @export var only_damage_central_health: bool = false
+@export var mesh: MeshInstance3D
+@export var mesh_target_id: StringName = "BP_"
 @export var remove_bones_on_destroy: bool = false:
 	set(value):
 		if remove_bones_on_destroy == value:
@@ -24,6 +29,8 @@ signal zero_health_reached
 @export var bone_to_remove: StringName
 @export var severed_body_scene: PackedScene
 @export var hitboxes: Array[Hitbox]
+var hit_locations: Array = []
+var decals: Array[Decal] = []
 var knockback_component: BoneKnockback3D
 var is_destroyed: bool
 
@@ -47,27 +54,61 @@ func _validate_property(property: Dictionary) -> void:
 
 
 func _ready() -> void:
+	# init material and shader parameters
+	var mat := mesh.get_active_material(0).duplicate()
+	mesh.set_surface_override_material(0, mat)
+	mat.set("shader_parameter/hit_count", 0)
+	mat.set("shader_parameter/hit_positions", PackedVector3Array())
+	mat.set("shader_parameter/hit_normals", PackedVector3Array())
+	mat.set("shader_parameter/hit_radius", PackedFloat32Array())
+	mat.set("shader_parameter/hit_strength", PackedFloat32Array())
+	# get the knockback component
 	for child in get_children():
 		if child is BoneKnockback3D:
 			knockback_component = child
 			break
+	# connect the signals
 	for hitbox in hitboxes:
 		hitbox.hitbox_hit.connect(on_hitbox_hit)
 	zero_health_reached.connect(on_zero_health_reached)
 
 
+func _process(_delta: float) -> void:
+	# update shader with parameters following the bone animation
+	if not hit_locations.is_empty():
+		update_deformation_shader()
+
+
 func on_hitbox_hit(
 		damage_amount: float,
-		_local_point: Vector3,
-		_local_normal: Vector3,
+		local_point: Vector3,
+		local_normal: Vector3,
 		projectile_direction: Vector3,
-		_bone_attachment: BoneAttachment3D,
-		_decal_params: Variant,
-		_deformation_params: Variant
+		bone_attachment: BoneAttachment3D,
+		decal_params: Variant,
+		deformation_params: Variant
 	) -> void:
+	# apply damage
 	take_damage(damage_amount)
+	# apply knockback
 	if knockback_component:
 		knockback_component.apply_knockback(projectile_direction)
+	# update deformation array and shader
+	var do_deform : bool = deformation_params != null and deformation_params.apply_deformation
+	if do_deform:
+		if hit_locations.size() >= MAX_HITS:
+			hit_locations.pop_front()
+		hit_locations.append({
+			"attachment": bone_attachment,
+			"pos": local_point,
+			"normal": local_normal,
+			"radius": deformation_params.hit_radius,
+			"strength": deformation_params.hit_strength
+		})
+		update_deformation_shader()
+	# spawn a decal
+	if decal_params:
+		spawn_hit_decal(bone_attachment, local_point, local_normal, decal_params)
 
 
 func take_damage(amount: float) -> void:
@@ -85,16 +126,94 @@ func on_zero_health_reached() -> void:
 	is_destroyed = true
 	SignalBus.body_part_destroyed.emit()
 	if remove_bones_on_destroy:
-		if skeleton != null and bone_to_remove != "":
-			var bone_idx: int = skeleton.find_bone(bone_to_remove)
-			if bone_idx >= 0:
-				var bone_transform: Transform3D = skeleton.global_transform * skeleton.get_bone_global_pose(bone_idx)
-				skeleton.set_bone_pose_scale(bone_idx, Vector3.ONE * 0.001)
-				if severed_body_scene != null:
-					spawn_severed_limb(bone_transform)
+		#TODO: remove mesh
+		if severed_body_scene != null:
+			#spawn_severed_limb()
+			pass
 
 
-func spawn_severed_limb(bone_transform: Transform3D) -> void:
-	var inst := severed_body_scene.instantiate()
-	add_child(inst)
-	inst.global_transform = bone_transform
+#func spawn_severed_limb(bone_transform: Transform3D) -> void:
+	#var inst := severed_body_scene.instantiate()
+	#add_child(inst)
+	#inst.global_transform = bone_transform
+
+
+# update the deformation shader with the hit locations and normals
+func update_deformation_shader() -> void:
+	var mesh_inv := mesh.global_transform.affine_inverse()
+	var positions := PackedVector3Array()
+	var normals := PackedVector3Array()
+	var radius := PackedFloat32Array()
+	var strength := PackedFloat32Array()
+
+	# iterate through all the hit locations and normals
+	for hit in hit_locations:
+		# hit is stored in bone-attachment local space; convert to mesh local so the mesh deformation shader can use it
+		var attachment := hit["attachment"] as BoneAttachment3D
+		# recalculate the attachment-to-mesh transform each frame so the hits follow the bone animation
+		var attachment_to_mesh := mesh_inv * attachment.global_transform
+		positions.append(attachment_to_mesh * hit["pos"])
+		var mesh_normal = (attachment_to_mesh.basis.inverse().transposed() * hit["normal"]).normalized()
+		normals.append(mesh_normal)
+		radius.append(float(hit["radius"]))
+		strength.append(float(hit["strength"]))
+
+	var mat := mesh.get_surface_override_material(0)
+	mat.set("shader_parameter/hit_count", hit_locations.size())
+	mat.set("shader_parameter/hit_positions", positions)
+	mat.set("shader_parameter/hit_normals", normals)
+	mat.set("shader_parameter/hit_radius", radius)
+	mat.set("shader_parameter/hit_strength", strength)
+
+
+func spawn_hit_decal(attachment: BoneAttachment3D, local_point: Vector3, local_normal: Vector3, hit_decal_params: DecalParameters) -> void:
+	if hit_decal_params == null or hit_decal_params.texture == null:
+		return
+	if decals.size() >= MAX_DECALS:
+		var old: Decal = decals.pop_front()
+		old.queue_free()
+
+	# create a new decal and set its parameters
+	var decal := Decal.new()
+	decal.texture_albedo = hit_decal_params.texture
+	decal.size = Vector3(hit_decal_params.width, hit_decal_params.depth, hit_decal_params.height)
+	decal.upper_fade = 0.5
+	decal.lower_fade = 0.5
+	decal.normal_fade = 0.2
+
+	# parent to the attachment node
+	attachment.add_child(decal)
+
+	# offset the decal position slightly so that the look_at position is different from the decal position
+	var pos_local := local_point - local_normal * 0.02
+	var target_local := local_point + local_normal
+
+	# set the decal's position and orientation
+	decal.global_position = attachment.global_transform * pos_local
+	decal.look_at(attachment.global_transform * target_local, Vector3.UP)
+	decal.rotate_object_local(Vector3(1, 0, 0), -PI / 2.0) # rotate the decal along the X axis by -90 degrees so that the decal texture is the correct orientation on the surface
+
+	decals.append(decal)
+
+
+# spawn a debug cylinder matching the decal's transforms
+func _spawn_debug_cylinder(attachment: BoneAttachment3D, decal: Decal) -> void:
+	var mesh := CylinderMesh.new()
+	mesh.top_radius = 0.1
+	mesh.bottom_radius = 0.1
+	mesh.height = 0.2
+	var cylinder := MeshInstance3D.new()
+	cylinder.mesh = mesh
+	attachment.add_child(cylinder)
+	cylinder.global_transform = decal.global_transform
+
+
+# spawn a debug sphere at the given hit position
+func _spawn_debug_sphere(hit_pos: Vector3, attachment: BoneAttachment3D) -> void:
+	var mesh := SphereMesh.new()
+	mesh.radius = 0.1
+	mesh.height = 0.2
+	var sphere := MeshInstance3D.new()
+	sphere.mesh = mesh
+	add_child(sphere)
+	sphere.global_position = attachment.global_transform * hit_pos
