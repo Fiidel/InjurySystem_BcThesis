@@ -1,13 +1,106 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://dmdxw0bs1x8x6"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://crlats6nw2pjd"]
 
-[ext_resource type="Texture2D" uid="uid://bjqefy4e74jts" path="res://Stages/Environments/Desert/desert_env_Stylized_Cliff_Rock_006_basecolor.png" id="1_0acw6"]
-[ext_resource type="Texture2D" uid="uid://bq3x57ae51bpn" path="res://Stages/Environments/Desert/desert_env_Stylized_Cliff_Rock_006_normal.png" id="2_o6h61"]
+[ext_resource type="Texture2D" uid="uid://bjqefy4e74jts" path="res://Stages/Environments/Desert/desert_env_Stylized_Cliff_Rock_006_basecolor.png" id="1_e6gjg"]
+[ext_resource type="Texture2D" uid="uid://bw316ff2evaoh" path="res://Stages/Environments/Desert/Stylized_Rocks_001_color.png" id="2_hgaqo"]
+[ext_resource type="Texture2D" uid="uid://bq3x57ae51bpn" path="res://Stages/Environments/Desert/desert_env_Stylized_Cliff_Rock_006_normal.png" id="2_i7atf"]
+[ext_resource type="Texture2D" uid="uid://ctqfh35i2jf1m" path="res://Stages/Environments/Desert/Stylized_Rocks_001_normal.png" id="4_u66pm"]
+
+[sub_resource type="Shader" id="Shader_0acw6"]
+code = "// NOTE: Shader automatically converted from Godot Engine 4.6.1.stable.mono's StandardMaterial3D.
+// added code noted by comments
+
+shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_disabled, diffuse_burley, specular_schlick_ggx;
+
+// added parameters
+uniform float scale_1;
+uniform float scale_2;
+uniform float noise_scale;
+uniform sampler2D texture_albedo_2 : source_color, filter_linear_mipmap, repeat_enable;
+uniform sampler2D texture_normal_2 : hint_roughness_normal, filter_linear_mipmap, repeat_enable;
+uniform sampler2D noise : source_color, filter_linear_mipmap, repeat_enable;
+// end of added parameters
+
+uniform vec4 albedo : source_color;
+uniform sampler2D texture_albedo : source_color, filter_linear_mipmap, repeat_enable;
+uniform ivec2 albedo_texture_size;
+uniform float point_size : hint_range(0.1, 128.0, 0.1);
+
+uniform float roughness : hint_range(0.0, 1.0);
+uniform sampler2D texture_metallic : hint_default_white, filter_linear_mipmap, repeat_enable;
+uniform vec4 metallic_texture_channel;
+uniform sampler2D texture_roughness : hint_roughness_r, filter_linear_mipmap, repeat_enable;
+
+uniform float specular : hint_range(0.0, 1.0, 0.01);
+uniform float metallic : hint_range(0.0, 1.0, 0.01);
+
+uniform sampler2D texture_normal : hint_roughness_normal, filter_linear_mipmap, repeat_enable;
+uniform float normal_scale : hint_range(-16.0, 16.0);
+
+uniform vec3 uv1_scale;
+uniform vec3 uv1_offset;
+uniform vec3 uv2_scale;
+uniform vec3 uv2_offset;
+
+void vertex() {
+	UV = UV * uv1_scale.xy + uv1_offset.xy;
+}
+
+void fragment() {
+	vec2 base_uv = UV;
+
+	// added code
+	float noise_value = texture(noise, base_uv * noise_scale).r;
+	
+	vec4 albedo_tex_1 = texture(texture_albedo, base_uv * scale_1);
+	vec4 albedo_tex_2 = texture(texture_albedo_2, base_uv * scale_2);
+	vec3 mixed_albedo = mix(albedo_tex_1 - vec4(0.03, 0.025, 0.05, 0.0), albedo_tex_2 - vec4(0.05, 0.0, 0.0, 0.0), noise_value).rgb;
+	float transition = 1.0 - abs(noise_value - 0.5) * 2.0;
+	ALBEDO = mix(mixed_albedo, mixed_albedo * vec3(0.76, 0.70, 0.62), transition);
+	
+	vec3 normal_1 = texture(texture_normal, base_uv * scale_1).rgb;
+	vec3 normal_2 = texture(texture_normal_2, base_uv * scale_2).rgb;
+	NORMAL_MAP = mix(normal_1, normal_2, noise_value);
+	NORMAL_MAP_DEPTH = normal_scale;
+	// end of added code
+	
+	float metallic_tex = dot(texture(texture_metallic, base_uv), metallic_texture_channel);
+	METALLIC = metallic_tex * metallic;
+	SPECULAR = specular;
+
+	vec4 roughness_texture_channel = vec4(1.0, 0.0, 0.0, 0.0);
+	float roughness_tex = dot(texture(texture_roughness, base_uv), roughness_texture_channel);
+	ROUGHNESS = roughness_tex * roughness;
+}
+"
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ircfv"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_43wwt"]
+noise = SubResource("FastNoiseLite_ircfv")
+seamless = true
 
 [resource]
 resource_name = "Rocks"
-cull_mode = 2
-albedo_texture = ExtResource("1_0acw6")
-normal_enabled = true
-normal_texture = ExtResource("2_o6h61")
-uv1_scale = Vector3(13, 11, 1)
-uv1_offset = Vector3(0, -10, 0)
+render_priority = 0
+shader = SubResource("Shader_0acw6")
+shader_parameter/scale_1 = 2.0
+shader_parameter/scale_2 = 1.0
+shader_parameter/noise_scale = 0.15
+shader_parameter/texture_albedo_2 = ExtResource("2_hgaqo")
+shader_parameter/texture_normal_2 = ExtResource("4_u66pm")
+shader_parameter/noise = SubResource("NoiseTexture2D_43wwt")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/texture_albedo = ExtResource("1_e6gjg")
+shader_parameter/albedo_texture_size = Vector2i(4096, 4096)
+shader_parameter/point_size = 1.0
+shader_parameter/roughness = 1.0
+shader_parameter/metallic_texture_channel = Vector4(1, 0, 0, 0)
+shader_parameter/specular = 0.0
+shader_parameter/metallic = 0.0
+shader_parameter/texture_normal = ExtResource("2_i7atf")
+shader_parameter/normal_scale = 1.0
+shader_parameter/uv1_scale = Vector3(13, 11, 1)
+shader_parameter/uv1_offset = Vector3(0, -10, 0)
+shader_parameter/uv2_scale = Vector3(1, 1, 1)
+shader_parameter/uv2_offset = Vector3(0, 0, 0)
