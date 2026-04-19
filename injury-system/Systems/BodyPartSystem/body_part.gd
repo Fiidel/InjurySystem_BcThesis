@@ -134,14 +134,18 @@ func on_zero_health_reached() -> void:
 		tween.tween_property(mat, "shader_parameter/albedo", Color.WHITE, 0.1)
 		await tween.finished
 		# spawn the severed limb rigidbody and remove the original bones and hitboxes
-		spawn_severed_limb(mesh)
+		spawn_severed_limb()
 		remove_bones()
 		for hitbox in hitboxes:
 			hitbox.queue_free()
 
 
-func spawn_severed_limb(mesh: MeshInstance3D) -> void:
+func spawn_severed_limb() -> void:
 	mesh.hide()
+	if severed_body_scene != null:
+		var severed_body: RigidBody3D = severed_body_scene.instantiate()
+		add_child(severed_body)
+		severed_body.global_transform = mesh.global_transform
 
 
 func remove_bones() -> void:

@@ -50,7 +50,6 @@ func add_knockback(bone_index: int, direction: Vector3, strength: float):
 
 
 func _process_modification_with_delta(delta: float) -> void:
-	var skeleton = get_skeleton()
 	if not skeleton:
 		return
 	
