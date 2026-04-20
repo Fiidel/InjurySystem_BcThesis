@@ -1,10 +1,15 @@
 [gd_scene format=3 uid="uid://b3fjuvv488qok"]
 
+[ext_resource type="Texture2D" uid="uid://cgrc0mu7kkls0" path="res://Stages/Environments/sky_24_2k_freestylized.png" id="1_1bvp3"]
 [ext_resource type="PackedScene" uid="uid://cph5iw2hp2sas" path="res://Entities/Enemies/Manticore/manticore.scn" id="3_1bvp3"]
 [ext_resource type="PackedScene" uid="uid://c5hswb3bqmoxd" path="res://Entities/Player/player.tscn" id="3_h2yge"]
 [ext_resource type="PackedScene" uid="uid://fddgp3tmu4g1" path="res://Stages/Environments/Desert/desert.tscn" id="3_lquwl"]
 
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_lquwl"]
+panorama = ExtResource("1_1bvp3")
+
 [sub_resource type="Sky" id="Sky_0xm2m"]
+sky_material = SubResource("PanoramaSkyMaterial_lquwl")
 
 [sub_resource type="Environment" id="Environment_ig7tw"]
 background_mode = 2
