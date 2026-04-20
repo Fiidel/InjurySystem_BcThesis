@@ -15,12 +15,14 @@ const STAR = preload("uid://cj7dw47a2y8gt")
 @onready var camera: Camera3D = $Camera3D
 @onready var ability_label: Label = %AbilityLabel
 @onready var flash_texture: TextureRect = %FlashTexture
+@onready var hit_crosshair: TextureRect = %HitCrosshair
 
 # ability variables
 var abilities: Dictionary
 var current_ability: int
 # effect variables
 var flash_effect_tween: Tween
+var hit_crosshair_tween: Tween
 
 
 func _ready() -> void:
@@ -32,6 +34,8 @@ func _ready() -> void:
 	abilities[3] = "Pierce"
 	current_ability = 1
 	ability_label.text = "1. " + abilities[1]
+	hit_crosshair.modulate = Color(1, 1, 1, 0)
+	SignalBus.enemy_hit.connect(_on_enemy_hit)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -103,3 +107,13 @@ func take_damage(_amount: float) -> void:
 	flash_effect_tween.set_ease(Tween.EASE_IN_OUT)
 	flash_effect_tween.tween_property(flash_texture, "modulate", Color.WHITE, 0.2)
 	flash_effect_tween.tween_property(flash_texture, "modulate", Color.TRANSPARENT, 0.2)
+
+
+func _on_enemy_hit() -> void:
+	if hit_crosshair_tween:
+		hit_crosshair_tween.kill()
+	hit_crosshair.modulate = Color(1, 1, 1, 0)
+	hit_crosshair_tween = create_tween()
+	hit_crosshair_tween.set_ease(Tween.EASE_IN_OUT)
+	hit_crosshair_tween.tween_property(hit_crosshair, "modulate:a", 1.0, 0.1)
+	hit_crosshair_tween.tween_property(hit_crosshair, "modulate:a", 0.0, 0.15)

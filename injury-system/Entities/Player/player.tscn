@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://q7hkaxovgbj0" path="res://Entities/Player/player.gd" id="1_mv1ah"]
 [ext_resource type="Texture2D" uid="uid://c6fa28p1wggn" path="res://Entities/Player/damage_screen_effect.png" id="2_3uyv8"]
 [ext_resource type="Script" uid="uid://bqj8w2k4npcam" path="res://Entities/Player/player_camera.gd" id="3_pcam"]
+[ext_resource type="Texture2D" uid="uid://gttaod4t5toi" path="res://Entities/Player/hit_crosshair_signifier.png" id="4_tekja"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 radius = 0.4
@@ -60,8 +61,8 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -11.5
+offset_left = -19.0
+offset_top = -12.0
 offset_right = 20.0
 offset_bottom = 11.5
 grow_horizontal = 2
@@ -69,3 +70,20 @@ grow_vertical = 2
 text = "•"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="HitCrosshair" type="TextureRect" parent="AbilityUI" unique_id=1560059260]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -11.0
+offset_top = -11.0
+offset_right = 11.0
+offset_bottom = 11.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_tekja")
+expand_mode = 3

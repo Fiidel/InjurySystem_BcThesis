@@ -1,6 +1,7 @@
 extends Node
 
 signal body_part_destroyed
+signal enemy_hit
 
 const BODY_PART_DESTROY_TIME_SCALE := 0.2
 const BODY_PART_DESTROY_SLOW_SECONDS := 1.0

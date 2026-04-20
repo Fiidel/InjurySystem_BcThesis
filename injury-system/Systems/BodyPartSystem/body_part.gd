@@ -86,6 +86,7 @@ func on_hitbox_hit(
 		decal_params: Variant,
 		deformation_params: Variant
 	) -> void:
+	SignalBus.enemy_hit.emit()
 	# apply damage
 	take_damage(damage_amount)
 	# apply knockback
