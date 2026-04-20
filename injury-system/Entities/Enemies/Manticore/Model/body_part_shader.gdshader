@@ -31,6 +31,7 @@ uniform vec3 hit_positions[16];
 uniform vec3 hit_normals[16];
 uniform float hit_radius[16];
 uniform float hit_strength[16];
+uniform float hit_flash : hint_range(0.0, 1.0) = 0.0;
 // end of added code
 
 void vertex() {
@@ -67,4 +68,8 @@ void fragment() {
 	// Normal Map: Enabled
 	NORMAL_MAP = texture(texture_normal, base_uv).rgb;
 	NORMAL_MAP_DEPTH = normal_scale;
+
+	// added code
+	EMISSION = vec3(hit_flash);
+	// end of added code
 }
