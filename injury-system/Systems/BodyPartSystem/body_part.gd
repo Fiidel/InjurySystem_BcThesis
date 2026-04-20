@@ -9,6 +9,9 @@ signal zero_health_reached
 
 const MAX_HITS: int = 16
 const MAX_DECALS: int = 16
+const HIT_FLASH_INTENSITY: float = 0.15
+const HIT_FLASH_WINDUP: float = 0.03
+const HIT_FLASH_UNWIND: float = 0.1
 
 @export var health: float = 1
 @export var only_damage_central_health: bool = false
@@ -33,6 +36,7 @@ var hit_locations: Array = []
 var decals: Array[Decal] = []
 var knockback_component: BoneKnockback3D
 var is_destroyed: bool
+var hit_flash_tween: Tween
 
 
 func _validate_property(property: Dictionary) -> void:
@@ -60,6 +64,7 @@ func _ready() -> void:
 	mat.set("shader_parameter/hit_normals", PackedVector3Array())
 	mat.set("shader_parameter/hit_radius", PackedFloat32Array())
 	mat.set("shader_parameter/hit_strength", PackedFloat32Array())
+	mat.set("shader_parameter/hit_flash", 0.0)
 	# get the knockback component
 	for child in get_children():
 		if child is BoneKnockback3D:
@@ -89,6 +94,8 @@ func on_hitbox_hit(
 	SignalBus.enemy_hit.emit()
 	# apply damage
 	take_damage(damage_amount)
+	# play flash effect on limb
+	play_hit_flash()
 	# apply knockback
 	if knockback_component:
 		knockback_component.apply_knockback(projectile_direction)
@@ -119,6 +126,17 @@ func take_damage(amount: float) -> void:
 	health -= amount
 	if health <= 0:
 		zero_health_reached.emit()
+
+
+func play_hit_flash() -> void:
+	var mat := mesh.get_surface_override_material(0)
+	if mat == null:
+		return
+	if hit_flash_tween and hit_flash_tween.is_valid():
+		hit_flash_tween.kill()
+	hit_flash_tween = create_tween()
+	hit_flash_tween.tween_property(mat, "shader_parameter/hit_flash", HIT_FLASH_INTENSITY, HIT_FLASH_WINDUP)
+	hit_flash_tween.tween_property(mat, "shader_parameter/hit_flash", 0.0, HIT_FLASH_UNWIND)
 
 
 func on_zero_health_reached() -> void:
