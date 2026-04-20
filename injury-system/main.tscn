@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://cph5iw2hp2sas" path="res://Entities/Enemies/Manticore/manticore.scn" id="3_1bvp3"]
 [ext_resource type="PackedScene" uid="uid://c5hswb3bqmoxd" path="res://Entities/Player/player.tscn" id="3_h2yge"]
-[ext_resource type="PackedScene" uid="uid://b7r47edphcosd" path="res://Stages/Environments/Desert/desert_env.tscn" id="3_lquwl"]
+[ext_resource type="PackedScene" uid="uid://fddgp3tmu4g1" path="res://Stages/Environments/Desert/desert.tscn" id="3_lquwl"]
 
 [sub_resource type="Sky" id="Sky_0xm2m"]
 
@@ -27,4 +27,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.833927, 8.209045, 12.3563
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 10.981531, 6.689547, 8.363481)
 floor_constant_speed = true
 
-[node name="desert_env" parent="." unique_id=1599827703 instance=ExtResource("3_lquwl")]
+[node name="Desert" parent="." unique_id=151719703 instance=ExtResource("3_lquwl")]

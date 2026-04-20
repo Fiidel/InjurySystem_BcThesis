@@ -230,6 +230,7 @@ func spawn_hit_decal(attachment: BoneAttachment3D, local_point: Vector3, local_n
 	# create a new decal and set its parameters
 	var decal := Decal.new()
 	decal.texture_albedo = hit_decal_params.texture
+	decal.texture_normal = hit_decal_params.texture_normal
 	decal.size = Vector3(hit_decal_params.width, hit_decal_params.depth, hit_decal_params.height)
 	decal.upper_fade = 0.5
 	decal.lower_fade = 0.5

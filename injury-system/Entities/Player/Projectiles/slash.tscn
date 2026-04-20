@@ -4,12 +4,14 @@
 [ext_resource type="Script" uid="uid://d0y3cjmkqy645" path="res://Entities/Player/Projectiles/projectile.gd" id="2_2lnad"]
 [ext_resource type="Script" uid="uid://ce0xv445unln3" path="res://Entities/Player/Projectiles/decal_parameters.gd" id="3_c6hvf"]
 [ext_resource type="Texture2D" uid="uid://7a4j88xh7w55" path="res://Entities/Player/Projectiles/slash_decal.png" id="3_coqll"]
+[ext_resource type="Texture2D" uid="uid://u23s250qnt8s" path="res://Entities/Player/Projectiles/slash_decal_normal.png" id="5_lqqlu"]
 [ext_resource type="Shader" uid="uid://daabserbdyo0d" path="res://Entities/Player/Projectiles/projectile_trail.gdshader" id="5_u4k6h"]
 [ext_resource type="PackedScene" uid="uid://p0vkiobouin6" path="res://Entities/Player/Projectiles/blood_spray.tscn" id="5_udtx8"]
 
 [sub_resource type="Resource" id="Resource_u4k6h"]
 script = ExtResource("3_c6hvf")
 texture = ExtResource("3_coqll")
+texture_normal = ExtResource("5_lqqlu")
 height = 0.1
 depth = 0.75
 

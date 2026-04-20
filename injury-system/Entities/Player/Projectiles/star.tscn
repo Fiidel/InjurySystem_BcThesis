@@ -6,10 +6,12 @@
 [ext_resource type="Texture2D" uid="uid://7qr50r78uvfq" path="res://Entities/Player/Projectiles/star_decal.png" id="3_mdmfb"]
 [ext_resource type="PackedScene" uid="uid://p0vkiobouin6" path="res://Entities/Player/Projectiles/blood_spray.tscn" id="5_3gy6u"]
 [ext_resource type="Shader" uid="uid://daabserbdyo0d" path="res://Entities/Player/Projectiles/projectile_trail.gdshader" id="5_efilr"]
+[ext_resource type="Texture2D" uid="uid://cix7jek0xwmay" path="res://Entities/Player/Projectiles/star_decal_normal.png" id="5_mxv3c"]
 
 [sub_resource type="Resource" id="Resource_efilr"]
 script = ExtResource("3_dni7a")
 texture = ExtResource("3_mdmfb")
+texture_normal = ExtResource("5_mxv3c")
 width = 0.1
 height = 0.1
 
