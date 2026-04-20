@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dycms638y6vac"
-path="res://.godot/imported/boulder_fragments.glb-331f4284105a1ec72386138ef84bd999.scn"
+path="res://.godot/imported/boulder_fragments.glb-e9cb66595d4e17030e161ed5d66116ec.scn"
 
 [deps]
 
-source_file="res://Entities/Player/Projectiles/boulder_fragments.glb"
-dest_files=["res://.godot/imported/boulder_fragments.glb-331f4284105a1ec72386138ef84bd999.scn"]
+source_file="res://Entities/Player/Projectiles/Models/boulder_fragments.glb"
+dest_files=["res://.godot/imported/boulder_fragments.glb-e9cb66595d4e17030e161ed5d66116ec.scn"]
 
 [params]
 

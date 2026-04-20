@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://7a4j88xh7w55"
-path="res://.godot/imported/slash_decal.png-640eab966efba99fb532c19afa1890f7.ctex"
+path="res://.godot/imported/slash_decal.png-ac301da559e1e986d660d6ced9c0fab4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Entities/Player/Projectiles/slash_decal.png"
-dest_files=["res://.godot/imported/slash_decal.png-640eab966efba99fb532c19afa1890f7.ctex"]
+source_file="res://Entities/Player/Projectiles/VFX/Hit Decals/slash_decal.png"
+dest_files=["res://.godot/imported/slash_decal.png-ac301da559e1e986d660d6ced9c0fab4.ctex"]
 
 [params]
 

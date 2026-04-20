@@ -1,12 +1,12 @@
 [gd_scene format=4 uid="uid://cj7dw47a2y8gt"]
 
-[ext_resource type="PackedScene" uid="uid://dfkkmmrw7iipb" path="res://Entities/Player/Projectiles/star.glb" id="1_gmpkb"]
+[ext_resource type="PackedScene" uid="uid://dfkkmmrw7iipb" path="res://Entities/Player/Projectiles/Models/star.glb" id="1_gmpkb"]
 [ext_resource type="Script" uid="uid://d0y3cjmkqy645" path="res://Entities/Player/Projectiles/projectile.gd" id="2_v84vg"]
 [ext_resource type="Script" uid="uid://ce0xv445unln3" path="res://Entities/Player/Projectiles/decal_parameters.gd" id="3_dni7a"]
-[ext_resource type="Texture2D" uid="uid://7qr50r78uvfq" path="res://Entities/Player/Projectiles/star_decal.png" id="3_mdmfb"]
-[ext_resource type="PackedScene" uid="uid://p0vkiobouin6" path="res://Entities/Player/Projectiles/blood_spray.tscn" id="5_3gy6u"]
+[ext_resource type="Texture2D" uid="uid://7qr50r78uvfq" path="res://Entities/Player/Projectiles/VFX/Hit Decals/star_decal.png" id="3_mdmfb"]
 [ext_resource type="Shader" uid="uid://daabserbdyo0d" path="res://Entities/Player/Projectiles/projectile_trail.gdshader" id="5_efilr"]
-[ext_resource type="Texture2D" uid="uid://cix7jek0xwmay" path="res://Entities/Player/Projectiles/star_decal_normal.png" id="5_mxv3c"]
+[ext_resource type="Texture2D" uid="uid://cix7jek0xwmay" path="res://Entities/Player/Projectiles/VFX/Hit Decals/star_decal_normal.png" id="5_mxv3c"]
+[ext_resource type="PackedScene" uid="uid://c0vqq8u8his2a" path="res://Entities/Player/Projectiles/VFX/Blood/blood.tscn" id="6_mxv3c"]
 
 [sub_resource type="Resource" id="Resource_efilr"]
 script = ExtResource("3_dni7a")
@@ -79,7 +79,7 @@ script = ExtResource("2_v84vg")
 type = 2
 speed = 20.0
 decal_params = SubResource("Resource_efilr")
-impact_particles_scene = ExtResource("5_3gy6u")
+impact_particles_scene = ExtResource("6_mxv3c")
 slash_ray_count = 0
 
 [node name="Star" parent="." index="0" unique_id=147017265]

@@ -1,14 +1,14 @@
 [gd_scene format=3 uid="uid://c6vo1skq0umfj"]
 
-[ext_resource type="PackedScene" uid="uid://b5k0h3m8npi41" path="res://Entities/Player/Projectiles/boulder.glb" id="1_113bm"]
+[ext_resource type="PackedScene" uid="uid://b5k0h3m8npi41" path="res://Entities/Player/Projectiles/Models/boulder.glb" id="1_113bm"]
 [ext_resource type="Script" uid="uid://d0y3cjmkqy645" path="res://Entities/Player/Projectiles/projectile.gd" id="2_l55lv"]
-[ext_resource type="Texture2D" uid="uid://dlcemm6bn8cdi" path="res://Entities/Player/Projectiles/boulder_decal.png" id="3_i6d0d"]
+[ext_resource type="Texture2D" uid="uid://dlcemm6bn8cdi" path="res://Entities/Player/Projectiles/VFX/Hit Decals/boulder_decal.png" id="3_i6d0d"]
 [ext_resource type="Script" uid="uid://ce0xv445unln3" path="res://Entities/Player/Projectiles/decal_parameters.gd" id="3_qqg1s"]
-[ext_resource type="Texture2D" uid="uid://dr71cdrwysbxx" path="res://Entities/Player/Projectiles/boulder_decal_normal.png" id="5_7idmx"]
+[ext_resource type="Texture2D" uid="uid://dr71cdrwysbxx" path="res://Entities/Player/Projectiles/VFX/Hit Decals/boulder_decal_normal.png" id="5_7idmx"]
 [ext_resource type="PackedScene" uid="uid://dg20oqwvfcbnf" path="res://Entities/Player/Projectiles/boulder_dust_particles.tscn" id="5_h33bd"]
 [ext_resource type="PackedScene" uid="uid://b1g1l23sinh3n" path="res://Entities/Player/Projectiles/boulder_fragments.tscn" id="5_jgwp4"]
 [ext_resource type="Script" uid="uid://dmpacokjs7bi3" path="res://Entities/Player/Projectiles/deformation_parameters.gd" id="5_u3rqu"]
-[ext_resource type="Material" uid="uid://d32csblxij13p" path="res://Entities/Player/Projectiles/boulder_material.tres" id="7_h33bd"]
+[ext_resource type="Material" uid="uid://d32csblxij13p" path="res://Entities/Player/Projectiles/Models/boulder_material.tres" id="7_h33bd"]
 
 [sub_resource type="Resource" id="Resource_h33bd"]
 script = ExtResource("3_qqg1s")

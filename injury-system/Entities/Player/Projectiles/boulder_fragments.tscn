@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://b1g1l23sinh3n"]
 
 [ext_resource type="Script" uid="uid://1emt6j1fdnl2" path="res://Entities/Player/Projectiles/boulder_fragments.gd" id="1_hho1x"]
-[ext_resource type="Material" uid="uid://d32csblxij13p" path="res://Entities/Player/Projectiles/boulder_material.tres" id="1_uwlky"]
+[ext_resource type="Material" uid="uid://d32csblxij13p" path="res://Entities/Player/Projectiles/Models/boulder_material.tres" id="1_uwlky"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bc4e8"]
 

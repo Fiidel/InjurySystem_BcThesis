@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://7qr50r78uvfq"
-path="res://.godot/imported/star_decal.png-a31c44a3ce4dac64dd3b1aab1ee4e658.ctex"
+uid="uid://u23s250qnt8s"
+path="res://.godot/imported/slash_decal_normal.png-14cb6430e347837b86746fab5917387b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Entities/Player/Projectiles/star_decal.png"
-dest_files=["res://.godot/imported/star_decal.png-a31c44a3ce4dac64dd3b1aab1ee4e658.ctex"]
+source_file="res://Entities/Player/Projectiles/VFX/Hit Decals/slash_decal_normal.png"
+dest_files=["res://.godot/imported/slash_decal_normal.png-14cb6430e347837b86746fab5917387b.ctex"]
 
 [params]
 

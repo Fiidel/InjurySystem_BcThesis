@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://c0vqq8u8his2a"]
+
+[ext_resource type="Texture2D" uid="uid://cgwvpvnbbnmfw" path="res://Entities/Player/Projectiles/VFX/Blood/blood_particle_mask.png" id="1_fc0xp"]
+[ext_resource type="Texture2D" uid="uid://npsmt3fheovf" path="res://Entities/Player/Projectiles/VFX/Blood/blood_particle_normal.png" id="2_k6m8q"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vfiax"]
+transparency = 2
+alpha_scissor_threshold = 0.3
+alpha_antialiasing_mode = 0
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("1_fc0xp")
+roughness = 0.1
+normal_enabled = true
+normal_texture = ExtResource("2_k6m8q")
+billboard_mode = 1
+
+[sub_resource type="Curve" id="Curve_e6ktl"]
+_data = [Vector2(0.003984064, 0), 0.0, 0.0, 0, 0, Vector2(0.12350598, 0.6382475), 0.69322276, 0.69322276, 0, 0, Vector2(0.99601597, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_nhx15"]
+texture_mode = 1
+curve = SubResource("Curve_e6ktl")
+
+[sub_resource type="Gradient" id="Gradient_alb0u"]
+offsets = PackedFloat32Array(0, 0.41972476)
+colors = PackedColorArray(0.51635844, 2.3704395e-06, 1.92523e-07, 1, 0.67684996, 1.5943311e-05, 0.11319093, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_u0t2c"]
+gradient = SubResource("Gradient_alb0u")
+
+[sub_resource type="Curve" id="Curve_hk6u8"]
+_data = [Vector2(0, 0), 0.0, 3.546103, 0, 0, Vector2(0.24701197, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_g7mjp"]
+curve = SubResource("Curve_hk6u8")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_45oo5"]
+lifetime_randomness = 0.5
+particle_flag_rotate_y = true
+emission_shape = 1
+emission_sphere_radius = 0.5
+angle_min = -179.99998
+angle_max = 180.00002
+direction = Vector3(0, 1, 0)
+spread = 180.0
+initial_velocity_max = 5.0
+scale_min = 0.19999999
+scale_max = 0.39999998
+scale_curve = SubResource("CurveTexture_g7mjp")
+color_ramp = SubResource("GradientTexture1D_u0t2c")
+alpha_curve = SubResource("CurveTexture_nhx15")
+
+[sub_resource type="QuadMesh" id="QuadMesh_53m0f"]
+
+[node name="Node3D" type="GPUParticles3D" unique_id=266838396]
+material_override = SubResource("StandardMaterial3D_vfiax")
+emitting = false
+amount = 16
+lifetime = 1.5
+one_shot = true
+explosiveness = 0.7
+process_material = SubResource("ParticleProcessMaterial_45oo5")
+draw_pass_1 = SubResource("QuadMesh_53m0f")

@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dfkkmmrw7iipb"
-path="res://.godot/imported/star.glb-ebe504f0932f2ae169eed725a7264ebc.scn"
+path="res://.godot/imported/star.glb-47253d2a21af6f956d686b0c26e5c8f2.scn"
 
 [deps]
 
-source_file="res://Entities/Player/Projectiles/star.glb"
-dest_files=["res://.godot/imported/star.glb-ebe504f0932f2ae169eed725a7264ebc.scn"]
+source_file="res://Entities/Player/Projectiles/Models/star.glb"
+dest_files=["res://.godot/imported/star.glb-47253d2a21af6f956d686b0c26e5c8f2.scn"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dlcemm6bn8cdi"
-path="res://.godot/imported/boulder_decal.png-f97554fc81841ea9c0e53c91b1cf3209.ctex"
+uid="uid://dr71cdrwysbxx"
+path="res://.godot/imported/boulder_decal_normal.png-51994bb994c086f2fd2bd78b300ef322.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Entities/Player/Projectiles/boulder_decal.png"
-dest_files=["res://.godot/imported/boulder_decal.png-f97554fc81841ea9c0e53c91b1cf3209.ctex"]
+source_file="res://Entities/Player/Projectiles/VFX/Hit Decals/boulder_decal_normal.png"
+dest_files=["res://.godot/imported/boulder_decal_normal.png-51994bb994c086f2fd2bd78b300ef322.ctex"]
 
 [params]
 
