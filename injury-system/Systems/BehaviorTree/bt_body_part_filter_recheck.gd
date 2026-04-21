@@ -1,18 +1,15 @@
 @icon("uid://o7l2bm84luhn")
 
 class_name BTBodyPartFilterRecheck
-extends BTDecorator
+extends BTBodyPartFilter
+# Note that this filter is derived from BTBodyPartFilter!
 
-@export var body_parts: Array[BodyPart] = []
 @export var recheck_interval: float = 1.0
-
 var recheck_timer: Timer
 
 
 func _ready() -> void:
-	if body_parts.is_empty():
-		push_error("Error: Body parts of BTBodyPartFilterRecheck " + name + " not set.")
-		return
+	super._ready()
 
 
 func execute() -> void:
@@ -33,7 +30,14 @@ func execute() -> void:
 
 func _on_child_finished(return_status: ReturnStatus) -> void:
 	cleanup_recheck_timer()
-	finished.emit(return_status)
+	super._on_child_finished(return_status)
+
+
+func is_any_body_part_unavailable() -> bool:
+	for body_part in body_parts:
+		if body_part.is_destroyed:
+			return true
+	return false
 
 
 func on_recheck_conditions() -> void:
@@ -49,13 +53,6 @@ func on_recheck_conditions() -> void:
 func abort() -> void:
 	cleanup_recheck_timer()
 	super.abort()
-
-
-func is_any_body_part_unavailable() -> bool:
-	for body_part in body_parts:
-		if body_part.is_destroyed:
-			return true
-	return false
 
 
 func cleanup_recheck_timer() -> void:

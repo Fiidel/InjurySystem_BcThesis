@@ -8,32 +8,22 @@ var selected_child: BTNode = null
 
 func execute() -> void:
 	selected_child = null
-	if child_nodes.is_empty():
+	var weighted_nodes: Array[Dictionary] = get_weighted_executable_children()
+	if weighted_nodes.is_empty():
 		finished.emit(ReturnStatus.FAILURE)
 		return
 
-	# get child nodes and their weights (default weight 1)
-	var weighted_nodes: Dictionary = {}
-	for child in child_nodes:
-		var weight_node := child as BTWeight
-		if weight_node == null:
-			weighted_nodes[child] = 1.0
-		else:
-			# only add nodes with non-zero weight
-			if weight_node.weight > 0.0:
-				weighted_nodes[child] = weight_node.weight
-
 	# choose random child based on weights
 	var total_weight: float = 0.0
-	for node in weighted_nodes:
-		total_weight += weighted_nodes[node]
+	for entry in weighted_nodes:
+		total_weight += entry.weight
 	
 	var random_value: float = randf_range(0.0, total_weight)
 	var current_ceiling: float = 0.0
-	for node in weighted_nodes:
-		current_ceiling += weighted_nodes[node]
+	for entry in weighted_nodes:
+		current_ceiling += entry.weight
 		if random_value <= current_ceiling:
-			selected_child = node
+			selected_child = entry.node
 			break
 	# failsafe
 	if selected_child == null:
@@ -51,3 +41,56 @@ func _on_child_finished(return_status: ReturnStatus) -> void:
 func abort() -> void:
 	if selected_child != null:
 		selected_child.abort()
+
+
+func get_weighted_executable_children() -> Array[Dictionary]:
+	var weighted_children: Array[Dictionary] = []
+	for child in child_nodes:
+		# do not add nodes that are filtered out
+		if not is_node_currently_selectable(child):
+			continue
+
+		# default weight is 1.0
+		var weight: float = 1.0
+
+		var weight_node: BTWeight = child as BTWeight
+		if weight_node != null:
+			# skip nodes that don't have a positive weight
+			if weight_node.weight <= 0.0:
+				continue
+			# overwrite the default weight with the actual weight of a BTWeight
+			weight = weight_node.weight
+
+		weighted_children.append({
+			"node": child,
+			"weight": weight
+		})
+	return weighted_children
+
+
+func is_node_currently_selectable(node: BTNode) -> bool:
+	var current_node: BTNode = node
+	while true:
+		# if the node is not a decorator, add it directly to the valid children
+		var decorator: BTDecorator = current_node as BTDecorator
+		if decorator == null:
+			return true
+
+		# if the node is a body part filter recheck, add it as valid if all body parts are available
+		var body_part_filter_recheck: BTBodyPartFilterRecheck = current_node as BTBodyPartFilterRecheck
+		if body_part_filter_recheck != null and body_part_filter_recheck.is_any_body_part_unavailable():
+			return false
+
+		# if the node is a body part filter, add it as valid if all body parts are available
+		var body_part_filter: BTBodyPartFilter = current_node as BTBodyPartFilter
+		if body_part_filter != null and body_part_filter.is_any_body_part_unavailable():
+			return false
+
+		# if the node has no child, it is not selectable
+		if decorator.child == null:
+			return false
+
+		# move to the next node
+		current_node = decorator.child
+	# if the node is not a decorator and has no child, return false
+	return false

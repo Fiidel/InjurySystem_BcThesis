@@ -13,13 +13,18 @@ func _ready() -> void:
 
 
 func execute() -> void:
-	for body_part in body_parts:
-		if body_part.is_destroyed:
-			finished.emit(ReturnStatus.FAILURE)
-			return
-
+	if is_any_body_part_unavailable():
+		finished.emit(ReturnStatus.FAILURE)
+		return
 	child.execute()
 
 
 func _on_child_finished(return_status: ReturnStatus) -> void:
 	finished.emit(return_status)
+
+
+func is_any_body_part_unavailable() -> bool:
+	for body_part in body_parts:
+		if body_part.is_destroyed:
+			return true
+	return false
