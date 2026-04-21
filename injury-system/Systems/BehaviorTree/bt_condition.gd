@@ -1,4 +1,4 @@
-@icon("uid://c1lqbffssicjv")
+@icon("uid://cwvvjitb412q")
 
 class_name BTCondition
 extends BTDecorator

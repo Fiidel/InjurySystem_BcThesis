@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c1lqbffssicjv"
-path="res://.godot/imported/bt_condition.png-a1c44d79c75791941a96766d0726db0c.ctex"
+uid="uid://cwvvjitb412q"
+path="res://.godot/imported/bt_condition.svg-eec2e18fcd42278aedd21a3fe9f31a72.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Systems/BehaviorTree/icons/bt_condition.png"
-dest_files=["res://.godot/imported/bt_condition.png-a1c44d79c75791941a96766d0726db0c.ctex"]
+source_file="res://Systems/BehaviorTree/icons/bt_condition.svg"
+dest_files=["res://.godot/imported/bt_condition.svg-eec2e18fcd42278aedd21a3fe9f31a72.ctex"]
 
 [params]
 
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false
