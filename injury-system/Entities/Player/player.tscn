@@ -6,15 +6,15 @@
 [ext_resource type="Texture2D" uid="uid://gttaod4t5toi" path="res://Entities/Player/hit_crosshair_signifier.png" id="4_tekja"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
-radius = 0.4
-height = 1.5
+height = 1.75
 
 [node name="Player" type="CharacterBody3D" unique_id=1339924766]
+collision_layer = 3
 collision_mask = 5
 script = ExtResource("1_mv1ah")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=310288960]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
 shape = SubResource("CapsuleShape3D_0xm2m")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=863646441]
