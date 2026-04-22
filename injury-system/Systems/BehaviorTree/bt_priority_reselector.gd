@@ -3,6 +3,7 @@
 class_name BTPriorityReselector
 extends BTNode
 
+@export var recheck_interval: float = 1.0
 var current_child_idx: int = 0
 var recheck_timer: Timer
 
@@ -13,7 +14,7 @@ func execute() -> void:
 		return
 	# start condition recheck interval
 	recheck_timer = Timer.new()
-	recheck_timer.wait_time = 1.0
+	recheck_timer.wait_time = recheck_interval
 	recheck_timer.one_shot = false
 	recheck_timer.autostart = true
 	add_child(recheck_timer)
