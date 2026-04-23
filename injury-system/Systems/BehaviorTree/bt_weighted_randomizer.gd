@@ -3,12 +3,26 @@
 class_name BTWeightedRandomizer
 extends BTNode
 
+@export var avoid_repeating_child_node: bool = false
+
 var selected_child: BTNode = null
+var previously_executed_child: BTNode = null
 
 
 func execute() -> void:
 	selected_child = null
 	var weighted_nodes: Array[Dictionary] = get_weighted_executable_children()
+	if weighted_nodes.is_empty():
+		finished.emit(ReturnStatus.FAILURE)
+		return
+
+	if avoid_repeating_child_node and weighted_nodes.size() > 1 and previously_executed_child != null:
+		var rerolled_weighted_nodes: Array[Dictionary] = []
+		for entry in weighted_nodes:
+			if entry.node != previously_executed_child:
+				rerolled_weighted_nodes.append(entry)
+		weighted_nodes = rerolled_weighted_nodes
+
 	if weighted_nodes.is_empty():
 		finished.emit(ReturnStatus.FAILURE)
 		return
@@ -31,6 +45,7 @@ func execute() -> void:
 		return
 
 	# execute chosen child
+	previously_executed_child = selected_child
 	selected_child.execute()
 
 

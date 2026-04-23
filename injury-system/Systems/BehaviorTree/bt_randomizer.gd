@@ -3,19 +3,30 @@
 class_name BTRandomizer
 extends BTNode
 
-var selected_child_idx: int = -1
+@export var avoid_repeating_child_node: bool = false
+
 var executable_children: Array[BTNode] = []
+var selected_child: BTNode = null
+var previously_executed_child: BTNode = null
 
 
 func execute() -> void:
-	selected_child_idx = -1
+	selected_child = null
 	executable_children = get_executable_children()
 	if executable_children.is_empty():
 		finished.emit(ReturnStatus.FAILURE)
 		return
 
-	selected_child_idx = randi_range(0, executable_children.size() - 1)
-	executable_children[selected_child_idx].execute()
+	if avoid_repeating_child_node and executable_children.size() > 1 and previously_executed_child != null:
+		executable_children.erase(previously_executed_child)
+
+	if executable_children.is_empty():
+		finished.emit(ReturnStatus.FAILURE)
+		return
+
+	selected_child = executable_children[randi_range(0, executable_children.size() - 1)]
+	previously_executed_child = selected_child
+	selected_child.execute()
 
 
 func _on_child_finished(return_status: ReturnStatus) -> void:
@@ -23,8 +34,8 @@ func _on_child_finished(return_status: ReturnStatus) -> void:
 
 
 func abort() -> void:
-	if not executable_children.is_empty() and selected_child_idx >= 0 and selected_child_idx < executable_children.size():
-		executable_children[selected_child_idx].abort()
+	if selected_child != null:
+		selected_child.abort()
 
 
 func get_executable_children() -> Array[BTNode]:
