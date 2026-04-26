@@ -1,7 +1,21 @@
 [gd_scene format=4 uid="uid://cjnu0dxt0osqi"]
 
 [ext_resource type="Material" uid="uid://d0usofhye0iif" path="res://Entities/Enemies/Manticore/Model/SplitModel/Tail.tres" id="1_ypi8b"]
-[ext_resource type="Material" uid="uid://gidwyqic26ep" path="res://Entities/Enemies/Manticore/Model/manticore_split_parts.tres" id="2_s4l0b"]
+[ext_resource type="Shader" uid="uid://ob6b3igd351g" path="res://Entities/Enemies/Manticore/Model/body_part_shader.gdshader" id="2_f6cj0"]
+[ext_resource type="Texture2D" uid="uid://3jgpx1meqfet" path="res://Entities/Enemies/Manticore/Model/manticore_split_SplitParts.png" id="3_y4dsn"]
+[ext_resource type="PackedScene" uid="uid://c2xnm6ekl0fic" path="res://Entities/Enemies/Manticore/Model/Body Part Meshes/tail_spikes.tscn" id="4_lak1d"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_y4dsn"]
+radius = 0.053710938
+height = 1.3291931
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_lak1d"]
+radius = 0.053710938
+height = 0.3128662
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_sq016"]
+radius = 0.1303711
+height = 0.49821472
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_pn8ud"]
 resource_name = "manticore_split_Plane_057"
@@ -408,39 +422,55 @@ bind/126/name = &"CTRL_IKTAILPOLE"
 bind/126/bone = -1
 bind/126/pose = Transform3D(2.174179, 0, 0.038461473, 4.584965e-09, 2.1745193, -2.5918237e-07, -0.038461473, 0, 2.1741793, 0.063492574, -4.4620495, 3.6012995)
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_y4dsn"]
-radius = 0.053710938
-height = 1.3291931
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_lak1d"]
-radius = 0.053710938
-height = 0.3128662
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_sq016"]
-radius = 0.1303711
-height = 0.49821472
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_y4dsn"]
+render_priority = 0
+shader = ExtResource("2_f6cj0")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/texture_albedo = ExtResource("3_y4dsn")
+shader_parameter/albedo_texture_size = Vector2i(1024, 1024)
+shader_parameter/point_size = 1.0
+shader_parameter/roughness = 1.0
+shader_parameter/metallic_texture_channel = Vector4(1, 0, 0, 0)
+shader_parameter/specular = 0.5
+shader_parameter/metallic = 0.0
+shader_parameter/normal_scale = 1.0
+shader_parameter/uv1_scale = Vector3(1, 1, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+shader_parameter/uv2_scale = Vector3(1, 1, 1)
+shader_parameter/uv2_offset = Vector3(0, 0, 0)
+shader_parameter/hit_count = 0
+shader_parameter/hit_positions = PackedVector3Array()
+shader_parameter/hit_normals = PackedVector3Array()
+shader_parameter/hit_radius = PackedFloat32Array()
+shader_parameter/hit_strength = PackedFloat32Array()
+shader_parameter/hit_flash = 0.0
 
 [node name="Tail_Severed" type="RigidBody3D" unique_id=253126970]
 collision_layer = 8
 collision_mask = 4
 
-[node name="Tail" type="MeshInstance3D" parent="." unique_id=1383812247]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1059210805]
+transform = Transform3D(2, 0, 0, 0, 0.05842537, -1.9991465, 0, 1.9991465, 0.05842537, 0, 2.241513, -3.7639742)
+shape = SubResource("CapsuleShape3D_y4dsn")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="." unique_id=1009113844]
+transform = Transform3D(2, 0, 0, 0, -0.2707395, -1.9815904, 0, 1.9815904, -0.2707395, 0, 2.2750442, -5.3816104)
+shape = SubResource("CapsuleShape3D_lak1d")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=2136718993]
+transform = Transform3D(2, 0, 0, 0, -0.29962286, -1.9774292, 0, 1.9774292, -0.29962286, 0, 2.4672027, -6.1174073)
+shape = SubResource("CapsuleShape3D_sq016")
+
+[node name="Tail" type="MeshInstance3D" parent="." unique_id=697149759]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 mesh = SubResource("ArrayMesh_pn8ud")
 skin = SubResource("Skin_f6cj0")
-surface_material_override/0 = ExtResource("2_s4l0b")
+skeleton = NodePath("")
+surface_material_override/0 = SubResource("ShaderMaterial_y4dsn")
 metadata/extras = {
 "booleans": {},
 "rigify_owner_rig": {}
 }
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1059210805]
-transform = Transform3D(1, 0, 0, 0, 0.029212685, -0.99957323, 0, 0.99957323, 0.029212685, 0, 1.1211865, -1.8777099)
-shape = SubResource("CapsuleShape3D_y4dsn")
-
-[node name="CollisionShape3D2" type="CollisionShape3D" parent="." unique_id=1009113844]
-transform = Transform3D(1, 0, 0, 0, -0.19960734, -0.979876, 0, 0.979876, -0.19960734, 0, 1.1432858, -2.683681)
-shape = SubResource("CapsuleShape3D_lak1d")
-
-[node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=2136718993]
-transform = Transform3D(1, 0, 0, 0, -0.14981142, -0.98871464, 0, 0.98871464, -0.14981142, 0, 1.2325565, -3.0307925)
-shape = SubResource("CapsuleShape3D_sq016")
+[node name="tail_spikes" parent="." unique_id=1502975557 instance=ExtResource("4_lak1d")]
+transform = Transform3D(0.99137163, -0.04168094, -0.12427813, 0.12980196, 0.18000962, 0.9750631, -0.01827021, -0.9827814, 0.18386671, 0.028147489, 2.3682384, -5.5566087)

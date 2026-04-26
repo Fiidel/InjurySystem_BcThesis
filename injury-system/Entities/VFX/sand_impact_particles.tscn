@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://btvy3lrgegxs2"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nvdxh"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.7910195, 0.6141576, 0.42746288, 0.39215687)
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="Curve" id="Curve_htdq2"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.49800795, 0.5028682), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_wj1kn"]
+curve = SubResource("Curve_htdq2")
+
+[sub_resource type="Curve" id="Curve_dv7vl"]
+_data = [Vector2(0, 0), 0.0, 3.7347903, 0, 0, Vector2(0.19920321, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_piwqi"]
+curve = SubResource("Curve_dv7vl")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_77jwu"]
+direction = Vector3(0, 1, 0)
+spread = 60.0
+initial_velocity_max = 6.0
+radial_velocity_min = -2.2351742e-05
+radial_velocity_max = -2.2351742e-05
+scale_min = 0.5
+scale_curve = SubResource("CurveTexture_piwqi")
+alpha_curve = SubResource("CurveTexture_wj1kn")
+
+[sub_resource type="QuadMesh" id="QuadMesh_dlnkk"]
+size = Vector2(0.2, 0.2)
+
+[node name="DustImpactParticles" type="GPUParticles3D" unique_id=146468807]
+material_override = SubResource("StandardMaterial3D_nvdxh")
+amount = 32
+lifetime = 2.0
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_77jwu")
+draw_pass_1 = SubResource("QuadMesh_dlnkk")

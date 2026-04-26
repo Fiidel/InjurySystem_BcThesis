@@ -4,10 +4,11 @@ class_name BTBodyPartFilter
 extends BTDecorator
 
 @export var body_parts: Array[BodyPart] = []
+@export var at_least_one_of: Array[BodyPart] = []
 
 
 func _ready() -> void:
-	if body_parts.is_empty():
+	if body_parts.is_empty() and at_least_one_of.is_empty():
 		push_error("Error: Body parts of BTBodyPartFilter " + name + " not set.")
 		return
 
@@ -26,5 +27,13 @@ func _on_child_finished(return_status: ReturnStatus) -> void:
 func is_any_body_part_unavailable() -> bool:
 	for body_part in body_parts:
 		if body_part.is_destroyed:
+			return true
+	if not at_least_one_of.is_empty():
+		var any_intact := false
+		for body_part in at_least_one_of:
+			if not body_part.is_destroyed:
+				any_intact = true
+				break
+		if not any_intact:
 			return true
 	return false

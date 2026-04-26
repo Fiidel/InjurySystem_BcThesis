@@ -417,6 +417,7 @@ collision_layer = 8
 collision_mask = 4
 
 [node name="LegBR" type="MeshInstance3D" parent="." unique_id=1264965686]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 mesh = SubResource("ArrayMesh_8x8xn")
 skin = SubResource("Skin_ucbft")
 surface_material_override/0 = ExtResource("2_w2bue")
@@ -426,5 +427,5 @@ metadata/extras = {
 }
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1639697425]
-transform = Transform3D(0.99709547, 0.07417316, 0.017292026, -0.07606238, 0.95816696, 0.2759182, 0.0038970776, -0.27643207, 0.9610257, -0.35813946, 0.45350963, -0.9278469)
+transform = Transform3D(1.9941909, 0.14834633, 0.034584053, -0.15212476, 1.9163336, 0.5518364, 0.0077941604, -0.5528641, 1.9220511, -0.7173494, 0.99092096, -1.9220028)
 shape = SubResource("CapsuleShape3D_qw3ql")

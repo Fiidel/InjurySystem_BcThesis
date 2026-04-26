@@ -2,8 +2,27 @@ extends BTAction
 
 @export var tail_spikes: TailSpikes
 @export var animation_tree: AnimationTree
+@export var manticore_body: CharacterBody3D
 @export var release_spikes_animation_delay: float = 0.0
 @export var spikes_regenerate_time: float = 1.0
+var turn_speed: float = 3.0
+
+
+func _ready() -> void:
+	set_physics_process(false)
+
+
+func _physics_process(delta: float) -> void:
+	var player: Node3D = blackboard.read("player")
+	if player == null:
+		finished.emit(ReturnStatus.FAILURE)
+		abort()
+		return
+	
+	var to_player: Vector3 = player.global_position - manticore_body.global_position
+	to_player.y = 0.0
+	var target_rotation: float = atan2(to_player.x, to_player.z)
+	manticore_body.rotation.y = rotate_toward(manticore_body.rotation.y, target_rotation, turn_speed * delta)
 
 
 func execute() -> void:
@@ -11,11 +30,16 @@ func execute() -> void:
 		push_error("Tail spikes node not assigned!")
 		finished.emit(ReturnStatus.FAILURE)
 		return
+	if manticore_body == null:
+		push_error("Manticore body not assigned!")
+		finished.emit(ReturnStatus.FAILURE)
+		return
 	var player: Node3D = blackboard.read("player")
 	if player == null:
 		finished.emit(ReturnStatus.FAILURE)
 		return
 	
+	set_physics_process(true)
 	animation_tree.set("parameters/AttackStateMachine/conditions/stinger", true)
 	animation_tree.set("parameters/AttackOneShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 	
@@ -26,6 +50,7 @@ func execute() -> void:
 	while animation_tree.get("parameters/AttackOneShot/active"):
 		await get_tree().process_frame
 	animation_tree.set("parameters/AttackStateMachine/conditions/stinger", false)
+	set_physics_process(false)
 	finished.emit(ReturnStatus.SUCCESS)
 
 
@@ -46,3 +71,7 @@ func release_spikes(player: Node3D) -> void:
 	# spike regeneration
 	await get_tree().create_timer(spikes_regenerate_time).timeout
 	tail_spikes.fade_in_material(0.5)
+
+
+func abort() -> void:
+	set_physics_process(false)

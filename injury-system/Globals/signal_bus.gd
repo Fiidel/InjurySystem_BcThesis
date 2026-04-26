@@ -1,6 +1,6 @@
 extends Node
 
-signal body_part_destroyed
+signal body_part_destroyed(body_part: BodyPart)
 signal enemy_hit
 
 const BODY_PART_DESTROY_TIME_SCALE := 0.2
@@ -19,7 +19,7 @@ func _ready() -> void:
 	body_part_destroyed.connect(_on_body_part_destroyed_time_emphasis)
 
 
-func _on_body_part_destroyed_time_emphasis() -> void:
+func _on_body_part_destroyed_time_emphasis(_body_part: BodyPart) -> void:
 	Engine.time_scale = BODY_PART_DESTROY_TIME_SCALE
 	_time_restore_timer.stop()
 	_time_restore_timer.start()

@@ -24,8 +24,7 @@ texture_mode = 1
 curve = SubResource("Curve_e6ktl")
 
 [sub_resource type="Gradient" id="Gradient_alb0u"]
-offsets = PackedFloat32Array(0, 0.41972476)
-colors = PackedColorArray(0.51635844, 2.3704395e-06, 1.92523e-07, 1, 0.67684996, 1.5943311e-05, 0.11319093, 1)
+colors = PackedColorArray(0.51635844, 2.3704395e-06, 1.92523e-07, 1, 0.77397734, 7.2172064e-05, 0.13552454, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_u0t2c"]
 gradient = SubResource("Gradient_alb0u")
@@ -46,9 +45,9 @@ angle_min = -179.99998
 angle_max = 180.00002
 direction = Vector3(0, 1, 0)
 spread = 180.0
-initial_velocity_max = 5.0
-scale_min = 0.19999999
-scale_max = 0.39999998
+initial_velocity_max = 3.0
+scale_min = 0.39999998
+scale_max = 0.59999996
 scale_curve = SubResource("CurveTexture_g7mjp")
 color_ramp = SubResource("GradientTexture1D_u0t2c")
 alpha_curve = SubResource("CurveTexture_nhx15")

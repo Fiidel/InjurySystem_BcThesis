@@ -424,6 +424,7 @@ collision_layer = 8
 collision_mask = 4
 
 [node name="WingR" type="MeshInstance3D" parent="." unique_id=16429585]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 mesh = SubResource("ArrayMesh_2nois")
 skin = SubResource("Skin_0kqnh")
 surface_material_override/0 = ExtResource("2_ksjmc")
@@ -433,13 +434,13 @@ metadata/extras = {
 }
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=451267094]
-transform = Transform3D(0.9604407, -0.2784841, -0.00041616708, 0.27494085, 0.94798064, 0.16043729, -0.04428468, -0.15420492, 0.98704594, -1.266502, 1.5436167, -0.22420004)
+transform = Transform3D(1.9208815, -0.55696833, -0.0008324201, 0.5498817, 1.8959615, 0.32087457, -0.088569365, -0.30840987, 1.974092, -2.4687843, 3.1977725, -0.4510248)
 shape = SubResource("BoxShape3D_q1tee")
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="." unique_id=1091477101]
-transform = Transform3D(0.058923025, -0.9982625, 0, 0.9982625, 0.058923025, 0, 0, 0, 1, -1.0358809, 1.5600051, 0.33597302)
+transform = Transform3D(0.11784605, -1.996525, 0, 1.996525, 0.11784605, 0, 0, 0, 2, -1.9779228, 3.193153, 0.731452)
 shape = SubResource("CapsuleShape3D_7ft0d")
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="." unique_id=838247861]
-transform = Transform3D(0.01882328, -0.3189004, 0.9476012, 0.9982626, 0.05892303, 1.7333355e-09, -0.055835534, 0.94595474, 0.31945542, -0.34320647, 1.4268122, -0.013381928)
+transform = Transform3D(0.037646554, -0.63780075, 1.8952026, 1.996525, 0.11784605, 3.2599392e-09, -0.111671075, 1.8919097, 0.63891083, -0.647209, 2.8153574, -0.013381928)
 shape = SubResource("CapsuleShape3D_8spgy")

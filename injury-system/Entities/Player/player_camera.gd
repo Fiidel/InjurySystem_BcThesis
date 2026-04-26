@@ -10,7 +10,7 @@ func _ready() -> void:
 	SignalBus.body_part_destroyed.connect(on_body_part_destroyed)
 
 
-func on_body_part_destroyed() -> void:
+func on_body_part_destroyed(_body_part: BodyPart) -> void:
 	var fov_tween = create_tween()
 	fov_tween.set_ignore_time_scale(true)
 	fov_tween.set_ease(Tween.EASE_IN_OUT)

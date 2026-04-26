@@ -3,11 +3,14 @@
 class_name Body
 extends Node
 
+signal enemy_killed
+
 @export var central_health: float = 1.0
 @export var bt_root: BTRoot
 @export var animation_tree: AnimationTree
 @export var skeleton_simulator: PhysicalBoneSimulator3D
 @export var movement_collision_shapes: Array[CollisionShape3D]
+var is_dead: bool = false
 
 
 func _ready() -> void:
@@ -15,8 +18,12 @@ func _ready() -> void:
 
 
 func take_central_damage(amount: float) -> void:
+	if is_dead:
+		return
 	central_health -= amount
 	if central_health <= 0:
+		is_dead = true
+		enemy_killed.emit()
 		if bt_root:
 			bt_root.abort()
 		call_deferred("activate_ragdoll") # must be called deferred

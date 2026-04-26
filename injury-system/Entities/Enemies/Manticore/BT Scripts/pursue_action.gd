@@ -3,6 +3,7 @@ extends BTAction
 @export var turn_speed: float = 0
 @export var animation_tree: AnimationTree
 @export var manticore_body: CharacterBody3D
+@export var stop_pursuit_range_override: float = -1.0
 
 
 func _ready() -> void:
@@ -33,14 +34,20 @@ func _physics_process(delta: float) -> void:
 	if melee_attack_range == null:
 		exit_with_failure()
 		return
+
+	var stop_pursuit_range: float = stop_pursuit_range_override if stop_pursuit_range_override > 0.0 else melee_attack_range
 	
-	if to_player.length() <= melee_attack_range:
+	if to_player.length() <= stop_pursuit_range:
+		manticore_body.velocity.x = 0.0
+		manticore_body.velocity.z = 0.0
 		exit_with_success()
 		return
 	else:
 		var target_rotation: float = atan2(to_player.x, to_player.z)
 		manticore_body.rotation.y = rotate_toward(manticore_body.rotation.y, target_rotation, turn_speed * delta)
-		manticore_body.global_position += to_player.normalized() * move_speed * delta
+		var move_direction := to_player.normalized()
+		manticore_body.velocity.x = move_direction.x * move_speed
+		manticore_body.velocity.z = move_direction.z * move_speed
 
 
 func execute() -> void:
@@ -50,6 +57,8 @@ func execute() -> void:
 
 func abort() -> void:
 	tween_run_blend(false)
+	manticore_body.velocity.x = 0.0
+	manticore_body.velocity.z = 0.0
 	set_physics_process(false)
 
 

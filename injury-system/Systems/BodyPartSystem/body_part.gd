@@ -102,19 +102,33 @@ func on_hitbox_hit(
 	# update deformation array and shader
 	var do_deform : bool = deformation_params != null and deformation_params.apply_deformation
 	if do_deform:
-		if hit_locations.size() >= MAX_HITS:
-			hit_locations.pop_front()
-		hit_locations.append({
-			"attachment": bone_attachment,
-			"pos": local_point,
-			"normal": local_normal,
-			"radius": deformation_params.hit_radius,
-			"strength": deformation_params.hit_strength
-		})
-		update_deformation_shader()
+		if can_register_deformation_hit(bone_attachment, local_point, deformation_params):
+			if hit_locations.size() >= MAX_HITS:
+				hit_locations.pop_front()
+			hit_locations.append({
+				"attachment": bone_attachment,
+				"pos": local_point,
+				"normal": local_normal,
+				"radius": deformation_params.hit_radius,
+				"strength": deformation_params.hit_strength
+			})
+			update_deformation_shader()
 	# spawn a decal
 	if decal_params:
 		spawn_hit_decal(bone_attachment, local_point, local_normal, decal_params)
+
+
+func can_register_deformation_hit(attachment: BoneAttachment3D, new_local_point: Vector3, deformation_params: DeformationParameters) -> bool:
+	if hit_locations.is_empty() or deformation_params.min_hit_separation <= 0.0:
+		return true
+
+	var new_world_point: Vector3 = attachment.global_transform * new_local_point
+	for hit in hit_locations:
+		var existing_world_point: Vector3 = hit["attachment"].global_transform * hit["pos"]
+		if existing_world_point.distance_to(new_world_point) <= deformation_params.min_hit_separation:
+			return false
+
+	return true
 
 
 func take_damage(amount: float) -> void:
@@ -141,7 +155,7 @@ func play_hit_flash() -> void:
 
 func on_zero_health_reached() -> void:
 	is_destroyed = true
-	SignalBus.body_part_destroyed.emit()
+	SignalBus.body_part_destroyed.emit(self)
 	if remove_bones_on_destroy:
 		# make the mesh material flash
 		var mat := mesh.get_active_material(0)
