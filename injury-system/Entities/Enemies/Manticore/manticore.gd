@@ -76,10 +76,13 @@ func align_to_ground(delta: float) -> void:
 	var target_basis := Basis(side_axis, ground_normal, -forward).orthonormalized()
 	var rotation_basis := target_basis.get_euler() # get the rotation from the basis
 	rotation_basis.z *= ground_align_z_rotation_scale # adjust the rotation along the z-axis (the enemy's sideways rotation to stand correctly along the ground normal)
-	target_basis = Basis.from_euler(rotation_basis) # convert the euler angles back to a basis
 	# interpolate the current basis with the target basis
-	var blend = clamp(ground_align_speed * delta, 0.0, 1.0) # must be 0-1
-	global_basis = global_basis.slerp(target_basis, blend)
+	target_basis = Basis.from_euler(rotation_basis).orthonormalized() # convert back to a stable basis
+	var current_basis := global_basis.orthonormalized()
+	var current_rotation := current_basis.get_rotation_quaternion()
+	var target_rotation := target_basis.get_rotation_quaternion()
+	var clamp = clamp(ground_align_speed * delta, 0.0, 1.0) # clamp interpolation to 0-1
+	global_basis = Basis(current_rotation.slerp(target_rotation, clamp)).orthonormalized()
 
 
 func get_ground_hit(from_position: Vector3) -> Dictionary:

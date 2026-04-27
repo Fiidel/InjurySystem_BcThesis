@@ -10,8 +10,8 @@ enum RakeAttackType {
 @export var attack_anim_delay: float = 0.0
 @export var animation_tree: AnimationTree
 @export var manticore_body: CharacterBody3D
-@export var physical_bones_collision_disable: Array[PhysicalBone3D] = []
-@export_range(1, 32, 1) var player_collision_layer: int = 1
+
+@onready var rotation_controller: RotationController = RotationController.new()
 var turn_speed: float = 3.0
 
 
@@ -28,13 +28,15 @@ func _physics_process(delta: float) -> void:
 	
 	var to_player: Vector3 = player.global_position - manticore_body.global_position
 	to_player.y = 0.0
-	var target_rotation: float = atan2(to_player.x, to_player.z)
-	manticore_body.rotation.y = rotate_toward(manticore_body.rotation.y, target_rotation, turn_speed * delta)
+	var rotate := rotation_controller.can_rotate(delta)
+	if rotate:
+		var target_rotation: float = atan2(to_player.x, to_player.z)
+		manticore_body.rotation.y = rotate_toward(manticore_body.rotation.y, target_rotation, turn_speed * delta)
 
 
 func execute() -> void:
+	rotation_controller.reset()
 	set_physics_process(true)
-	disable_bone_character_collisions()
 	
 	var rake_condition: String = _get_rake_condition_name()
 	animation_tree.set("parameters/AttackStateMachine/conditions/" + rake_condition, true)
@@ -48,14 +50,12 @@ func execute() -> void:
 		await get_tree().process_frame
 	
 	animation_tree.set("parameters/AttackStateMachine/conditions/" + rake_condition, false)
-	enable_bone_character_collisions()
 	
 	set_physics_process(false)
 	finished.emit(ReturnStatus.SUCCESS)
 
 
 func abort() -> void:
-	enable_bone_character_collisions()
 	set_physics_process(false)
 
 
@@ -82,15 +82,3 @@ func _get_rake_condition_name() -> String:
 			return "rakeLR"
 	push_error("Invalid rake attack type: %s" % rake_attack_type)
 	return ""
-
-
-func disable_bone_character_collisions() -> void:
-	for bone in physical_bones_collision_disable:
-		if is_instance_valid(bone):
-			bone.set_collision_layer_value(player_collision_layer, false)
-
-
-func enable_bone_character_collisions() -> void:
-	for bone in physical_bones_collision_disable:
-		if is_instance_valid(bone):
-			bone.set_collision_layer_value(player_collision_layer, true)

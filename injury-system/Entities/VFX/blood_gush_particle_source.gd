@@ -1,17 +1,17 @@
 class_name BloodGushParticleSource
 extends Marker3D
 
-@export var body_part: BodyPart
+@export var severed_body_part: BodyPart
 @onready var blood_particles_scene: PackedScene = preload("uid://dalqw5lx4vbr7")
 
 
 func _ready() -> void:
-	if body_part != null:
+	if severed_body_part != null:
 		SignalBus.body_part_destroyed.connect(on_body_part_destroyed)
 
 
 func on_body_part_destroyed(body_part: BodyPart) -> void:
-	if body_part != self.body_part:
+	if body_part != severed_body_part:
 		return
 	
 	var blood_particles_instance: GPUParticles3D = blood_particles_scene.instantiate()

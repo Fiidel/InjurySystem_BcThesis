@@ -3,6 +3,7 @@ extends BTAction
 @export var attack_anim_delay: float = 0.0
 @export var animation_tree: AnimationTree
 @export var manticore_body: CharacterBody3D
+@onready var rotation_controller: RotationController = RotationController.new()
 var turn_speed: float = 3.0
 
 
@@ -19,11 +20,14 @@ func _physics_process(delta: float) -> void:
 	
 	var to_player: Vector3 = player.global_position - manticore_body.global_position
 	to_player.y = 0.0
-	var target_rotation: float = atan2(to_player.x, to_player.z)
-	manticore_body.rotation.y = rotate_toward(manticore_body.rotation.y, target_rotation, turn_speed * delta)
+	var rotate := rotation_controller.can_rotate(delta)
+	if rotate:
+		var target_rotation: float = atan2(to_player.x, to_player.z)
+		manticore_body.rotation.y = rotate_toward(manticore_body.rotation.y, target_rotation, turn_speed * delta)
 
 
 func execute() -> void:
+	rotation_controller.reset()
 	set_physics_process(true)
 	
 	# start attack animation

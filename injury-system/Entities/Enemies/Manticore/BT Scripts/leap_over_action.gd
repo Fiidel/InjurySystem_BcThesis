@@ -7,6 +7,7 @@ extends BTAction
 @export var leap_upward_velocity: float = 10.0
 @export var jump_halt_animation_delay: float = 0.0
 var can_look_towards_player: bool = true
+@onready var rotation_controller: RotationController = RotationController.new()
 
 
 func _ready() -> void:
@@ -22,8 +23,10 @@ func _physics_process(delta: float) -> void:
 		return
 	var to_player: Vector3 = player.global_position - manticore_body.global_position
 	to_player.y = 0.0
-	var target_rotation: float = atan2(to_player.x, to_player.z)
-	manticore_body.rotation.y = rotate_toward(manticore_body.rotation.y, target_rotation, turn_speed * delta)
+	var rotate := rotation_controller.can_rotate(delta)
+	if rotate:
+		var target_rotation: float = atan2(to_player.x, to_player.z)
+		manticore_body.rotation.y = rotate_toward(manticore_body.rotation.y, target_rotation, turn_speed * delta)
 
 
 func execute() -> void:
@@ -33,6 +36,7 @@ func execute() -> void:
 		return
 	
 	can_look_towards_player = true
+	rotation_controller.reset()
 	set_physics_process(true)
 	
 	animation_tree.set("parameters/AttackStateMachine/conditions/leap", true)

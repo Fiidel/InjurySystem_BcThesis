@@ -8,6 +8,7 @@ extends BTAction
 @export var leap_velocity: float = 8.0
 @export var leap_upward_velocity: float = 2.0
 
+@onready var rotation_controller: RotationController = RotationController.new()
 var halt_movement_timer: Timer
 var animation_movement_halted: bool = false
 
@@ -29,8 +30,10 @@ func _physics_process(delta: float) -> void:
 		return
 	var to_player: Vector3 = player.global_position - manticore_body.global_position
 	to_player.y = 0.0
-	var target_rotation: float = atan2(to_player.x, to_player.z)
-	manticore_body.rotation.y = rotate_toward(manticore_body.rotation.y, target_rotation, turn_speed * delta)
+	var rotate := rotation_controller.can_rotate(delta)
+	if rotate:
+		var target_rotation: float = atan2(to_player.x, to_player.z)
+		manticore_body.rotation.y = rotate_toward(manticore_body.rotation.y, target_rotation, turn_speed * delta)
 
 
 func execute() -> void:
@@ -40,6 +43,7 @@ func execute() -> void:
 		finished.emit(ReturnStatus.FAILURE)
 		return
 	
+	rotation_controller.reset()
 	set_physics_process(true)
 	
 	# start leap animation and the movement halt timer
