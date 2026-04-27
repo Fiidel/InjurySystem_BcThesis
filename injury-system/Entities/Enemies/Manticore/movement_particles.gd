@@ -2,6 +2,7 @@ class_name MovementParticles
 extends Node3D
 
 @export var body: CharacterBody3D
+@export var body_parts_generating_particles: Array[BodyPart] = []
 @export_range(1, 20, 1) var landing_particle_amount: int = 8
 @export_range(0.1, 5.0, 0.1) var landing_spawn_radius: float = 1.0
 @export_range(1, 20, 1) var trail_particle_amount: int = 4
@@ -30,7 +31,7 @@ func _physics_process(_delta: float) -> void:
 	if body == null:
 		return
 
-	if not was_on_floor and body.is_on_floor():
+	if not was_on_floor and body.is_on_floor() and should_spawn_particles():
 		spawn_particles(body.global_position, landing_particle_amount, landing_spawn_radius)
 	was_on_floor = body.is_on_floor()
 
@@ -57,6 +58,9 @@ func on_movement_trail_timer_timeout() -> void:
 	if trail_origin == null or body == null:
 		return
 	
+	if not should_spawn_particles():
+		return
+	
 	# if the enemy is not on the floor or not moving, restart the timer but don't spawn particles
 	var horizontal_speed := Vector2(body.velocity.x, body.velocity.z).length()
 	if not body.is_on_floor() or horizontal_speed < trail_minimum_movement_speed:
@@ -74,3 +78,12 @@ func random_horizontal_offset(radius: float) -> Vector3:
 	var angle := rng.randf_range(0.0, TAU)
 	var distance := sqrt(rng.randf()) * radius
 	return Vector3(cos(angle) * distance, 0.0, sin(angle) * distance)
+
+
+func should_spawn_particles() -> bool:
+	if body_parts_generating_particles.is_empty():
+		return true
+	for part in body_parts_generating_particles:
+		if !part.is_destroyed:
+			return true
+	return false
