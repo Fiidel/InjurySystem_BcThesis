@@ -24,7 +24,7 @@ fog_sun_scatter = 0.1
 fog_density = 0.5
 fog_aerial_perspective = 0.4
 volumetric_fog_enabled = true
-volumetric_fog_density = 0.02
+volumetric_fog_density = 0.015
 volumetric_fog_albedo = Color(0.87051505, 0.80197895, 0.5005253, 1)
 volumetric_fog_emission = Color(0.3508252, 0.2825333, 0.16542125, 1)
 volumetric_fog_anisotropy = 0.4
@@ -48,5 +48,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.981531, 7.4851084, 21.4371
 floor_constant_speed = true
 
 [node name="Desert" parent="." unique_id=151719703 instance=ExtResource("3_lquwl")]
+
+[node name="Bounds" parent="Desert/NavigationRegion3D" parent_id_path=PackedInt32Array(151719703, 1818626805) index="1" unique_id=1671352988]
+visible = true
 
 [editable path="Desert"]

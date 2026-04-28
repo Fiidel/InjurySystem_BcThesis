@@ -13,8 +13,15 @@ const HIT_FLASH_INTENSITY: float = 0.15
 const HIT_FLASH_WINDUP: float = 0.03
 const HIT_FLASH_UNWIND: float = 0.1
 
+@export var only_damage_central_health: bool = false:
+	set(value):
+		if only_damage_central_health == value:
+			return
+		only_damage_central_health = value
+		if only_damage_central_health and health <= 0:
+			health = 1
+		notify_property_list_changed()
 @export var health: float = 1
-@export var only_damage_central_health: bool = false
 @export var mesh: MeshInstance3D
 @export var mesh_target_id: StringName = "BP_"
 @export var remove_bones_on_destroy: bool = false:
@@ -40,6 +47,10 @@ var hit_flash_tween: Tween
 
 
 func _validate_property(property: Dictionary) -> void:
+	# hide health when this body part only relays damage
+	if property.name == &"health" and only_damage_central_health:
+		property.usage = PROPERTY_USAGE_NO_EDITOR
+
 	# toggle skeleton and bone based on remove_bones_on_destroy
 	if property.name in ["skeleton", "bone_to_remove", "severed_body_scene"]:
 		if not remove_bones_on_destroy:

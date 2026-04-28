@@ -26,7 +26,7 @@ const FLY_BLEND_PATH := "parameters/PursueBlendTree/FlyBlend/blend_amount"
 @export var fly_speed_modifier: float = 0.9
 @export var limp_speed_modifier: float = 0.75
 @export var crawl_speed_modifier: float = 0.5
-@export var hind_legs_speed_modifier: float = 0.6
+@export var hind_legs_speed_modifier: float = 0.5
 
 @export_group("Fly Hover")
 @export var fly_hover_height: float = 1.0

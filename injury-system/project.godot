@@ -23,6 +23,10 @@ config/icon="res://icon.svg"
 
 SignalBus="*uid://bpwi4d1cvt631"
 
+[display]
+
+window/size/mode=3
+
 [dotnet]
 
 project/assembly_name="InjurySystem"
