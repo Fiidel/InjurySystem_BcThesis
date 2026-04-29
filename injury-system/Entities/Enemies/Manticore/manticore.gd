@@ -81,8 +81,8 @@ func align_to_ground(delta: float) -> void:
 	var current_basis := global_basis.orthonormalized()
 	var current_rotation := current_basis.get_rotation_quaternion()
 	var target_rotation := target_basis.get_rotation_quaternion()
-	var clamp = clamp(ground_align_speed * delta, 0.0, 1.0) # clamp interpolation to 0-1
-	global_basis = Basis(current_rotation.slerp(target_rotation, clamp)).orthonormalized()
+	var clamped = clamp(ground_align_speed * delta, 0.0, 1.0) # clamp interpolation to 0-1
+	global_basis = Basis(current_rotation.slerp(target_rotation, clamped)).orthonormalized()
 
 
 func get_ground_hit(from_position: Vector3) -> Dictionary:
