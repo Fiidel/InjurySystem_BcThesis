@@ -49,7 +49,4 @@ floor_constant_speed = true
 
 [node name="Desert" parent="." unique_id=151719703 instance=ExtResource("3_lquwl")]
 
-[node name="Bounds" parent="Desert/NavigationRegion3D" parent_id_path=PackedInt32Array(151719703, 1818626805) index="1" unique_id=1671352988]
-visible = true
-
 [editable path="Desert"]

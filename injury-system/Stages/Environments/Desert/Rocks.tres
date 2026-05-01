@@ -51,12 +51,14 @@ void fragment() {
 
 	// added code
 	float noise_value = texture(noise, base_uv * noise_scale).r;
-	
 	vec4 albedo_tex_1 = texture(texture_albedo, base_uv * scale_1);
 	vec4 albedo_tex_2 = texture(texture_albedo_2, base_uv * scale_2);
-	vec3 mixed_albedo = mix(albedo_tex_1 - vec4(0.03, 0.025, 0.05, 0.0), albedo_tex_2 - vec4(0.05, 0.0, 0.0, 0.0), noise_value).rgb;
+	// mix the 2 albedo textures based on noise value
+	vec3 mixed_albedo = mix(albedo_tex_1, albedo_tex_2, noise_value).rgb;
+	// calculate transition regions
 	float transition = 1.0 - abs(noise_value - 0.5) * 2.0;
-	ALBEDO = mix(mixed_albedo, mixed_albedo * vec3(0.76, 0.70, 0.62), transition);
+	// add some darkening along the transitions for more variation
+	ALBEDO = mix(mixed_albedo, mixed_albedo * vec3(0.5), transition);
 	
 	vec3 normal_1 = texture(texture_normal, base_uv * scale_1).rgb;
 	vec3 normal_2 = texture(texture_normal_2, base_uv * scale_2).rgb;
@@ -85,7 +87,7 @@ resource_name = "Rocks"
 render_priority = 0
 shader = SubResource("Shader_0acw6")
 shader_parameter/scale_1 = 2.0
-shader_parameter/scale_2 = 1.0
+shader_parameter/scale_2 = 1.7
 shader_parameter/noise_scale = 0.15
 shader_parameter/texture_albedo_2 = ExtResource("2_hgaqo")
 shader_parameter/texture_normal_2 = ExtResource("4_u66pm")

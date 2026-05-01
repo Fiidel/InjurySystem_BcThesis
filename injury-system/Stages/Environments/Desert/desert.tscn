@@ -168,7 +168,6 @@ collision_mask = 13
 shape = SubResource("ConcavePolygonShape3D_8f3xk")
 
 [node name="Bounds" type="StaticBody3D" parent="NavigationRegion3D" unique_id=1671352988]
-visible = false
 collision_layer = 4
 collision_mask = 15
 
@@ -241,5 +240,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5844135, 0)
 material_override = SubResource("StandardMaterial3D_01ioh")
 amount = 4096
 lifetime = 3.0
+visibility_aabb = AABB(-100.03084, -22.199327, -118.06782, 224.9133, 65.31144, 234.95868)
 process_material = SubResource("ParticleProcessMaterial_01ioh")
 draw_pass_1 = SubResource("QuadMesh_yobvk")
