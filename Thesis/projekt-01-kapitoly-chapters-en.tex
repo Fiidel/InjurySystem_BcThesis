@@ -16,7 +16,7 @@ The goal of this thesis is the design and implementation of a dynamic injury sys
 
 Chapter \ref{chap:theory} explores existing injury systems from a design perspective and explains the basics of the mechanisms that are used in the implementation of the final product, which include inverse kinematics (for character animation) and AI patterns (specifically the finite state machine and the behavior tree).
 
-Chapter \ref{chap:design} details the design of the game demo. It explains the design of the enemy model, the subsystems necessary for implementing a cohesive enemy with a specialized injury system, and showcases mockups of the in-engine tools' user interface.
+Chapter \ref{chap:design} details the design of the game demo. It explains the design of the enemy model, the subsystems necessary for implementing a cohesive enemy with a specialized injury system.
 
 % @TODO ch4, ch5, etc.
 
@@ -84,9 +84,6 @@ The designs also aim for enemy variance that enforces different strategies to be
 
 Game designs should also be mindful of not overwhelming the player. This can be solved by making combat systems more diegetic, meaning embedding mechanics into to the \q{narrative world} (the game world as perceived by the game characters). For example, whichever body part the player shoots, that part takes damage, as opposed to the player choosing from several invasive UI popups.
 
-
-% \section{Godot}
-% @TODO I should probably talk about Godot too, at least an overview of what it is and what it can do/what it offers since I'll be working in it
 
 
 \section{Locomotion}
@@ -177,6 +174,9 @@ This basic BT implementation can then be extended by more specialized nodes.
 It is useful to have a \texttt{BehaviorTree} object that is built by a \texttt{BehaviorTreeBuilder}. This will serve as the central point for storing and updating the tree.
 The BT has an \texttt{update} method which performs the traversal of the tree and is the entry point of the BT. It is called whenever an update is needed, though it need not be every game frame -- every other frame or 5 frames per second can suffice (to lighten or spread out the processing load). For a more efficient approach, an event-based node traversal implementation is possible where a central scheduler manages the traversal using the observer pattern.
 
+Actions usually have to interact with other parts of the system. For this purpose, it can fetch data from a blackboard, a shared data storage for the behavior tree.
+It may also be important to have a shutdown mechanism that handles action exits cleanly \cite[Chapter~6]{GameAIPro1}.
+
 \begin{figure}[H]
     \label{BT_illustration}
     \centering
@@ -190,16 +190,35 @@ Utility theory in enemy AI design refers to the evaluation of \emph{utility} acr
 Utility calculations can also be integrated into behavior tree traversal. The behavior tree implementation can be extended by a \emph{utility selector} node. It first queries its children for a utility score, and then decides which child to enter based on that score. For an AI aimed towards optimal decision making, the child with the highest score would be picked. Alternatively, the choice could be randomized, but still weighted towards the higher scored children \cite[Chapter~10]{GameAIPro1}.
 
 
-\section{Pathfinding and Navigation}
-A virtual environment can be sectioned into connected areas to map where a game character can move. The aggregation of these areas and how they are connected is known as a \emph{navigation mesh}, and it allows agents to plan paths to reach a point in the environment. Even if the virtual environment is 3D, characters are usually constrained to surfaces flat enough to walk on. Each character needs to calculate a suitable geometric route through the areas that avoids collisions with objects \cite{navmesh}. A 3D navigation mesh of an environment consisting of two platforms and a walkable ramp is showcased in Figure \ref{navmesh_example}.
+% % from the:
+% % Initialization -- All but the simplest of actions will need to interface with other systems and objects to do the work. For example, a particular action may need to fetch data from a blackboard, or make a request of the animation systems. In a well-defined modular architecture getting access to these other games systems can be problematic. Extra work is required during the setup of behavior tree actions to provide the systems that those actions will use. This is often solved by passing extra parameters during node instantiation or through the use of the Visitor software design pattern.
+% % Shutdown—Like initialization, the shutdown of actions can be problematic due to the dependencies on external systems. Special care must be taken when shutting down an action to ensure that freeing resources does not interfere with other behaviors. For example, you cannot simply reset the animation system once an action shuts down as another instance of that action may have recently been activated elsewhere.
 
-\begin{figure}[H]
-    \label{navmesh_example}
-    \centering
-    \includegraphics[width=\textwidth]{obrazky-figures/navmesh_example.png}
-    \caption{The visualized polygons of a 3D navigation mesh\protect\footnotemark.}
-\end{figure}
-\footnotetext{Image taken from \url{https://docs.godotengine.org/en/latest/tutorials/navigation/navigation_using_navigationmeshes.html}.}
+
+% \section{Pathfinding and Navigation}
+% A virtual environment can be sectioned into connected areas to map where a game character can move. The aggregation of these areas and how they are connected is known as a \emph{navigation mesh}, and it allows agents to plan paths to reach a point in the environment. Even if the virtual environment is 3D, characters are usually constrained to surfaces flat enough to walk on. Each character needs to calculate a suitable geometric route through the areas that avoids collisions with objects \cite{navmesh}. A 3D navigation mesh of an environment consisting of two platforms and a walkable ramp is showcased in Figure \ref{navmesh_example}.
+
+% \begin{figure}[H]
+%     \label{navmesh_example}
+%     \centering
+%     \includegraphics[width=\textwidth]{obrazky-figures/navmesh_example.png}
+%     \caption{The visualized polygons of a 3D navigation mesh\protect\footnotemark.}
+% \end{figure}
+% \footnotetext{Image taken from \url{https://docs.godotengine.org/en/latest/tutorials/navigation/navigation_using_navigationmeshes.html}.}
+
+\section{Godot}
+
+an overview of what it is and what it can do/what it offers since I'll be working in it
+
+GDScript, C\#
+some sources
+
+\subsection{Architecture}
+nodes, scene tree, in-engine tools, engine editor is itself a game, scripts can edit the editor and run directly within it
+
+\subsection{Shading Language}
+own shading language based of GLSL
+
 
 % ===================================================================
 % ===================================================================
@@ -207,29 +226,29 @@ A virtual environment can be sectioned into connected areas to map where a game 
 
 \chapter{Injury System Design}
 \label{chap:design}
-Navrhněte uživatelské rozhraní a výslednou funkcionalitu aplikace, která demonstruje pokročilé reakce herní postavy na zranění.
 
+The end goal of this thesis is to create a demo of an enemy system that allows players to target different body parts and destroy them to affect the behavior of the enemy. A~secondary objective, though not any less important, is to build up supporting structures that help modularly construct different kinds of enemies in Godot.
+
+
+\section{The Modularity of Godot}
+Godot's scene and node-based architecture allows for great extensibility. Games in Godot are a tree of nodes that are grouped together into scenes\footnote{Overview of Godot's key concepts, available at \url{https://docs.godotengine.org/en/stable/getting_started/introduction/key_concepts_overview.html}}. It is possible to create classes by using \texttt{class\_name} in the header of a script, which also makes them a custom node type that can be inserted into the scene tree, and they will work just like native node types (such as \texttt{CharacterBody3D}, \texttt{Camera3D}, \texttt{CollisionShape3D}, etc.). It is even possible to create tool scripts (by using the \texttt{@tool} header at the top of a script) which run live in the editor. The scripts' variables can be prepended with \texttt{@export} which makes the values visible and editable directly in the engine's editor. Their visibility can even be toggled or the possible values supplied based on the values of other variables. Via these engine features, Godot provides a toolbox for developing modular, extensible, and encapsulated systems that can then be woven together into a more complex scene.
+
+
+\section{Body Part Injury System}
+The goal is to recreate an injury system in Godot with nodes and tooling to facilitate creating enemies with body-part based models and abilities like in the video games in Chapter~\ref{chap:theory}.
 
 The player should be able to make meaningful choices that have a real impact on what happens next \cite{schell2019art}. For example, a player that prefers melee combat might target an enemy's wings to prevent it from flying and getting out of melee range.
 
-The game should combine the three sources of unpredictability mentioned in Chapter \ref{chap:theory} to make it more engaging to players. The element of chance comes from the enemy's AI which makes randomized decisions based on a decision-making pattern like a behavior tree. The player chooses which body parts to attack so that they can disable the enemy's abilities that require those parts to be triggered. The complexity comes from the way body parts serve as prerequisites for the enemy's abilities, such as two wings being necessary for flight, at least three limbs for walking, or a stinger tail for poison attacks, and the way they enable and limit what actions it has available in its behavior.
+The game should combine the three sources of unpredictability mentioned in Chapter~\ref{chap:theory} to make it more engaging to players. The element of chance comes from the enemy's AI which makes randomized decisions based on a decision-making pattern like a behavior tree. The player chooses which body parts to attack so that they can disable the enemy's abilities that require those parts to be triggered. The complexity comes from the way body parts serve as prerequisites for the enemy's abilities, such as two wings being necessary for flight, at least three limbs for walking, or a stinger tail for poison attacks, and the way they enable and limit what actions it has available in its behavior.
 
-Depending on the implementation of the player controller, there are even more elements of player choice and rules complexity. Such cases could include the player maneuvering around the virtual space to avoid or close in on an enemy, or any of the player's special abilities and attacks with various cooldowns and effects. However, the player controller is a complex issue of its own. It is not covered by this thesis, but the player's experience is a crucial aspect of games and should be accounted for when discussing game design.
-
-
-Design justified by design principles (books).
-
-There are many possible implementations of a body part injury system.
-HP-based; body-part based; idk
-
-probably going with a joint HP pool where each body part is some fraction of that pool
+There should be a central \texttt{Body} node that stores the total health, with \texttt{BodyPart} child nodes that either have their own health or subtract health from the \texttt{Body}.
 
 losing a body part needs to have a gameplay effect (quote games)
 
-\section{Enemy Design}
-4 limbs, wings, tail -- targetable body parts
+Intertwined with the behavior tree of the enemy -- altering the behavior based on destroyed boy parts -- gameplay effect (e.g., fly attack is hard to avoid, so the player may want to focus on destroying the wings first to disable its fly ability). Such a system provides dynamic reactivity to the player's actions and choices.
 
-a skeleton rig that allows its mesh to be deformed to reach a target point using IK
+Should also have visual effects as a visual response to the player's actions, while it also serves to make the core of the system -- the dismemberment -- look more impactful.
+
 
 \section{Enemy AI Based on Body Parts}
 \subsection{Behavior Execution}
@@ -237,8 +256,27 @@ what pattern to use when simulating the behavior? something that will change sta
 
 chosen Behavior Tree
 
+The BT should have some sort of GUI to help streamline not only the creation of BTs, but also their fast editing and iteration. The node-based architecture of Godot is well-suited for the node-based structure of BTs, and thus the BT can live inside the enemy scene as a Root node and its collection of BT child nodes.
+
+Event-based implementation via Godot's signals; construction on \_ready() when the enemy node is loaded into the running scene
+
+Nodes and decorators. All the classic ones for base functionality (tree traversal logic and execution nodes) -- Root, Sequence, Selector, Action, Condition decorator.
+
+PriorityReselctor -- for interrupts when a branch with higher priority becomes available
+
+Randomizer and WeightedRandomizer for pure randomization
+
+UtilityRandomizer and Utility decorator -- for circumstance-based calculated randomization
+
+CooldownDecorator
+
+Blackboard
+
+
 \subsection{Behavior Limiting}
-patterns to check for available actions? how to limit effectively what the Behavior Tree (or the chosen way to implement behavior) has access to? so that when the random value in the weighted network is generated, so that it doesn't try to execute a branch that cannot be executed due to missing links
+BodyPartFilter, BodyPartFilterRecheck
+
+patterns to check for available actions? how to limit effectively what the Behavior Tree (or the chosen way to implement behavior) has access to? so that when the random value in the weighted network is generated, so that it does not try to execute a branch that cannot be executed due to missing links
 
 The behavior also needs to be limited
 
@@ -249,47 +287,437 @@ limiting options based on harm;
 procedural animation of actions
 
 
-\section{UI Mockup}
-Godot plugin design and mockups
+\section{Mesh Deformation}
+
+
+
+\section{Demo Enemy Design}
+A manticore because it offers many opportunities for body part abilities and damage -- legs, wings, stinger.
+
+The body parts split into separate surfaces to be able to control their visuals separately and spawn meshes of the severed body parts
+
+Animations for the various types of body-part based attacks and types of movement (the different missing body part types of movement especially)
+
+
+\section{Player Controller}
+Depending on the implementation of the player controller, there are even more elements of player choice and rules complexity. Such cases could include the player maneuvering around the virtual space to avoid or close in on an enemy, or any of the player's special abilities and attacks with various cooldowns and effects. However, the player controller is a complex issue of its own. It is not covered by this thesis, but the player's experience is a crucial aspect of games and should be accounted for when discussing game design.
+
+A basic player controller for movement and camera (not the focus of this thesis despite having a crucial effect on gameplay in case of a full game).
+
+3 types of attacks -- slashing (arc), piercing (point), and bludgeoning (larger shape), each with their own models, hit effects and hit decals.
 
 
 % ===================================================================
 % ===================================================================
 % ===================================================================
 
-% \chapter{Implementation and Demonstration in Various Test Cases/Situations}
-% \section{Creating an Enemy Model}
-% Blender. Explain enemy design (body parts) -- that's why it's a custom model.
-% sculpting, retopo, rigify addon skeleton edited to fit the model, automatic weight paints with some manual adjustments, exported to Godot.
+\chapter{Implementation and Demonstration}
+\section{Modeling}
+Due to the unique requirements of the enemy model for this game demo, a custom model was designed and created. A simple arena-like desert basin surrounded by mountains was also modeled. Both models were made in Blender.
 
-% \section{Inverse Kinematics in Godot}
-% As of version 4.5, the Godot engine offers some nodes for inverse kinematics in 3D, their documentation available on the official website\footnote{The official documentation is available at \url{https://docs.godotengine.org/en/stable/}}.
+\subsection{Enemy Model}
+The enemy model contains separate body part meshes, joined together as a cohesive whole. Each mesh has its own surface material as well, so that it can be controlled directly and in isolation from the other parts in the game engine.
 
-% We will be using \texttt{SkeletonIK3D}, which rotates the bones in a \texttt{Skeleton3D} bone chain to reach a target end effector position with the end bone, and \texttt{LookAtModifier3D}, which rotates a bone to look at a target.
+First, a detailed model of a manticore was sculpted as a whole.
+Due to the high vertex count left after the sculpting workflow, the model was retopologized (simplified into fewer polygons) while maintaining the proper shape and details, but being more performance-efficient.
+The model was then UV-unwrapped (the vertices mapped onto a 2D image) and textured.
+Once the base model was finished, the skeleton rig was made using the Rigify Blender addon. Rigify's quadruped template with wing bones taken from the bird template was used. The rig was edited to fit the manticore, and some bones were added (such as the tail bones). Blender generated automatic weight paints (which determine how much a bone deforms the mesh), although they had to be manually adjusted in some areas.
 
-% % Expansions to the inverse kinematics support of the engine are to be implemented in the next version (4.6), as per an article on the official Godot engine website\footnote{\url{https://godotengine.org/article/inverse-kinematics-returns-to-godot-4-6/}}.
+Finally, the model was separated into the different body parts that would be targetable by the player -- the head and torso, the legs, the wings, and a stinger tail. The vertices were ripped at the seams and the left over holes filled with new geometry to seal them.
 
-% optional adjusting based on centroid for quadrupeds (e.g., different foot placement and leaning if a leg is gone)
+Animations were made in Blender using the skeleton rig's inverse kinematics to position the bones and deform the mesh and then capturing these positions in the keyframes of the animation. These animations were catered to the different usage of body parts for the various types of movement and attacks that the manticore enemy possesses.
+Movement animations include the idle animation, walking, running, running with a limp, crawling, walking on hind legs, leaping, flying, and diving.
+Attack animations include biting, raking with claws (left, right, or both), and a stinger tail attack.
 
-% \section{Behavior Tree Creation through UI}
+The whole model then had its vertices painted, with the red channel signifying the deformation magnitude (see Section \ref{DeformationShader}).
+Controlling the deformation magnitude in sensitive areas can be crucial to preventing the revealing of body part seams or extreme deformations where they are not desired. Notice the black vertex colors where the body parts separate in Figure \ref{ManticoreSplit}.
 
-% % from the BT Starter Kit:
-% % Initialization—All but the simplest of actions will need to interface with other systems and objects to do the work. For example, a particular action may need to fetch data from a blackboard, or make a request of the animation systems. In a well-defined modular architecture getting access to these other games systems can be problematic. Extra work is required during the setup of behavior tree actions to provide the systems that those actions will use. This is often solved by passing extra parameters during node instantiation or through the use of the Visitor software design pattern.
-% % Shutdown—Like initialization, the shutdown of actions can be problematic due to the dependencies on external systems. Special care must be taken when shutting down an action to ensure that freeing resources does not interfere with other behaviors. For example, you cannot simply reset the animation system once an action shuts down as another instance of that action may have recently been activated elsewhere.
 
-% % used patterns diagrams
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{obrazky-figures/manticore_split.png}
+    \caption{The manticore model with detached body parts, rendered with vertex colors.}
+    \label{ManticoreSplit}
+\end{figure}
+
+
+
+\subsection{Environment}
+A sandy desert basin arena was modeled to test the enemy behavior in. To avoid the visible repetition of the seamless textures applied to the terrain, two texture shaders were developed that reduce these pattern artifacts. For the sand, the same texture was mixed at a different scale and rotation, the results of which can be seen in Figure \ref{TextureBombedSand}. The rotation calculation uses the standard 2D rotation matrix.
+
+
+\begin{lstlisting}[caption={Sand shader -- repeating the same texture with a different scale and rotation.},frame=tb,breaklines,label=alg_SandTexture]
+[*in:*] float scale_1, float scale_2, float angle_offset
+
+void fragment() {
+    vec4 albedo_1 = texture(texture_albedo, UV * scale_1);
+    float angle = radians(angle_offset);
+    vec2 centered_uv = UV - 0.5;
+    vec2 rotated_uv = vec2(
+        centered_uv.x * cos(angle) - centered_uv.y * sin(angle),
+        centered_uv.x * sin(angle) + centered_uv.y * cos(angle)
+    );
+    vec4 albedo_2 = texture(texture_albedo, rotated_uv * scale_2);
+    ALBEDO = mix(albedo_1, albedo_2, 0.5).rgb;
+}
+\end{lstlisting}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{obrazky-figures/texture_bombing_sand.png}
+    \caption{The sand environment -- simple texture repetition (left) vs. shader (right).}
+    \label{TextureBombedSand}
+\end{figure}
+
+A slight vertex displacement based on the height map texture of the sand was also added to the shader to roughen the unnaturally smooth ground mesh. The shader code in Algorithm~\ref{alg_SandVertex} was shortened. The \texttt{rotated\_uv} calculation is equal to the one in Algorithm~\ref{alg_SandTexture}, and the same scale and rotation is applied so that the height texture matches the albedo texture displacement.
+
+\begin{lstlisting}[caption={Sand shader -- vertex displacement based on the height texture.},frame=tb,label=alg_SandVertex]
+[*in:*] sampler2D height_map, float max_height_offset
+
+void vertex() {
+    float height_1 = texture(height_map, UV * scale_1).r;
+    height_1 = height_1 * 2.0 - 1.0; // normalize to -1 to 1
+    float height_2 = texture(height_map, rotated_uv * scale_2).r;
+    height_2 = height_2 * 2.0 - 1.0;
+    float height = mix(height_1, height_2, 0.5);
+    // move vertices up or down on the y axis
+    VERTEX += vec3(0.0, 1.0, 0.0) * height * max_height_offset;
+}
+\end{lstlisting}
+
+
+
+For the mountains, two different textures were mixed based on noise and slight color darkening, strongest at the transitions, was applied to further break up the monotony.
+
+The shader mixes the two albedo textures based on the seamless noise texture. For the transition regions, we can figure out the extremes (values $0.0$ being fully texture 1, or $1.0$ being fully texture 2) by subtracting $0.5$ from the noise texture, the values of which span $0$ to $1$. That maps the values to $0.0$ (the transition point) to $0.5$ (purely textured by one of the textures). Then we map it back to $0$ to $1$ by multiplying it by $2$ and invert it to get the transition regions (with $0.0$ being no transition), as seen in Algorithm \ref{alg_RocksShader}.
+
+\begin{lstlisting}[caption={Rocks shader.},frame=tb,breaklines,float,label=alg_RocksShader]
+[*in:*] float scale_1, float scale_2, sampler2D texture_albedo_2, sampler2D texture_normal_2, sampler2D noise, float noise_scale
+
+void fragment() {
+    float noise_value = texture(noise, base_uv * noise_scale).r;
+    vec4 albedo_tex_1 = texture(texture_albedo, base_uv * scale_1);
+    vec4 albedo_tex_2 = texture(texture_albedo_2, base_uv * scale_2);
+    // mix the 2 albedo textures based on noise value
+    vec3 mixed_albedo = mix(albedo_tex_1, albedo_tex_2, noise_value).rgb;
+    // calculate transition regions
+    transition = 1.0 - abs(noise_value - 0.5) * 2.0;
+    // add some darkening along the transitions for more variation
+    ALBEDO = mix(mixed_albedo, mixed_albedo * vec3(0.5), transition);
+}
+\end{lstlisting}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{obrazky-figures/texture_bombing_mountains.png}
+    \caption{The rocks -- simple texture repetition (left) vs. shader (right).}
+    \label{TextureBombedRock}
+\end{figure}
+
+
+All environmental textures were taken from StylizedTextures\footnote{Stylized Sand 002, Stylized Rocks 001, Stylized Cliff Rock 006, available at: \url{https://stylizedtextures.com}}. The skybox was taken from FreeStylized\footnote{Skybox 24, available at: \url{https://freestylized.com}}. Both websites offer their works under the CC0 license as of the writing of this thesis.
+
+
+
+\section{Behavior Tree}
+The behavior tree (BT) is the central control unit of the enemy AI. It decides the flow of the decision-making and and behavior execution via its node system. Each BT node inherits from the abstract class \texttt{BTNode}, the implementation of which can be seen in the pseudocode Algorithm \ref{BTNode}.
+
+
+\begin{lstlisting}[caption={The \texttt{BTNode} class which all behavior tree nodes inherit from.},frame=tb, float, label=BTNode]
+@abstract class_name BTNode
+
+signal finished(status: ReturnStatus)
+
+enum ReturnStatus {	RUNNING, SUCCESS, FAILURE }
+
+var blackboard: Blackboard
+var child_nodes: Array[BTNode] = []
+
+func construct_tree(bb: Blackboard) -> void:
+	blackboard = bb
+	var scene_child_nodes = get_children()
+	add_children_and_call_their_construct()
+	for child in child_nodes:
+		child.finished.connect(_on_child_finished)
+
+# to be overridden by subclasses
+func _on_child_finished(_return_status: ReturnStatus) -> void:
+	pass
+
+# cleanup func for interruptable nodes; to be overridden by subclasses
+func abort() -> void:
+	pass
+
+@abstract func execute() -> void
+\end{lstlisting}
+
+
+When a behavior tree enters the scene tree (when it loads into the game), it automatically begins to construct itself, further described in Section BT.2.
+Each BT starts with the \texttt{BTRoot} node which also holds the \texttt{Blackboard}, starts the construction, and finally the execution, wherein each child node is executed sequentially no matter the return status.
+
+It is also where the return status enumeration is defined. Currently, due to the event-based architecture, only \texttt{SUCCESS} and \texttt{FAILURE} are used, but \texttt{RUNNING} is also included should it ever be useful.
+
+An event-driven behavior tree was implemented over a tick-based one (see Chapter \ref{chap:theory}). It allows the branches to manage their own uptime and just emit the \texttt{finished} signal when they're done, letting the parent nodes that are subscribed to that signal to handle the exit. Signals in Godot are equivalent to \texttt{events} in languages like \texttt{C\#}.
+
+To share information among the various branches, the BT uses a \texttt{Blackboard}, which is a dictionary that every BTNode has access to, initiated in the root and propagated to every node.
+
+Each BTNode can also implement the \texttt{abort} function, which is used to interrupt currently running behavior. It is the responsibility of each node to correctly abort its currently running children. This abort logic has to propagate from the node that caused it all the way through to the currently executed node farthest down the behavior tree, so any nodes that control the flow of the tree, as well as the decorators, must implement it. 
+
+The \texttt{BTDecorator} class that all decorator nodes inherit from is equal in functionality to \texttt{BTNode}, but allows only a single child node.
+
+
+
+\subsection{Node Types}
+This subsection describes the implementation of all the different behavior tree nodes.
+
+\subsubsection{Root}
+The root node is the first node of any behavior tree. It is responsible for the construction of the whole tree and the initialization of the blackboard. It executes its children sequentially, no matter the return state.
+
+\subsubsection{Sequence}
+The sequence node executes its children in order. If any of them finish with \texttt{FAILURE}, the whole sequence node finishes with \texttt{FAILURE}.
+
+\subsubsection{Selector}
+The selector node executes its children in order. If a child node finishes with \texttt{SUCCESS}, the whole selector node finishes with \texttt{SUCCESS}. Otherwise, it continues to the next child node. It returns \texttt{FAILURE} if none of the children succeed.
+
+\subsubsection{PriorityReselector}
+The priority reselector node acts like a selector node, but continuously (in the defined time interval) checks the availability of child nodes that are in the node tree before the one that is currently being executed. This rechecking only happens for child nodes that are \texttt{Condition} decorators (their condition is the one \texttt{PriorityReselector} checks against). In case a previous node becomes available (the condition result returns as true), the priority reselector aborts the current child and starts executing the newly available child.
+
+For example, an \texttt{AttackOrIdleReslector} has a \texttt{Condition} child that checks if the player is seen by the enemy, and an \texttt{Action} node which performs the Idle behavior. Normally, the enemy executes the Idle action indefinitely, but when the player comes into the enemy's detection range, the priority reselector now evaluates the first \texttt{BTCondition} child as true, aborts Idle, and starts executing the attack branch.
+
+\subsubsection{Condition Decorator}
+The condition decorator executes its child node only if its condition evaluates as true. It contains a condition function, which is called whenever this node is executed. If it returns true, it executes its child and waits for its return status. If it returns false, the condition decorator finishes with \texttt{FAILURE}.
+
+This can be used to filter out certain branches based on the given conditions and is generally useful in controlling the decisional flow of the tree traversal.
+
+\subsubsection{Randomizer, WeightedRandomizer, Weight Decorator}
+These nodes serve to randomize the flow of the behavior tree.
+
+\texttt{Randomizer} is a pure randomization node. It randomly chooses which of its child nodes to execute.
+
+\texttt{WeightedRandomizer} chooses a random child to executed based on the weights of the child. It expects the \texttt{Weight} decorators, which have a settable float \texttt{weight} property, as direct children; otherwise, the default weight is $1.0$.
+
+% \begin{lstlisting}[caption={Weighted randomized choice.},frame=tb,label=alg_BT_WeightedRandomizer]
+% # choose random child based on weights
+% var total_weight: float = 0.0
+% for entry in weighted_nodes:
+%     total_weight += entry.weight
+
+% var random_value: float = randf_range(0.0, total_weight)
+% var current_ceiling: float = 0.0
+% for entry in weighted_nodes:
+%     current_ceiling += entry.weight
+%     if random_value <= current_ceiling:
+%         selected_child = entry.node
+%         break
+% \end{lstlisting}
+
+Both randomizer nodes account for body part filters, and do not consider branches that are filtered out due to missing body parts in the randomized child selection.
+
+\subsubsection{UtilityRandomizer, Utility}
+Utility randomizers work much like weighted randomizers, except the weights are dynamically calculated via utility functions that often use the variables of the current game state to evaluate which branch would be the most valuable to execute.
+
+The randomization also heavily relies on the type of random number generator used. A generator with a continuous uniform distribution will maintain pretty even randomization. On the contrary, if a normal distribution were to be used, the randomization would be heavily skewed towards some of the choices. This might be desirable if the utility weights themselves are not sufficient in altering the probability towards choices with greater weights, and the developer wishes to further alter the probability scale. However, this project uses a continuous uniform distribution generator to preserve an even level of randomness of the chosen branches.
+
+Utility calculations can bring out the most dynamic behavior in enemy AI, as they directly work with the state of the game to calculate the usefulness of a branch. It mainly depends on the complexity of the calculations and the game state variables taken into account.
+
+\subsubsection{Cooldown Decorator}
+The cooldown decorator only executes its child when the cooldown is available. Once the child node is executed, a cooldown timer is started, for the duration of which the decorator finishes with \texttt{FAILURE}. Once the timer runs out, the child can be normally executed again.
+
+\subsubsection{BodyPartFilter, BodyPartFilterRecheck}
+The body part filters are decorators that filter out branches where body parts are unavailable due to having been destroyed. It has an array of all required body parts and an array of body parts where at least one is needed to not be filtered. When executed, the decorator finishes with \texttt{FAILURE} if any body part is unavailable, otherwise it normally executes the child node. The \text{BodyPart} class is described in Section \ref{BodyParts}.
+
+\texttt{BodyPartFilter} is appropriate for one-and-done checks, while \texttt{BodyPartFilterRecheck} is better for branches where the executing behavior lasts for a longer period of time. Since it continuously checks the available limbs and aborts and finishes with a \texttt{FAILURE} when a body part becomes unavailable, it is useful for detecting injuries in the middle of action execution.
+
+\subsubsection{Action}
+Action nodes are leaf nodes for the standard behavior execution. This is where the code for the behavior that the player sees lives, such as pursuing or a bite attack.
+
+\subsubsection{Blackboard}
+The blackboard is a shared data storage that every behavior tree node has access to. It is implemented as a dictionary with the \texttt{store}, \texttt{read}, and \texttt{remove} functions that work with keys and values of the \texttt{Variant} type (meaning any type can be used).
+
+
+\subsection{Creating Behavior Trees inside the Scene Tree}
+\label{BT_SceneTreeCreation}
+Developing a behavior tree only via code can be confusing and unweildy. Having a graphic representation in which they can be edited can bring clarity to their structure (since the parent-child hierarchy is clearly visible) and make their creation and iteration faster.
+
+Godot's node architecture is well-suited for this purpose. Adding behavior tree nodes to the scene tree can be an intuitive way of construction. Behavior tree nodes can be created by defining their scripts as classes with \texttt{class\_name} at the top -- they automatically become nodes that can be added to the scene tree. Each node must then have an implementation of the construct function (obtaining the children from the scene tree and calling the construct function for each of its children) and a unified interface that can be relied on when driving the flow of the behavior tree (such as the execute and abort functions). When the enemy is loaded into the scene, the \texttt{Root} node gets all of its children from the scene tree and starts the behavior tree construction. Once that is finished, it starts executing the behavior tree, so the enemy AI starts immediately. The root is also where any starting variables should be added to the blackboard.
+
+This way, the behavior tree structure can be constructed inside the editor. Each node can then be extended with a script that defines the necessary behavior (such as adding a condition function to the \texttt{Condition} decorator or attack logic to an \texttt{Action} node).
+
+For visual clarity, svg icons were created to differentiate the node types at first glance, as can be seen in Figure \ref{BT_SceneTree}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{obrazky-figures/BT_SceneTree.png}
+    \caption{The behvaior tree nodes inside the enemy scene tree.}
+    \label{BT_SceneTree}
+\end{figure}
+
+
+% =================================================================
+
+
+
+\section{Deformation Shader}
+\label{DeformationShader}
+
+- talk about attempts to map it to UV, but unsuccessful. An ideal deformation would be painted directly onto the material, would also produce more stable results (when the same place is hit several time, the dent increases unnaturally) and would avoid the "only x hits" array size issue.
+
+- updated every frame with the new transforms (due to bone movements, the positions of the hits need to be recalculated)
+
+- shader pro deformaci a flash efekt při zásahu
+
+Similar to the concept of weight paints (which modify how much a given bone deforms the mesh when using a skeleton rig).
+
+- deformation strength vertex colors due to controlling deformation in sensitive areas (insert photo of the manticore's deformed face with bulging eyes and teeth) -- we do not want this kind of deformation, so we need to control the deformation magnitude in different parts of the body; 
+
+vertex modifier due to the necessity to author the deformation on different parts of the mesh -- an equal magnitude of mesh deformation is not desired in all parts of the mesh; granular control via vertex colors offers a more authored enemy design, and prevents awkward deformations in sensitive areas, as can be seen in Figure x.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{obrazky-figures/deformation_authoring.png}
+    \caption{The same magnitude of deformation on the whole mesh can produce undesirable results.}
+    \label{AuthoredDeformation}
+\end{figure}
+
+\begin{lstlisting}[caption={Deformation shader.},frame=tb,breaklines,float,label=arg_DeformationShader]
+[*in:*] int hit_count = 0, vec3 hit_positions[16], vec3 hit_normals[16], float hit_radius[16], float hit_strength[16]
+
+void vertex() {
+    float deformation_magnitude = COLOR.r; // vertex color
+    for (int i = 0; i < hit_count; i++) {
+        float radius = hit_radius[i];
+        float strength = hit_strength[i];
+        float dist = distance(VERTEX, hit_positions[i]);
+        if (dist < radius) {
+            float falloff = 1.0 - (dist / radius);
+            falloff = falloff * falloff; // smooth
+            VERTEX -= normalize(hit_normals[i]) * falloff * strength * deformation_magnitude;
+        }
+    }
+}
+\end{lstlisting}
+
+
+\section{Body Part Nodes}
+\label{BodyParts}
+The logic for the separated body parts is contained within the \texttt{Body}, \texttt{BodyPart}, and \texttt{Hitbox} classes. Each class has a custom node icon.
+
+Like the behavior tree nodes, these classes are also meant to be added to the scene tree (see Section \ref{BT_SceneTreeCreation}), with \texttt{Body} being the root node and \texttt{BodyParts} being their direct children. \texttt{BodyPart} nodes should then contain \texttt{BoneAttachment3D} nodes (that copy the transforms of the defined bone onto their children, making them move with the bone) with \texttt{Hitboxes} that contain the desired collision shapes. An example chain of nodes would be:
+
+\noindent\texttt{Body -> LegFL (BodyPart) -> ThighFLBone (BoneAttachment3D) ->\\-> ThighFLHitbox (Hitbox) -> CollisionShape3D}
+
+There can be several \texttt{BoneAttachment3D} nodes, each with their own \texttt{Hitbox}, to detect hits more accurately (since collision shapes are usually simple shapes like capsules).
+
+\subsection{Health Management}
+The \texttt{Body} class tracks the central amount of health the enemy has, which determines whether it is alive or dead. \texttt{BodyParts} have their separate health pools, which determine whether that body part is destroyed or not, but they also have an option to make damage bypass their own health and only damage the central health pool. That option is useful for body parts that themselves cannot be destroyed, but contribute to the overall defeating of the enemy, such as the torso and head.
+
+When a body part reaches 0 health, a notifying signal is emitted. A special camera effect plays and time slows down (described in Section \ref{PlayerController}), the separated mesh turns red for a moment and then the mesh is hidden, the bones and hitboxes freed, and a severed body part scene is spawned in the destroyed part's location with its own physics.
+
+When the body reaches 0 health, a notifying signal is emitted, the behavior tree is stopped, and the ragdoll is activated (further described in Section \ref{VisualsAdjustmentsEffects}). After a moment, the manticore's body fades into full transparency and is freed.
+
+\subsection{Hitboxes and Hit Management}
+\texttt{Hitbox} nodes inherit from \texttt{Area3D} nodes, which are able to detect when another area or body (like a projectile) collides with it. The hitboxes receive the hits with parameters wrapped in a \texttt{ProjectileHitData} resource. It contains \texttt{damage\_amount}, \texttt{world\_position}, \texttt{world\_normal}, \texttt{projectile\_direction}, \texttt{decal\_params}, and \texttt{deformation\_params}. The world position and normal of the detected hit are then converted to the local space of the bone that the hitbox is attached to. Then the hitbox emits a signal with the original parameters, except with the world-space hit position and normal replaced for the converted ones.
+
+\texttt{BodyPart} nodes are connected to this signal and whenever it is emitted, they start processing the hit. The global \texttt{enemy\_hit} signal is emitted. Damage is applied to the body part (based on the hit's \texttt{damage\_amount} parameter), the body part's flash effect is played, and the hit decal is added to the body part (both described in Section \ref{HitEffects}). If the body part has a knockback node attached, it applies the knockback using the \texttt{projectile\_direction} vector (see Section \ref{Knockback}). Finally, the hits are registered into the deformation arrays that are supplied to the deformation shader (see Setion \ref{DeformationShader}).
+
+\subsection{Hit Effects}
+\label{HitEffects}
+When the body part is hit, the flash effect is achieved via simple fragment shader code that controls the material's \texttt{emission}, interpolating between $0$ and the flash strength, and back to $0$.
+
+Hit decals are spawned, attaching a \texttt{Decal} node oriented by the hit's normal to the \texttt{BoneAttachment3D} parent of the hitbox that was hit. These nodes project textures onto surfaces that they intersect with, hence why it is important to size and orient the node correctly.
+
+When a body part is destroyed, it starts a constant spewing of blood particles. The particles themselves, implemented via the \texttt{GPUParticles3D} node, and a custom blood texture are spawned at a predetermined position and rotation on the enemy's body, activated by a \texttt{BodyPart}'s \texttt{body\_part\_destroyed} signal. The blood material's properties are set to \texttt{transparency: alpha scissor}, which, in combination with alpha curves that control the transparency of the material over time, makes it look like the blood congeales into separate strands as the alpha value decreases.
+
+
+\section{Knockback \texttt{SkeletonModifier3D}}
+\label{Knockback}
+The skeleton has a custom \texttt{BodyPartKnockback3D} node attached to it. The class inherits from \texttt{SkeletonModifier3D}, which allows developers to modify skeleton deformations via code. It applies bone modifiactions after animations (if an \texttt{AnimationMixer} is present), and they can even be stacked to modify the skeleton one after another as necessary.
+
+Each \texttt{BodyPart} can have a custom \texttt{BoneKnockback3D} class node. It takes the bone to apply knockback to and the strength of the knockback as parameters. The \texttt{apply\_knockback} function is called from \texttt{BodyPart} whenever a hit is received. \texttt{BoneKnockback3D} then converts the world-space projectile direction into the skeleton's local space, as that's the coordinate system that \texttt{SkeletonModifier3D} works with. The bone to apply knockback to, the direction, and the strength are then sent to the \texttt{BodyPartKnockback3D} node to be added to the ongoing knockback effects.
+
+In \texttt{BodyPartKnockback3D}, the new knockback is added to the \texttt{active\_knockbacks} dictionary where each entry is tied to a bone index key and contains the target offset, the current progress, and a bool flag signifying whether it is getting to the target offset or returning back to a zero offset. It also adds a knockback to the base bone of the whole body (usually the base of the spine chain), which is defined as an export variable in the class.
+
+The \texttt{\_process\_modification\_with\_delta} function from \texttt{SkeletonModifier3D} is used to process the knockbacks. Inside it, the active knockbacks are iterated through and their progress towards their target offsets is advanced by the defined speed. The current offset is applied on top of the skeleton's animations as an interpolation between a zero vector and the target offset based on the current progress ($0.0$ to $1.0$). Once a target offset is reached, the \texttt{is\_returning} flag is switched on and the progress is interpolated back towards a zero vector. After it raches progress $0.0$, it is removed from \texttt{active\_knockbacks} entirely.
+
+
+\section{Player Controller}
+\label{PlayerController}
+The player controller implements a simple movement script from Godot's \texttt{CharacterBody3D} template. The player can choose between 3 types of attacks by pressing \texttt{1}, \texttt{2}, or \texttt{3}.
+
+Each projectile has several export variables that can be set. The projectile's type can be slashing (a wide arc), piercing (a point), and bludgeoning (a sphere). This affects the way it detects hits. Slashing projectiles project a number of raycasts along its width, and the middle raycast's hit is preferred. Piercing projectiles have a single raycast from their center. Bludgeoning projectiles use a shapecast (an analogue to a raycast, but uses a shape instead of a line). Each hit's position and normal is recorded and handed off to the \texttt{Hitbox} that was hit. Next, the projectile's damage amount and travel speed can be set, as well as whether it should be affected by gravity. Each also contains decal parameters that are to be spawned on impact and attached to the enemy (see Section~\ref{HitEffects}), impact visual effects (the projectile's break effect and blood particles that are spawned on a hit), and deformation parameters (see Section~\ref{DeformationShader}). For example, the boulder attack is affected by gravity, deforms the enemy's mesh, leaves a bruise decal, and spawns rock fragments and dust particles on impact.
+
+When a body part is destroyed, the player is notified via the \texttt{body\_part\_destroyed} global signal. The time scale of the game is momentarily lowered so that it slows down, and the player camera zooms in.
+
+When the player hits an enemy, an X-shaped crosshair appears to communicate the hit to the player. When the player is hit by an enemy, a blood texture flashes on the edges of the screen. Numerical damage to the player was not implemented, as it is not the focus of this thesis.
+
+
+
+\section{The Manticore Enemy}
+\subsection{Body Parts}
+- the Body and BodyParts node structure, hitboxes, etc.
+
+- attacks and movesets, their body part dependencies
+
+\subsection{Behavior Tree}
+- the final BT implementation with all the nodes showcased/used
+
+- highlight adaptability (idle vs attack recheck; pursue fallbacks with active rechecking of body part filters)
+
+- demo behavior tree s Idle stavem a větví pro útočení; adaptivní pohyb při zranění během pronásledování (chybějící část potřebná pro daný pohyb je zaregistrována a přepne se na fallback pursue behavior)
+
+
+\subsection{Visuals, Adjustments, and Effects}
+\label{VisualsAdjustmentsEffects}
+
+- animation tree and controls
+
+- slow down and zoom in on body part destroyed, crosshair effect on enemy hit (global \texttt{enemy\_hit} signal)
+
+- otáčení modelu dle úhlu země
+
+- efekty při pohybování se a dopadu na zem (sand particles), efekty při zásahu (blood spray, hit decals), kontinuální blood spray při odseknutí končetiny
+
+- ragdoll, 6DOF joints
+
+- IK pro umístění nohou, řízeno přes keyframes animace (v momentu animace, kdy se noha usadí na zem - spuštění IK připevnění, obdobně při vznesení nohy a odpoutání IK) - WIP
+
+- Editor enhancement: exports are shown/hidden based on conditions; skeleton bone options supplied after skeleton is loaded
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{obrazky-figures/Editor_ExportToggles.png}
+    \caption{The export variables are being shown or hidden in the Godot editor depending on \texttt{remove\_part\_if\_destroyed}'s value.}
+    \label{EditorExportToggles}
+\end{figure}
+
+
+\section{Demonstration in Various Test Cases/Situations}
+like even a different model, like a robotic capsule, to showcase the deformation
 
 
 % % ===================================================================
 % % ===================================================================
 % % ===================================================================
 
-% \chapter{User/Performance testing of the resulting implemented design}
+\chapter{User/Performance testing of the resulting implemented design}
+Shader Precompilation
+- lag spikes whenever a new effect is on screen, like a new projectile or the manticore body transparency triggered
+- loading screen while all of the effects are played in the background to "precompile" the shaders
+
+
+Godot profiler
+
+Number of detached limbs on the ground (physics test)
+
+Too many deformation points and decals (like an enemy having 200 deformation marks, what's the performance stats on that -- for 8, 16, 32, 64, 128, 256 marks scale graph info)
+
+blackboard dictionary lookups testing?
 
 
 % % ===================================================================
 % % ===================================================================
 % % ===================================================================
 
-% \chapter{Documentation and Publication}
+\chapter{Documentation and Publication}
 % + video

@@ -42,11 +42,4 @@
 \newblock Computer graphics / Game design.
 \newblock ISBN 9781138632097.
 
-\bibitem{navmesh}
-{\sc\bgroup}Toll{\egroup}, W. van; {\sc\bgroup}Triesscheijn{\egroup}, R.; {\sc\bgroup}Kallmann{\egroup}, M.; {\sc\bgroup}Oliva{\egroup}, R.; {\sc\bgroup}Pelechano{\egroup}, N. et~al.
-\newblock A comparative study of navigation meshes.
-\newblock In:~{\em Proceedings of the 9th International Conference on Motion in Games} online.
-\newblock New York, NY, USA: ACM, 2016, p.~91--100.
-\newblock Available at: ~{\small\url{https://inria.hal.science/hal-01392267/file/comparative_study_of_navigation_meshes_main.pdf}}.
-
 \end{thebibliography}

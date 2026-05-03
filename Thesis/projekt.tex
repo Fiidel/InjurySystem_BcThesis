@@ -116,8 +116,13 @@
 % This solves the problems with links which leads after the picture
 \usepackage[all]{hypcap}
 
-% self-added svg package for svg figures
+% self-added svg packages
 \usepackage{svg}
+\usepackage{listings}
+\renewcommand\lstlistingname{Algorithm}
+\lstset{morecomment=[l]{//}}
+\lstset{commentstyle=\color{gray}\itshape}
+\lstset{moredelim=[is][\textit]{[*}{*]}}
 
 % Informace o práci/projektu / Information about the thesis
 %---------------------------------------------------------------------------

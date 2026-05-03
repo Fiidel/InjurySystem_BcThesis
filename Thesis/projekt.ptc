@@ -12,13 +12,50 @@
 \contentsline {subsection}{\numberline {2.4.1}Finite State Machine}{9}{subsection.2.4.1}%
 \contentsline {subsection}{\numberline {2.4.2}Behavior Tree}{9}{subsection.2.4.2}%
 \contentsline {subsection}{\numberline {2.4.3}Utility}{11}{subsection.2.4.3}%
-\contentsline {section}{\numberline {2.5}Pathfinding and Navigation}{12}{section.2.5}%
+\contentsline {section}{\numberline {2.5}Godot}{12}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Architecture}{12}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Shading Language}{12}{subsection.2.5.2}%
 \contentsline {chapter}{\numberline {3}Injury System Design}{13}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Enemy Design}{13}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Enemy AI Based on Body Parts}{14}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}Behavior Execution}{14}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}Behavior Limiting}{14}{subsection.3.2.2}%
-\contentsline {section}{\numberline {3.3}UI Mockup}{14}{section.3.3}%
-\contentsline {chapter}{Bibliography}{15}{chapter*.6}%
+\contentsline {section}{\numberline {3.1}The Modularity of Godot}{13}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Body Part Injury System}{13}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Enemy AI Based on Body Parts}{14}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Behavior Execution}{14}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Behavior Limiting}{14}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}Mesh Deformation}{15}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Demo Enemy Design}{15}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Player Controller}{15}{section.3.6}%
+\contentsline {chapter}{\numberline {4}Implementation and Demonstration}{16}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Modeling}{16}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Enemy Model}{16}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Environment}{17}{subsection.4.1.2}%
+\contentsline {section}{\numberline {4.2}Behavior Tree}{19}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Node Types}{21}{subsection.4.2.1}%
+\contentsline {subsubsection}{Root}{21}{section*.6}%
+\contentsline {subsubsection}{Sequence}{21}{section*.7}%
+\contentsline {subsubsection}{Selector}{21}{section*.8}%
+\contentsline {subsubsection}{PriorityReselector}{21}{section*.9}%
+\contentsline {subsubsection}{Condition Decorator}{21}{section*.10}%
+\contentsline {subsubsection}{Randomizer, WeightedRandomizer, Weight Decorator}{22}{section*.11}%
+\contentsline {subsubsection}{UtilityRandomizer, Utility}{22}{section*.12}%
+\contentsline {subsubsection}{Cooldown Decorator}{22}{section*.13}%
+\contentsline {subsubsection}{BodyPartFilter, BodyPartFilterRecheck}{22}{section*.14}%
+\contentsline {subsubsection}{Action}{23}{section*.15}%
+\contentsline {subsubsection}{Blackboard}{23}{section*.16}%
+\contentsline {subsection}{\numberline {4.2.2}Creating Behavior Trees inside the Scene Tree}{23}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Deformation Shader}{24}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Body Part Nodes}{24}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Health Management}{25}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Hitboxes and Hit Management}{25}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Hit Effects}{26}{subsection.4.4.3}%
+\contentsline {section}{\numberline {4.5}Knockback \texttt {SkeletonModifier3D}}{26}{section.4.5}%
+\contentsline {section}{\numberline {4.6}Player Controller}{27}{section.4.6}%
+\contentsline {section}{\numberline {4.7}The Manticore Enemy}{27}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Body Parts}{27}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Behavior Tree}{27}{subsection.4.7.2}%
+\contentsline {subsection}{\numberline {4.7.3}Visuals, Adjustments, and Effects}{28}{subsection.4.7.3}%
+\contentsline {section}{\numberline {4.8}Demonstration in Various Test Cases/Situations}{28}{section.4.8}%
+\contentsline {chapter}{\numberline {5}User/Performance testing of the resulting implemented design}{29}{chapter.5}%
+\contentsline {chapter}{\numberline {6}Documentation and Publication}{30}{chapter.6}%
+\contentsline {chapter}{Bibliography}{31}{chapter*.17}%
 \ttl@starttoc {chapters@1}
 \contentsfinish 
