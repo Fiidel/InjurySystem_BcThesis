@@ -10,14 +10,15 @@ alpha_antialiasing_mode = 0
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
 albedo_texture = ExtResource("1_fc0xp")
+metallic_specular = 0.75
 roughness = 0.1
 normal_enabled = true
 normal_texture = ExtResource("2_k6m8q")
 billboard_mode = 1
 
 [sub_resource type="Curve" id="Curve_e6ktl"]
-_data = [Vector2(0.003984064, 0), 0.0, 0.0, 0, 0, Vector2(0.12350598, 0.6382475), 0.69322276, 0.69322276, 0, 0, Vector2(0.99601597, 0), 0.0, 0.0, 0, 0]
-point_count = 3
+_data = [Vector2(0.003984064, 0), 0.0, 0.0, 0, 0, Vector2(0.1712707, 0.58859044), -0.2957901, -0.2957901, 0, 0, Vector2(0.37292817, 0.46408492), 0.0, 0.0, 0, 0, Vector2(0.75690603, 0.3720591), 0.0, 0.0, 0, 0, Vector2(0.99601597, 0), 0.0, 0.0, 0, 0]
+point_count = 5
 
 [sub_resource type="CurveTexture" id="CurveTexture_nhx15"]
 texture_mode = 1

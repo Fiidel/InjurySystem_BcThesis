@@ -5,7 +5,7 @@ class_name BodyPartKnockback3D
 extends SkeletonModifier3D
 
 const KNOCKBACK_SPEED: float = 12.0
-const MASS_BASE_MULTIPLIER: float = 0.5
+const MASS_BASE_MULTIPLIER: float = 0.5 # for the bone that is supposed to move the whole body alongside the bone that was hit
 
 @export var skeleton: Skeleton3D:
 	set(value):

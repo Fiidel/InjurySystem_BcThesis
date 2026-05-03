@@ -44,7 +44,7 @@ func _on_child_finished(_return_status: ReturnStatus) -> void:
 	pass
 
 
-## cleanup func for interruptable nodes; to be overridden by subclasses
+# cleanup func for interruptable nodes; to be overridden by subclasses
 func abort() -> void:
 	pass
 

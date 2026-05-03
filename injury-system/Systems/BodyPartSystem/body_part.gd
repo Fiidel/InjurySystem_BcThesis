@@ -23,12 +23,11 @@ const HIT_FLASH_UNWIND: float = 0.1
 		notify_property_list_changed()
 @export var health: float = 1
 @export var mesh: MeshInstance3D
-@export var mesh_target_id: StringName = "BP_"
-@export var remove_bones_on_destroy: bool = false:
+@export var remove_part_if_destroyed: bool = false:
 	set(value):
-		if remove_bones_on_destroy == value:
+		if remove_part_if_destroyed == value:
 			return
-		remove_bones_on_destroy = value
+		remove_part_if_destroyed = value
 		notify_property_list_changed()
 @export var skeleton: Skeleton3D:
 	set(value):
@@ -53,7 +52,7 @@ func _validate_property(property: Dictionary) -> void:
 
 	# toggle skeleton and bone based on remove_bones_on_destroy
 	if property.name in ["skeleton", "bone_to_remove", "severed_body_scene"]:
-		if not remove_bones_on_destroy:
+		if not remove_part_if_destroyed:
 			property.usage = PROPERTY_USAGE_NO_EDITOR
 	
 	# validate the bone_to_destroy property
@@ -129,6 +128,7 @@ func on_hitbox_hit(
 		spawn_hit_decal(bone_attachment, local_point, local_normal, decal_params)
 
 
+# check if the new hit location is too close to any existing hit location
 func can_register_deformation_hit(attachment: BoneAttachment3D, new_local_point: Vector3, deformation_params: DeformationParameters) -> bool:
 	if hit_locations.is_empty() or deformation_params.min_hit_separation <= 0.0:
 		return true
@@ -167,7 +167,7 @@ func play_hit_flash() -> void:
 func on_zero_health_reached() -> void:
 	is_destroyed = true
 	SignalBus.body_part_destroyed.emit(self)
-	if remove_bones_on_destroy:
+	if remove_part_if_destroyed:
 		# make the mesh material flash
 		var mat := mesh.get_active_material(0)
 		var tween: Tween = create_tween()
@@ -177,18 +177,18 @@ func on_zero_health_reached() -> void:
 		tween = create_tween()
 		tween.tween_property(mat, "shader_parameter/albedo", Color.WHITE, 0.1)
 		await tween.finished
-		# spawn the severed limb rigidbody and remove the original bones and hitboxes
+		# spawn the severed limb rigidbody and remove the original bones and all children
 		spawn_severed_limb()
 		remove_bones()
-		for hitbox in hitboxes:
-			hitbox.queue_free()
+		for child in get_children():
+			child.queue_free()
 
 
 func spawn_severed_limb() -> void:
 	mesh.hide()
 	if severed_body_scene != null:
 		var severed_body: RigidBody3D = severed_body_scene.instantiate()
-		add_child(severed_body)
+		get_parent().add_child(severed_body)
 		severed_body.global_transform = mesh.global_transform
 
 
