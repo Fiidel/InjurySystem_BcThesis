@@ -207,17 +207,25 @@ Utility calculations can also be integrated into behavior tree traversal. The be
 % \footnotetext{Image taken from \url{https://docs.godotengine.org/en/latest/tutorials/navigation/navigation_using_navigationmeshes.html}.}
 
 \section{Godot}
+Godot is a game engine capable of creating 2D and 3D games and tools. It exports to desktop, mobile, the web, and even consoles. It comes with an editor with many integrated tools, such as the code editor, an animation editor, a tilemap editor, a shader editor, a debugger, or a profiler. External programs are also supported (e.g.,~code editing in VSCode with GDScript and C\# plugins or direct imports of Blender scenes)\footnote{\label{fn:godot-intro}Introduction to Godot, available at: \url{https://docs.godotengine.org/en/stable/getting_started/introduction/introduction_to_godot.html}}.
 
-an overview of what it is and what it can do/what it offers since I'll be working in it
+Programs in Godot can be written with the native GDScript (a language akin to Python) or with C\#. GDScript is tightly integrated with the editor itself.
+Certain C\# project exports can be limited (Android and iOS are still experimental\footnote{C\#/{.}NET Scripting, available at: \url{https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/index.html}}, and web exports are only supported in Godot 3\footnote{Exporting for the Web, available at: \url{https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_web.html}}). Other languages (C++, Rust, \dots) are supported via GDExtension, which allows developers to interact with third-party libraries in the engine at runtime. The engine itself can also be directly edited, as it is free and open source under the MIT license\textsuperscript{\ref{fn:godot-intro}}.
 
-GDScript, C\#
-some sources
 
-\subsection{Architecture}
-nodes, scene tree, in-engine tools, engine editor is itself a game, scripts can edit the editor and run directly within it
+\subsection{Key Concepts}
+Godot's architecture is object-oriented with a flexible scene system and node hierarchy. A game is a tree of nodes grouped into scenes. Games are made up of scenes, which can be as small and simple (a sword, a tree) or as compound (an enemy, an entire level) as necessary, since scenes can be nested inside other scenes.
+A scene is composed of one or more nodes, which are the smallest building block components, arranged into a tree. The engine provides a multitude of node types that handle a lot of the things a game requires. These nodes can be combined or extended, allowing developers to tailor their scenes to their needs\footnote{\label{fn:godot-concepts}Key Concepts, available at: \url{https://docs.godotengine.org/en/stable/getting_started/introduction/key_concepts_overview.html}}.
+
+To communicate with each other, nodes use signals, an integrated version of the observer pattern. Instead of hard-wiring nodes to each other, a node can define and emit signals that other nodes can connect to. For example, buttons emit press signals, areas emit signals when something enters their collision shape, or users can create their own and decide when they should be emitted\textsuperscript{\ref{fn:godot-concepts}}.
+
+
+\subsection{Engine Extensibility}
+The Godot editor can be extended via its native API, using the same language as the game code, because the Godot editor runs on the game engine. It supports hot-reloading and building plugins and extending the editor (using the \texttt{@tool} script annotation), as the game code can run directly inside of it\footnote{Godot Design Philosophy, available at: \url{https://docs.godotengine.org/en/stable/getting_started/introduction/godot_design_philosophy.html}}.
 
 \subsection{Shading Language}
-own shading language based of GLSL
+Godot uses a shading language similar to GLSL ES 3.0 for its haders. Most data types and functions are supported.
+It also offers in-built variables like \texttt{UV}, \texttt{COLOR}, \texttt{VERTEX}, etc., though what is available depends on the type of shader and the function used. Uniform variables are parameters that can be passed into the shader and show up in the editor. They can also have hints that tell the editor how they should be displayed and how they can be edited\footnote{Godot's Shading Language, available at: \url{https://docs.godotengine.org/en/stable/tutorials/shaders/shader_reference/shading_language.html}}.
 
 
 % ===================================================================
@@ -231,23 +239,21 @@ The end goal of this thesis is to create a demo of an enemy system that allows p
 
 
 \section{The Modularity of Godot}
-Godot's scene and node-based architecture allows for great extensibility. Games in Godot are a tree of nodes that are grouped together into scenes\footnote{Overview of Godot's key concepts, available at \url{https://docs.godotengine.org/en/stable/getting_started/introduction/key_concepts_overview.html}}. It is possible to create classes by using \texttt{class\_name} in the header of a script, which also makes them a custom node type that can be inserted into the scene tree, and they will work just like native node types (such as \texttt{CharacterBody3D}, \texttt{Camera3D}, \texttt{CollisionShape3D}, etc.). It is even possible to create tool scripts (by using the \texttt{@tool} header at the top of a script) which run live in the editor. The scripts' variables can be prepended with \texttt{@export} which makes the values visible and editable directly in the engine's editor. Their visibility can even be toggled or the possible values supplied based on the values of other variables. Via these engine features, Godot provides a toolbox for developing modular, extensible, and encapsulated systems that can then be woven together into a more complex scene.
+Godot's scene and node-based architecture allows for great extensibility. It is possible to create classes by using \texttt{class\_name} in the header of a script, which also makes them a custom node type that can be inserted into the scene tree, and they will work just like native node types (such as \texttt{CharacterBody3D}, \texttt{Camera3D}, \texttt{CollisionShape3D}, etc.). It is even possible to create tool scripts (by using the \texttt{@tool} header at the top of a script) which run live in the editor. The scripts' variables can be prepended with \texttt{@export} which makes the values visible and editable directly in the engine's editor. Their visibility can even be toggled or the possible values supplied based on the values of other variables. Via these engine features, Godot provides a toolbox for developing modular, extensible, and encapsulated systems that can then be woven together into a more complex scene.
 
 
 \section{Body Part Injury System}
 The goal is to recreate an injury system in Godot with nodes and tooling to facilitate creating enemies with body-part based models and abilities like in the video games in Chapter~\ref{chap:theory}.
 
-The player should be able to make meaningful choices that have a real impact on what happens next \cite{schell2019art}. For example, a player that prefers melee combat might target an enemy's wings to prevent it from flying and getting out of melee range.
+Losing a body part needs to have a meaningful effect on the gameplay, as the player should be able to make choices, the results of which impact the state of the game \cite{schell2019art}. For example, a player that prefers melee combat might target an enemy's wings to prevent it from flying and getting out of melee range or to first disable its dive attach which is hard to avoid. Such a system provides dynamic reactivity to the player's actions and choices.
 
-The game should combine the three sources of unpredictability mentioned in Chapter~\ref{chap:theory} to make it more engaging to players. The element of chance comes from the enemy's AI which makes randomized decisions based on a decision-making pattern like a behavior tree. The player chooses which body parts to attack so that they can disable the enemy's abilities that require those parts to be triggered. The complexity comes from the way body parts serve as prerequisites for the enemy's abilities, such as two wings being necessary for flight, at least three limbs for walking, or a stinger tail for poison attacks, and the way they enable and limit what actions it has available in its behavior.
+The game should combine the three sources of unpredictability mentioned in Chapter~\ref{chap:theory} to make it more engaging to players. The element of chance comes from the enemy's AI which makes randomized decisions based on a decision-making pattern like the behavior tree. The player chooses which body parts to attack so that they can disable the enemy's abilities that require those parts to be triggered. The complexity comes from the way body parts serve as prerequisites for the enemy's abilities, such as two wings being necessary for flight, at least three limbs for running, or a stinger tail for ranged attacks, and the way they facilitate and limit what actions it has available in its behavior.
 
 There should be a central \texttt{Body} node that stores the total health, with \texttt{BodyPart} child nodes that either have their own health or subtract health from the \texttt{Body}.
 
-losing a body part needs to have a gameplay effect (quote games)
+The game should also have visual effects and visual feedback to the player's actions. While it has the practical importance of communicating to the player (like whether an attack has hit the enemy or the player has taken damage), it also serves to make the core of the system -- the dismemberment -- look more impactful (like time slowing down and the camera zooming in communicating that something important has just happened).
 
-Intertwined with the behavior tree of the enemy -- altering the behavior based on destroyed boy parts -- gameplay effect (e.g., fly attack is hard to avoid, so the player may want to focus on destroying the wings first to disable its fly ability). Such a system provides dynamic reactivity to the player's actions and choices.
-
-Should also have visual effects as a visual response to the player's actions, while it also serves to make the core of the system -- the dismemberment -- look more impactful.
+Visual feedback is also important to the feel of a game, as the every action the player takes should have a noticeable effect on the game world and its state. The player dislike when their actions are not being acknowledged by the game \cite{Orselli_NewellFun}.
 
 
 \section{Enemy AI Based on Body Parts}
