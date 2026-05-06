@@ -35,6 +35,7 @@ func preload_manticore_hit_flash() -> void:
 	var body_part := find_first_body_part(body)
 	if body_part:
 		body_part.play_hit_flash()
+		await get_tree().process_frame
 		await RenderingServer.frame_post_draw
 
 	manticore_instance.queue_free()

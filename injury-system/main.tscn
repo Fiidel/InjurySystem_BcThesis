@@ -58,12 +58,12 @@ floor_constant_speed = true
 
 [node name="Desert" parent="." unique_id=151719703 instance=ExtResource("3_lquwl")]
 
-[node name="Loading" type="CanvasLayer" parent="." unique_id=1986813540]
+[node name="Loading" type="CanvasLayer" parent="." unique_id=147469514]
 script = ExtResource("5_lquwl")
 scenes_to_preload = Array[PackedScene]([ExtResource("6_4c57u"), ExtResource("7_efxa6"), ExtResource("8_dg77c"), ExtResource("9_ycdy4"), ExtResource("10_w48qg")])
 manticore_scene = ExtResource("3_1bvp3")
 
-[node name="BlackoutPanel" type="PanelContainer" parent="Loading" unique_id=657330218]
+[node name="BlackoutPanel" type="PanelContainer" parent="Loading" unique_id=1877986596]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -71,7 +71,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_7mycd")
 
-[node name="Label" type="Label" parent="Loading/BlackoutPanel" unique_id=250336250]
+[node name="Label" type="Label" parent="Loading/BlackoutPanel" unique_id=286767889]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 16
