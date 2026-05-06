@@ -175,7 +175,19 @@
   %acknowledgment={Here it is possible to express thanks to the supervisor and to the people which provided professional help
 %(external submitter, consultant, etc.).},
   % Rozšířený abstrakt (cca 3 normostrany) - lze definovat zde nebo níže / Extended abstract (approximately 3 standard pages) - can be defined here or below
-  %extendedabstract={Do tohoto odstavce bude zapsán rozšířený výtah (abstrakt) práce v českém (slovenském) jazyce.},
+ extendedabstract={Tato práce se zabývá návrhem a implementací modulárního systému zranění herních postav založeném na poškozování jednotlivých částí těla v enginu Godot. Hlavním cílem je vytvořit systém, ve kterém nepřítel dynamicky reaguje na zranění, která mu hráč způsobí. Jednotlivé části mohou sloužit ke schopnostem nepřítele, takže jejich zničení může být pro hráče takticky výhodné. Zranění tak neznamená pouze odečtení životů, ale může omezit pohyb, zamezit použití nějaké schopnosti a změnit tak chování nepřítele.
+
+Teoretická část shrnuje přístupy ke zraněním ve vybraných hrách, které implementují systémy zranění založené na částech těla, a popisuje herní mechaniky těchto systémů. Dále představuje inverzní kinematiku používanou pro animace herních postav. Nakonec rozebírá konečné automaty a behaviorální stromy sloužící pro rozhodování nepřítele.
+
+Praktická část realizuje znovupoužitelné třídy, ze kterých lze ve stromě scén skládat nepřátele. Programy jsou psány v jazyce GDScript, použítá verze Godotu je 4.6.2. Nepřítel je rozdělen na různé části těla, kde každá má svůj stav s nastavitelnými parametry. Systém zásahů mapuje útoky na konkrétní části těla a aktualizuje jejich stav. Pokud části nezbývají žádné životy, je zničena, což se odrazí nejen vizuálně, ale i v herní logice.
+
+Klíčovým aspektem práce je přímé napojení stavu zranění na rozhodování nepřítele. Behaviorální strom je rozšířen o uzly, které se stavy částí těla pracují. Pokud je například zničena část potřebná pro patřičný útok, chování daný útok nebere vpotaz jako možnost nebo přepne na záložní chování. To umožňuje zavést chování nepřítele, který se dynamicky adaptuje na svá zranění.
+
+Práce zároveň propojuje herní logiku zranění s vizuální odezvou. Zásahy se promítají do animace pomocí impulsů aplikovaných na kostru modelu, vizuální efekty hráči dávají najevo, že se mění stav herního světa, a lokální deformace meshe dává větší váhu silnějším útokům hráče. Vizuální změny tak podporují odezvu na hráčovy činy.
+
+Navržené řešení demonstrováno v hratelné 3D ukázce pomocí boje s nepřátelskou mantikorou, která kombinuje části těla k různým typům pohybu a útoků. Cílení na různé části těla během boje mění boj tím, že odebírá konkrétní možnosti nepřítele (např. zpomalení nebo odebrání specifického útoku). Výsledkem je souboj, ve kterém se hráč může takticky rozhodovat místo pouhého ubírání životů nepříteli.
+
+Z pohledu návrhu softwaru práce klade důraz na modularitu, znovupoužitelnost a práci v editoru. Vytvořené scénové uzly a jejich struktura umožňují použití na další typy nepřátel s minimem duplicitní logiky. Práce tak přináší nejen funkční prototyp, ale i praktický základ pro další vývoj nepřátel založených na zranění částí těla v Godotu.},
   %extabstract.odd={true}, % Začít rozšířený abstrakt na liché stránce? / Should extended abstract start on the odd page?
   %faculty={FIT}, % FIT/FEKT/FSI/FA/FCH/FP/FAST/FAVU/USI/DEF
   faculty.cs={Fakulta informačních technologií}, % Fakulta v češtině - pro využití této položky výše zvolte fakultu DEF / Faculty in Czech - for use of this entry select DEF above
