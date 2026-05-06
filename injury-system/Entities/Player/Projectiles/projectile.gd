@@ -4,6 +4,8 @@ class_name Projectile
 extends RigidBody3D
 ## Projectile class for the player's abilities.
 
+signal spawn_load_completed(projectile: Projectile) # monitoring
+
 enum ProjectileTypeEnum {
 	SLASHING,
 	BLUDGEONING,
@@ -70,13 +72,27 @@ func _ready() -> void:
 	# connect signals
 	body_entered.connect(_on_physics_body_entered)
 	projectile_hitbox.area_entered.connect(_on_hitbox_entered)
-	# set the facing direction
-	look_at(global_position + projectile_direction)
+	# set the facing direction (guard zero vectors used during preload warmup)
+	var facing_direction := projectile_direction
+	if facing_direction.length_squared() <= 0.000001:
+		facing_direction = -global_basis.z
+	if facing_direction.length_squared() > 0.000001:
+		look_at(global_position + facing_direction)
 	# offset for gravity-based projectiles to start the arc at an upwards angle
 	if is_affected_by_gravity:
 		projectile_direction.y += 0.25
 	# set velocity
 	linear_velocity = projectile_direction * speed
+	m_emit_spawn_load_completed_async()
+
+
+# monitoring
+func m_emit_spawn_load_completed_async() -> void:
+	# wait until a frame is rendered after the projectile has been added to the scene tree
+	await get_tree().process_frame
+	await RenderingServer.frame_post_draw
+	if is_inside_tree():
+		spawn_load_completed.emit(self)
 
 
 func _physics_process(_delta: float) -> void:
@@ -172,12 +188,18 @@ func destroy_bludgeoning_projectile() -> void:
 
 # spawn impact particles at a given position
 func spawn_impact_particles(attach_node: Node3D, spawn_position: Vector3) -> void:
+	var impact_vfx_start_usec := ProfilerMonitors.m_now_usec() # monitoring
+	# spawn impact particles
 	if not impact_particles_scene:
 		return
 	var impact_particles: GPUParticles3D = impact_particles_scene.instantiate()
 	attach_node.add_child(impact_particles)
 	impact_particles.global_position = spawn_position
 	impact_particles.emitting = true
+	# monitoring
+	var impact_vfx_duration_ms := float(ProfilerMonitors.m_now_usec() - impact_vfx_start_usec) / 1000.0
+	ProfilerMonitors.m_record_projectile_impact_vfx(impact_vfx_duration_ms)
+	# wait for the impact particles to finish and free them
 	await get_tree().create_timer(impact_particles.lifetime).timeout
 	impact_particles.queue_free()
 

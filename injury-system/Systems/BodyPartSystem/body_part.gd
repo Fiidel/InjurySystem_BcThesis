@@ -154,18 +154,30 @@ func take_damage(amount: float) -> void:
 
 
 func play_hit_flash() -> void:
+	var hit_flash_activation_start_usec := ProfilerMonitors.m_now_usec() # monitoring
+	# get the mesh material and kill any existing tween
 	var mat := mesh.get_surface_override_material(0)
 	if mat == null:
 		return
 	if hit_flash_tween and hit_flash_tween.is_valid():
 		hit_flash_tween.kill()
+	# flash the mesh material
 	hit_flash_tween = create_tween()
 	hit_flash_tween.tween_property(mat, "shader_parameter/hit_flash", HIT_FLASH_INTENSITY, HIT_FLASH_WINDUP)
 	hit_flash_tween.tween_property(mat, "shader_parameter/hit_flash", 0.0, HIT_FLASH_UNWIND)
+	# monitor activation cost after one rendered frame
+	m_track_hit_flash_activation_after_draw(hit_flash_activation_start_usec)
+
+
+func m_track_hit_flash_activation_after_draw(hit_flash_activation_start_usec: int) -> void:
+	await RenderingServer.frame_post_draw
+	var hit_flash_activation_ms := float(ProfilerMonitors.m_now_usec() - hit_flash_activation_start_usec) / 1000.0
+	ProfilerMonitors.m_record_hit_flash_activation(hit_flash_activation_ms)
 
 
 func on_zero_health_reached() -> void:
 	is_destroyed = true
+	clear_deformation_data()
 	SignalBus.body_part_destroyed.emit(self)
 	if remove_part_if_destroyed:
 		# make the mesh material flash
@@ -182,6 +194,18 @@ func on_zero_health_reached() -> void:
 		remove_bones()
 		for child in get_children():
 			child.queue_free()
+
+
+func clear_deformation_data() -> void:
+	hit_locations.clear()
+	var mat := mesh.get_surface_override_material(0)
+	if mat == null:
+		return
+	mat.set("shader_parameter/hit_count", 0)
+	mat.set("shader_parameter/hit_positions", PackedVector3Array())
+	mat.set("shader_parameter/hit_normals", PackedVector3Array())
+	mat.set("shader_parameter/hit_radius", PackedFloat32Array())
+	mat.set("shader_parameter/hit_strength", PackedFloat32Array())
 
 
 func spawn_severed_limb() -> void:
@@ -246,8 +270,15 @@ func update_deformation_shader() -> void:
 
 	# iterate through all the hit locations and normals
 	for hit in hit_locations:
+		var attachment_ref: Variant = hit.get("attachment", null)
+		if attachment_ref == null:
+			continue
+		if not is_instance_valid(attachment_ref):
+			continue
+		if not (attachment_ref is BoneAttachment3D):
+			continue
 		# hit is stored in bone-attachment local space; convert to mesh local so the mesh deformation shader can use it
-		var attachment := hit["attachment"] as BoneAttachment3D
+		var attachment: BoneAttachment3D = attachment_ref
 		# recalculate the attachment-to-mesh transform each frame so the hits follow the bone animation
 		var attachment_to_mesh := mesh_inv * attachment.global_transform
 		positions.append(attachment_to_mesh * hit["pos"])
@@ -257,7 +288,9 @@ func update_deformation_shader() -> void:
 		strength.append(float(hit["strength"]))
 
 	var mat := mesh.get_surface_override_material(0)
-	mat.set("shader_parameter/hit_count", hit_locations.size())
+	if mat == null:
+		return
+	mat.set("shader_parameter/hit_count", positions.size())
 	mat.set("shader_parameter/hit_positions", positions)
 	mat.set("shader_parameter/hit_normals", normals)
 	mat.set("shader_parameter/hit_radius", radius)

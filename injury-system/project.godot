@@ -22,6 +22,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 SignalBus="*uid://bpwi4d1cvt631"
+ProfilerMonitors="*uid://b4ioanroy66sy"
 
 [display]
 
@@ -30,10 +31,6 @@ window/size/mode=3
 [dotnet]
 
 project/assembly_name="InjurySystem"
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/dynamic_injury_system/plugin.cfg")
 
 [input]
 

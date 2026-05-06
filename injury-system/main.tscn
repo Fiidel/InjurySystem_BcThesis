@@ -4,6 +4,12 @@
 [ext_resource type="PackedScene" uid="uid://cph5iw2hp2sas" path="res://Entities/Enemies/Manticore/manticore.scn" id="3_1bvp3"]
 [ext_resource type="PackedScene" uid="uid://c5hswb3bqmoxd" path="res://Entities/Player/player.tscn" id="3_h2yge"]
 [ext_resource type="PackedScene" uid="uid://fddgp3tmu4g1" path="res://Stages/Environments/Desert/desert.tscn" id="3_lquwl"]
+[ext_resource type="Script" uid="uid://b532t5d8r2r4d" path="res://Globals/preload_scenes.gd" id="5_lquwl"]
+[ext_resource type="PackedScene" uid="uid://c6vo1skq0umfj" path="res://Entities/Player/Projectiles/boulder.tscn" id="6_4c57u"]
+[ext_resource type="PackedScene" uid="uid://dg20oqwvfcbnf" path="res://Entities/Player/Projectiles/boulder_dust_particles.tscn" id="7_efxa6"]
+[ext_resource type="PackedScene" uid="uid://b1g1l23sinh3n" path="res://Entities/Player/Projectiles/boulder_fragments.tscn" id="8_dg77c"]
+[ext_resource type="PackedScene" uid="uid://bo6hoxdtu4dff" path="res://Entities/Player/Projectiles/slash.tscn" id="9_ycdy4"]
+[ext_resource type="PackedScene" uid="uid://cj7dw47a2y8gt" path="res://Entities/Player/Projectiles/star.tscn" id="10_w48qg"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_lquwl"]
 panorama = ExtResource("1_1bvp3")
@@ -30,6 +36,9 @@ volumetric_fog_emission = Color(0.3508252, 0.2825333, 0.16542125, 1)
 volumetric_fog_anisotropy = 0.4
 volumetric_fog_sky_affect = 0.3
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7mycd"]
+bg_color = Color(0.1663743, 0.16637433, 0.1663742, 1)
+
 [node name="Node3D" type="Node3D" unique_id=626739966]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=480537609]
@@ -41,12 +50,31 @@ light_indirect_energy = 8.0
 light_volumetric_fog_energy = 0.2
 
 [node name="Player" parent="." unique_id=1339924766 instance=ExtResource("3_h2yge")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.833927, 8.209045, 12.356348)
+transform = Transform3D(-0.21614993, 0, -0.9763602, 0, 1, 0, 0.9763602, 0, -0.21614993, -48.748657, 11.349567, 12.356348)
 
 [node name="Manticore" parent="." unique_id=1310202999 instance=ExtResource("3_1bvp3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.981531, 7.4851084, 21.437103)
+transform = Transform3D(-0.3669721, 0, -0.93023187, 0, 1, 0, 0.93023187, 0, -0.3669721, 1.9932022, 7.4851084, 23.429365)
 floor_constant_speed = true
 
 [node name="Desert" parent="." unique_id=151719703 instance=ExtResource("3_lquwl")]
+
+[node name="Loading" type="CanvasLayer" parent="." unique_id=1986813540]
+script = ExtResource("5_lquwl")
+scenes_to_preload = Array[PackedScene]([ExtResource("6_4c57u"), ExtResource("7_efxa6"), ExtResource("8_dg77c"), ExtResource("9_ycdy4"), ExtResource("10_w48qg")])
+manticore_scene = ExtResource("3_1bvp3")
+
+[node name="BlackoutPanel" type="PanelContainer" parent="Loading" unique_id=657330218]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7mycd")
+
+[node name="Label" type="Label" parent="Loading/BlackoutPanel" unique_id=250336250]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 16
+text = "Loading..."
 
 [editable path="Desert"]

@@ -32,6 +32,8 @@ func _ready() -> void:
 
 func delete_child_timer(node: RigidBody3D) -> void:
 	await get_tree().create_timer(3.0).timeout
+	var fade_setup_start_usec := ProfilerMonitors.m_now_usec() # monitoring
+	# fade out the mesh
 	var mesh: MeshInstance3D = get_mesh_instance(node)
 	if mesh:
 		var material: StandardMaterial3D = mesh.get_active_material(0)
@@ -41,6 +43,10 @@ func delete_child_timer(node: RigidBody3D) -> void:
 		var tween: Tween = create_tween()
 		tween.tween_property(material, "albedo_color:a", 0, 2.0)
 		tween.play()
+		# monitoring
+		var fade_setup_ms := float(ProfilerMonitors.m_now_usec() - fade_setup_start_usec) / 1000.0
+		ProfilerMonitors.m_record_projectile_impact_vfx(fade_setup_ms)
+		# wait for the tween to finish
 		await tween.finished
 	node.queue_free()
 

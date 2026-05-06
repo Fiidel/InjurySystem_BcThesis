@@ -93,10 +93,20 @@ func _physics_process(delta: float) -> void:
 
 # spawning projectiles and firing them in the camera direction
 func spawn_projectile(projectile_type: PackedScene) -> void:
+	var spawn_start_usec := ProfilerMonitors.m_now_usec() # monitoring
 	var projectile = projectile_type.instantiate() as Projectile
+	# monitoring
+	projectile.spawn_load_completed.connect(_on_projectile_spawn_load_completed.bind(spawn_start_usec), CONNECT_ONE_SHOT)
+	# set the projectile's direction, position, and add to the scene tree
 	projectile.projectile_direction = -camera.global_transform.basis.z
 	get_tree().root.add_child(projectile)
 	projectile.global_position = global_position + Vector3(0,1.25,0)
+
+
+# monitoring projectile spawn load completion
+func _on_projectile_spawn_load_completed(_projectile: Projectile, spawn_start_usec: int) -> void:
+	var spawn_duration_ms := float(ProfilerMonitors.m_now_usec() - spawn_start_usec) / 1000.0
+	ProfilerMonitors.m_record_projectile_spawn(spawn_duration_ms)
 
 
 func take_damage(_amount: float) -> void:

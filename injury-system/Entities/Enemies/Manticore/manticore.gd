@@ -43,12 +43,19 @@ func on_enemy_killed() -> void:
 
 
 func fade_out_meshes() -> void:
+	var fade_start_usec := ProfilerMonitors.m_now_usec() # monitoring
+	# fade out the meshes
 	var instant_tween := create_tween()
 	for mesh_instance in instant_fade_meshes:
 		instant_tween.parallel().tween_property(mesh_instance, "transparency", 1.0, 0.2)
 	var tween := create_tween()
 	for mesh_instance in fade_meshes:
 			tween.parallel().tween_property(mesh_instance, "transparency", 1.0, death_fade_duration)
+	# monitor the fade activation cost after one rendered frame
+	await RenderingServer.frame_post_draw
+	var fade_duration_ms := float(ProfilerMonitors.m_now_usec() - fade_start_usec) / 1000.0
+	ProfilerMonitors.m_record_enemy_fade(fade_duration_ms)
+	# wait for the tweens to finish
 	await tween.finished
 
 
