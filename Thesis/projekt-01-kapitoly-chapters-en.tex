@@ -8,17 +8,17 @@
 
 \chapter{Introduction}
 
-% úvod, asi trochu k design philosophy a cílům
-
 The goal of this thesis is the design and implementation of a dynamic injury system of game characters in the Godot Engine. The term \emph{character} here describes game characters in general, and is not intended to be limited to anthropomorphs. This demo is not player-centric, but rather aims to implement a standalone injury system and its effects on the creature's behavior and animation.
-
-% The Godot Engine was chosen for this project because 
 
 Chapter \ref{chap:theory} explores existing injury systems from a design perspective and explains the basics of the mechanisms that are used in the implementation of the final product, which include inverse kinematics (for character animation) and AI patterns (specifically the finite state machine and the behavior tree).
 
-Chapter \ref{chap:design} details the design of the game demo. It explains the design of the enemy model, the subsystems necessary for implementing a cohesive enemy with a specialized injury system.
+Chapter \ref{chap:design} details the design of the game demo. It explains the design of the enemy model, the subsystems necessary for implementing a cohesive enemy with a specialized injury system, enemy AI, and the player controller.
 
-% @TODO ch4, ch5, etc.
+Chapter \ref{chap:implementation} describes how the design was realized in Godot -- asset creation and environment modeling, the behavior tree implementation and node types, mesh deformation, the body part and hit logic, bone knockback, and the player controller. Finally, it describes the manticore enemy's implementation as combination of all of these pieces.
+
+%Chapter \ref{chap:testing} evaluates performance aspects of the demo, including profiling in Godot and experiments aimed at identifying costly effects such as shader compilation spikes or scaling limits of deformation and physics-heavy scenarios.
+
+%Chapter \ref{chap:conclusion} closes the thesis by summarizing the outcomes, discussing documentation and publication of the work, and outlining possible directions for future improvement.
 
 % ===================================================================
 % ===================================================================
@@ -303,6 +303,7 @@ This demo's player controller implements basic movement and camera controls and 
 % ===================================================================
 
 \chapter{Implementation and Demonstration}
+\label{chap:implementation}
 \section{Modeling}
 Due to the unique requirements of the enemy model for this game demo, a custom model was designed and created. A simple arena-like desert basin surrounded by mountains was also modeled. Both models were made in Blender.
 
@@ -708,12 +709,60 @@ TODO
 % % ===================================================================
 
 \chapter{Performance Testing}
-Godot profiler
+\label{chap:testing}
+Godot offers the profiler, visual profiler, and monitors as integrated performance tools. Custom monitors are used to test the problematic areas of the game performance, and a loading screen is implemented to better the performance.
 
-Shader Precompilation
-- lag spikes whenever a new effect is on screen, like a new projectile or the manticore body transparency triggered
-- loading screen while all of the effects are played in the background to "precompile" the shaders
+\section{Projectile and Shader Stutters}
+The biggest stutters were encountered when a new projectile type or its impact visual effects were spawned into the game or when the manticore's hit flash effect was triggered.
 
+To test these specific stutters, monitors were set up that measure the time it takes to execute the code that spawns the projectile, its impact visual effects, and the enemy's hit flash effect. The testing scenario was as follows: all 3 projectile types were spawned (which also spawns the their visual effects), the enemy was hit with a projectile (which activates the hit shader), one body part was destroyed, and the enemy was killed. The project's cached shaders were deleted before every test to prevent caching inconsistencies. As can be seen in Figure~\ref{ProfilerDuration1} and Figure~\ref{ProfilerStutter1}, the stutters have been detected by the profiler, which considers $16.67$ms (1 frame at 60FPS) as the threshold for a stutter, which the peak durations are above several times over.
+
+% - Projectile spawn peak 121 120 117 114 327 121ms, count 5 11 3 4 6 5
+
+% - Impact vfx peak 43 40 43 43 43 46, count 2 2 2 2 2 2
+
+% - enemy shader (hit flash) 128 138 127 122 124 128, count 17 21 26 15 20 17
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{obrazky-figures/profiler_duration_1.png}
+    \caption{.}
+    \label{ProfilerDuration1}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{obrazky-figures/profiler_stutters_1.png}
+    \caption{.}
+    \label{ProfilerStutter1}
+\end{figure}
+
+
+\section{Loading Screen}
+To bypass the stutters when certain scenes are first loaded, a loading screen was implemented. The loading screen covers the entire screen while specified scenes are being loaded into the game and quickly removed. After all of the problematic scenes are loaded and removed, the loading screen is removed.
+
+As seen in the results of the profiler monitors in Figure~\ref{ProfilerDuration2} and Figure~\ref{ProfilerStutter2} after the loading screen was implemented, the stutters were eliminated or greatly reduced. Even though the peak duration for the impact visual effects remained the same, its count of stutters was reduced to 1 thanks to the loading screen, and it no longer stutters in-game.
+
+% - Projectile spawn peak 17 17 17 18 17 17ms, count 3 1 4 4 2 1
+
+% - Impact vfx peak 43 41 45 42 48 39, count 1 1 1 1 1 1
+
+% - enemy shader (hit flash) 50 55 49 79 69 80ms, count 3 4 5 3 3 2
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{obrazky-figures/profiler_duration_2.png}
+    \caption{.}
+    \label{ProfilerDuration2}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{obrazky-figures/profiler_stutters_2.png}
+    \caption{.}
+    \label{ProfilerStutter2}
+\end{figure}
 
 
 % Number of detached limbs on the ground (physics test)
@@ -728,4 +777,5 @@ Shader Precompilation
 % % ===================================================================
 
 \chapter{Documentation, Publication, Conclusion}
+\label{chap:conclusion}
 % + video
