@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b3fjuvv488qok"]
 
 [ext_resource type="Texture2D" uid="uid://cgrc0mu7kkls0" path="res://Stages/Environments/sky_24_2k_freestylized.png" id="1_1bvp3"]
+[ext_resource type="Script" uid="uid://dmxjcgk3m5qr3" path="res://Globals/scene_manager.gd" id="1_efxa6"]
 [ext_resource type="PackedScene" uid="uid://cph5iw2hp2sas" path="res://Entities/Enemies/Manticore/manticore.scn" id="3_1bvp3"]
 [ext_resource type="PackedScene" uid="uid://c5hswb3bqmoxd" path="res://Entities/Player/player.tscn" id="3_h2yge"]
 [ext_resource type="PackedScene" uid="uid://fddgp3tmu4g1" path="res://Stages/Environments/Desert/desert.tscn" id="3_lquwl"]
@@ -40,6 +41,7 @@ volumetric_fog_sky_affect = 0.3
 bg_color = Color(0.1663743, 0.16637433, 0.1663742, 1)
 
 [node name="Node3D" type="Node3D" unique_id=626739966]
+script = ExtResource("1_efxa6")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=480537609]
 environment = SubResource("Environment_ig7tw")
