@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://b5i22wtoe06hx" path="res://Stages/Environments/Desert/Stylized_Sand_002_height.png" id="1_xxfsh"]
 [ext_resource type="Texture2D" uid="uid://bqpubu0ld5gf4" path="res://Stages/Environments/Desert/desert_env_Stylized_Sand_002_basecolor.png" id="2_rb1mv"]
-[ext_resource type="Texture2D" uid="uid://ckf4dim0m2lv" path="res://Stages/Environments/Desert/desert_env_Stylized_Sand_002_normal.png" id="3_1qrfi"]
+[ext_resource type="Texture2D" uid="uid://cwpr00dg20l3n" path="res://Stages/Environments/Desert/Stylized_Sand_002_normal.png" id="3_xxfsh"]
 [ext_resource type="Texture2D" uid="uid://vklwqap4etok" path="res://Stages/Environments/Desert/Stylized_Sand_002_roughness.png" id="4_1ya2v"]
 
 [sub_resource type="Shader" id="Shader_fo6qg"]
@@ -111,7 +111,7 @@ shader_parameter/metallic_texture_channel = Vector4(1, 0, 0, 0)
 shader_parameter/texture_roughness = ExtResource("4_1ya2v")
 shader_parameter/specular = 0.0
 shader_parameter/metallic = 0.0
-shader_parameter/texture_normal = ExtResource("3_1qrfi")
+shader_parameter/texture_normal = ExtResource("3_xxfsh")
 shader_parameter/normal_scale = 1.0
 shader_parameter/uv1_scale = Vector3(1, 1, 1)
 shader_parameter/uv1_offset = Vector3(0, 0, 0)
