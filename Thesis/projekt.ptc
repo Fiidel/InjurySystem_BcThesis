@@ -14,53 +14,52 @@
 \contentsline {subsection}{\numberline {2.4.3}Utility}{11}{subsection.2.4.3}%
 \contentsline {section}{\numberline {2.5}Godot}{12}{section.2.5}%
 \contentsline {subsection}{\numberline {2.5.1}Key Concepts}{12}{subsection.2.5.1}%
-\contentsline {subsection}{\numberline {2.5.2}Engine Extensibility}{13}{subsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.5.2}Engine Extensibility}{12}{subsection.2.5.2}%
 \contentsline {subsection}{\numberline {2.5.3}Shading Language}{13}{subsection.2.5.3}%
 \contentsline {chapter}{\numberline {3}Injury System Design}{14}{chapter.3}%
-\contentsline {section}{\numberline {3.1}The Modularity of Godot}{14}{section.3.1}%
+\contentsline {section}{\numberline {3.1}Enemy Design}{14}{section.3.1}%
 \contentsline {section}{\numberline {3.2}Body Part Injury System}{14}{section.3.2}%
 \contentsline {section}{\numberline {3.3}Enemy AI Based on Body Parts}{15}{section.3.3}%
 \contentsline {subsection}{\numberline {3.3.1}Behavior Tree}{15}{subsection.3.3.1}%
 \contentsline {subsection}{\numberline {3.3.2}Limiting Behavior}{16}{subsection.3.3.2}%
-\contentsline {section}{\numberline {3.4}Knockback}{16}{section.3.4}%
-\contentsline {section}{\numberline {3.5}Mesh Deformation}{16}{section.3.5}%
-\contentsline {section}{\numberline {3.6}Enemy Design}{16}{section.3.6}%
-\contentsline {section}{\numberline {3.7}Player Controller}{17}{section.3.7}%
-\contentsline {chapter}{\numberline {4}Implementation and Demonstration}{18}{chapter.4}%
+\contentsline {section}{\numberline {3.4}Mesh Deformation}{16}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Knockback}{16}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Player Controller}{17}{section.3.6}%
+\contentsline {chapter}{\numberline {4}Implementation}{18}{chapter.4}%
 \contentsline {section}{\numberline {4.1}Modeling}{18}{section.4.1}%
 \contentsline {subsection}{\numberline {4.1.1}Enemy Model}{18}{subsection.4.1.1}%
 \contentsline {subsection}{\numberline {4.1.2}Environment}{19}{subsection.4.1.2}%
-\contentsline {section}{\numberline {4.2}Behavior Tree}{21}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}Node Types}{23}{subsection.4.2.1}%
+\contentsline {section}{\numberline {4.2}Body Part Nodes}{21}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Health Management}{22}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Hitboxes and Hit Management}{22}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Hit Effects}{22}{subsection.4.2.3}%
+\contentsline {section}{\numberline {4.3}Behavior Tree}{23}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Node Types}{23}{subsection.4.3.1}%
 \contentsline {subsubsection}{Root}{23}{section*.6}%
-\contentsline {subsubsection}{Sequence}{23}{section*.7}%
-\contentsline {subsubsection}{Selector}{23}{section*.8}%
-\contentsline {subsubsection}{PriorityReselector}{23}{section*.9}%
-\contentsline {subsubsection}{Condition Decorator}{23}{section*.10}%
+\contentsline {subsubsection}{Sequence}{24}{section*.7}%
+\contentsline {subsubsection}{Selector}{24}{section*.8}%
+\contentsline {subsubsection}{PriorityReselector}{24}{section*.9}%
+\contentsline {subsubsection}{Condition Decorator}{24}{section*.10}%
 \contentsline {subsubsection}{Randomizer, WeightedRandomizer, Weight Decorator}{24}{section*.11}%
 \contentsline {subsubsection}{UtilityRandomizer, Utility}{24}{section*.12}%
-\contentsline {subsubsection}{Cooldown Decorator}{24}{section*.13}%
-\contentsline {subsubsection}{BodyPartFilter, BodyPartFilterRecheck}{24}{section*.14}%
+\contentsline {subsubsection}{Cooldown Decorator}{25}{section*.13}%
+\contentsline {subsubsection}{BodyPartFilter, BodyPartFilterRecheck}{25}{section*.14}%
 \contentsline {subsubsection}{Action}{25}{section*.15}%
 \contentsline {subsubsection}{Blackboard}{25}{section*.16}%
-\contentsline {subsection}{\numberline {4.2.2}Creating Behavior Trees inside the Scene Tree}{25}{subsection.4.2.2}%
-\contentsline {section}{\numberline {4.3}Deformation Shader}{26}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Body Part Nodes}{27}{section.4.4}%
-\contentsline {subsection}{\numberline {4.4.1}Health Management}{28}{subsection.4.4.1}%
-\contentsline {subsection}{\numberline {4.4.2}Hitboxes and Hit Management}{28}{subsection.4.4.2}%
-\contentsline {subsection}{\numberline {4.4.3}Hit Effects}{28}{subsection.4.4.3}%
-\contentsline {section}{\numberline {4.5}Knockback \texttt {SkeletonModifier3D}}{29}{section.4.5}%
+\contentsline {subsection}{\numberline {4.3.2}Creating Behavior Trees inside the Scene Tree}{25}{subsection.4.3.2}%
+\contentsline {section}{\numberline {4.4}Deformation Shader}{26}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Knockback \texttt {SkeletonModifier3D}}{28}{section.4.5}%
 \contentsline {section}{\numberline {4.6}Player Controller}{29}{section.4.6}%
-\contentsline {section}{\numberline {4.7}The Manticore Enemy}{30}{section.4.7}%
+\contentsline {section}{\numberline {4.7}The Manticore Enemy}{29}{section.4.7}%
 \contentsline {subsection}{\numberline {4.7.1}Body Parts}{30}{subsection.4.7.1}%
 \contentsline {subsection}{\numberline {4.7.2}Behavior Tree}{30}{subsection.4.7.2}%
-\contentsline {subsection}{\numberline {4.7.3}Animation Tree}{31}{subsection.4.7.3}%
-\contentsline {subsection}{\numberline {4.7.4}Visuals, Adjustments, and Effects}{32}{subsection.4.7.4}%
-\contentsline {section}{\numberline {4.8}Demonstration in Various Test Cases/Situations}{33}{section.4.8}%
-\contentsline {chapter}{\numberline {5}Performance Testing}{34}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Projectile and Shader Stutters}{34}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Loading Screen}{34}{section.5.2}%
-\contentsline {chapter}{\numberline {6}Documentation, Publication, Conclusion}{37}{chapter.6}%
-\contentsline {chapter}{Bibliography}{38}{chapter*.17}%
+\contentsline {subsection}{\numberline {4.7.3}Animation Tree}{30}{subsection.4.7.3}%
+\contentsline {subsection}{\numberline {4.7.4}Visuals, Adjustments, and Effects}{30}{subsection.4.7.4}%
+\contentsline {chapter}{\numberline {5}Performance Testing}{33}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Projectile and Shader Stutters}{33}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Loading Screen}{33}{section.5.2}%
+\contentsline {chapter}{\numberline {6}Conclusion}{36}{chapter.6}%
+\contentsline {chapter}{Bibliography}{37}{chapter*.17}%
 \ttl@starttoc {chapters@1}
+\contentsline {chapter}{\numberline {A}Demo Showcase}{38}{appendix.A}%
 \contentsfinish 

@@ -8,17 +8,16 @@
 
 \chapter{Introduction}
 
-The goal of this thesis is the design and implementation of a dynamic injury system of game characters in the Godot Engine. The term \emph{character} here describes game characters in general, and is not intended to be limited to anthropomorphs. This demo is not player-centric, but rather aims to implement a standalone injury system and its effects on the creature's behavior and animation.
+The goal of this thesis is the design and implementation of a dynamic body-part-based injury system for game characters in the Godot Engine. The term \emph{character} here describes game characters in general, and is not intended to be limited to anthropomorphs. This demo is not player-centric, but rather aims to implement a standalone injury system and its effects on enemy behavior, animation, and visual feedback. The implementation uses Godot 4 and GDScript, and aims to introduce reusable nodes that can be added to the enemy's scene tree, allowing logic to be added modulary through the editor.
 
-Chapter \ref{chap:theory} explores existing injury systems from a design perspective and explains the basics of the mechanisms that are used in the implementation of the final product, which include inverse kinematics (for character animation) and AI patterns (specifically the finite state machine and the behavior tree).
+The resulting project demonstrates combat in which body parts can be destroyed, which limits the enemy's options based on the lost parts and debilitates it. Its decision-making adapts through behavior filters and fallback decisions. The player can influence the combat not only by hitting the enemy as many times as possible until it dies, but also by selecting targets that disable specific attacks or mobility options. The implementation introduces reusable scene nodes, signal-based communication, and enemy AI integration that provide a basis for authoring other enemies with body-part-based injury mechanics in Godot.
 
-Chapter \ref{chap:design} details the design of the game demo. It explains the design of the enemy model, the subsystems necessary for implementing a cohesive enemy with a specialized injury system, enemy AI, and the player controller.
+Chapter \ref{chap:theory} explores existing body-part-based injury systems in games from a design perspective and describes the relevant game mechanics. It also introduces inverse kinematics and decision-making patterns. Finally, it describes the Godot engine and its key features.
+Chapter \ref{chap:design} details the design of the game demo, including the enemy model and the subsystems needed for a cohesive injury-aware enemy system.
+Chapter \ref{chap:implementation} describes the implementation of the design in Godot -- asset creation and environment modeling, behavior tree implementation and node types, mesh deformation, body part and hit logic, bone knockback, and final enemy integration.
+Chapter \ref{chap:testing} evaluates performance, focuses on stutter sources, and presents the loading screen solution used to reduce runtime spikes.
+Chapter \ref{chap:conclusion} summarizes the achieved results and outlines possible future work.
 
-Chapter \ref{chap:implementation} describes how the design was realized in Godot -- asset creation and environment modeling, the behavior tree implementation and node types, mesh deformation, the body part and hit logic, bone knockback, and the player controller. Finally, it describes the manticore enemy's implementation as combination of all of these pieces.
-
-%Chapter \ref{chap:testing} evaluates performance aspects of the demo, including profiling in Godot and experiments aimed at identifying costly effects such as shader compilation spikes or scaling limits of deformation and physics-heavy scenarios.
-
-%Chapter \ref{chap:conclusion} closes the thesis by summarizing the outcomes, discussing documentation and publication of the work, and outlining possible directions for future improvement.
 
 % ===================================================================
 % ===================================================================
@@ -50,17 +49,17 @@ The implementation of injury depends on where the design lands on the spectrum b
 \section{Case Studies}
 This section examines the systems within games that implement a body part injury system and their approach to the design.
 
-In Horizon Zero Dawn and Horizon Forbidden West, components and armor plates can be removed with high tear damage weapons, which deals little to no damage, but reveals weak points or disables attacks\footnote{\url{https://www.polygon.com/horizon-zero-dawn-guide-walkthrough/21357205/machines-fight-rockbreaker-behemoth-thunderjaw-stormbird-deathbringer-tallneck-corrupted-cauldron/}}.
+In Horizon Zero Dawn and Horizon Forbidden West, components and armor plates can be removed with high tear damage weapons, which deals little to no damage, but reveals weak points or disables attacks\footnote{\href{https://www.polygon.com/horizon-zero-dawn-guide-walkthrough/21357205/machines-fight-rockbreaker-behemoth-thunderjaw-stormbird-deathbringer-tallneck-corrupted-cauldron/}{polygon.com/horizon-zero-dawn-guide-walkthrough/21357205/machines-fight-rockbreaker-behemoth-thunderjaw-stormbird-deathbringer-tallneck-corrupted-cauldron}}.
 
-In Monster Hunter Wilds, removing body parts is a core part of the experience, gathering them as loot or removing the monsters' dangerous abilities. Different weapon types (slashing, blunt, ranged) deal increased damage to specific enemies' body parts. For example, slashing weapons deal extra damage to tails, while blunt weapons can stun, making the enemy roll on the ground for a period of time\footnote{\url{https://www.polygon.com/monster-hunter-wilds-guide/528353/monster-tails-fangs-claws-horns-how-to-get-sever-cut-break/}}.
+In Monster Hunter Wilds, removing body parts is a core part of the experience, gathering them as loot or removing the monsters' dangerous abilities. Different weapon types (slashing, blunt, ranged) deal increased damage to specific enemies' body parts. For example, slashing weapons deal extra damage to tails, while blunt weapons can stun, making the enemy roll on the ground for a period of time\footnote{\href{https://www.polygon.com/monster-hunter-wilds-guide/528353/monster-tails-fangs-claws-horns-how-to-get-sever-cut-break/}{polygon.com/monster-hunter-wilds-guide/528353/monster-tails-fangs-claws-horns-how-to-get-sever-cut-break}}.
 
-Dead Space has many enemies with weak spots, different for each enemy type. Attacking those parts can limit an enemy's attack or movement. Some enemies can have armor that protects their weak points, forcing the player to focus on another weak point or to change their position to access weak points hidden on the enemy's back. Enemies can also have weak points that are dangerous to the player, such as explosive sacks damaging the player when destroyed in close proximity, forcing another angle of strategy to the weak point system. The important aspect of this combat system is in how it enforces different strategies that the player needs to apply based on the enemy type's weak point effects\footnote{\url{https://www.dualshockers.com/dead-space-remake-necromorph-weakness/}}.
+Dead Space has many enemies with weak spots, different for each enemy type. Attacking those parts can limit an enemy's attack or movement. Some enemies can have armor that protects their weak points, forcing the player to focus on another weak point or to change their position to access weak points hidden on the enemy's back. Enemies can also have weak points that are dangerous to the player, such as explosive sacks damaging the player when destroyed in close proximity, forcing another angle of strategy to the weak point system. The important aspect of this combat system is in how it enforces different strategies that the player needs to apply based on the enemy type's weak point effects\footnote{\href{https://www.dualshockers.com/dead-space-remake-necromorph-weakness/}{dualshockers.com/dead-space-remake-necromorph-weakness}}.
 
-Fallout offers a slow-motion targeting system that allows players to target specific body parts. Each body part has its own chance of being hit, modified by distance and cover. The number of attacks a player can make is dependent on the player's action points and the weapon type. Body parts have a status that is separate from the target's overall health. A status bar can be worn down until empty, at which point the limb becomes crippled. Crippled limbs have effects like hindered movement, removing a robot's weaponized arm, or shooting an enemy's head (which in most cases kills them outright)\footnote{\url{https://www.videogamer.com/guides/a-beginners-guide-to-combat-in-fallout-4/}}.
+Fallout offers a slow-motion targeting system that allows players to target specific body parts. Each body part has its own chance of being hit, modified by distance and cover. The number of attacks a player can make is dependent on the player's action points and the weapon type. Body parts have a status that is separate from the target's overall health. A status bar can be worn down until empty, at which point the limb becomes crippled. Crippled limbs have effects like hindered movement, removing a robot's weaponized arm, or shooting an enemy's head (which in most cases kills them outright)\footnote{\href{https://www.videogamer.com/guides/a-beginners-guide-to-combat-in-fallout-4/}{videogamer.com/guides/a-beginners-guide-to-combat-in-fallout-4}}.
 
-In Xenoblade Chronicles X, the player can target appendages which have their own health pool, separate from the overall one. Destroying appendages disables certain attacks and lowers the enemy's defenses\footnote{\url{https://deltiasgaming.com/xenoblade-chronicles-x-combat-guide/}}.
+In Xenoblade Chronicles X, the player can target appendages which have their own health pool, separate from the overall one. Destroying appendages disables certain attacks and lowers the enemy's defenses\footnote{\href{https://deltiasgaming.com/xenoblade-chronicles-x-combat-guide/}{deltiasgaming.com/xenoblade-chronicles-x-combat-guide}}.
 
-Phoenix Point's \q{free aim} combat allows the player to hit specific body parts based on projectile collisions. Each body part has their independent values (like health) and features. Disabling parts has various effects, such as hindering mobility, disabling the enemy's main weapon, or triggering a bleeding effect. Each part also has a different armor value which reduces damage\footnote{\url{https://www.rockpapershotgun.com/phoenix-point-free-aim-and-part-damage-guide-how-to-use-the-free-aiming-system-for-more-precise-shots}}.
+Phoenix Point's \q{free aim} combat allows the player to hit specific body parts based on projectile collisions. Each body part has their independent values (like health) and features. Disabling parts has various effects, such as hindering mobility, disabling the enemy's main weapon, or triggering a bleeding effect. Each part also has a different armor value which reduces damage\footnote{\href{https://www.rockpapershotgun.com/phoenix-point-free-aim-and-part-damage-guide-how-to-use-the-free-aiming-system-for-more-precise-shots}{rockpapershotgun.com/phoenix-point-free-aim-and-part-damage-guide-how-to-use-the-free-aiming-system-for-more-precise-shots}}.
 
 \addtocounter{footnote}{-3}
 \begin{figure}
@@ -70,11 +69,11 @@ Phoenix Point's \q{free aim} combat allows the player to hit specific body parts
     \label{GameCaseStudies}
 \end{figure}
 
-\footnotetext[7]{Image taken from \url{https://vulkk.com/2023/02/03/dead-space-remake-combat-tips-how-to-defeat-each-type-of-necromorph/}.}
+\footnotetext[7]{Image taken from \href{https://vulkk.com/2023/02/03/dead-space-remake-combat-tips-how-to-defeat-each-type-of-necromorph/}{vulkk.com/2023/02/03/dead-space-remake-combat-tips-how-to-defeat-each-type-of-necromorph}.}
 
-\footnotetext[8]{Image taken from \url{https://www.thegamer.com/fallout-3-vats-bethesda-nearly-cut/}.}
+\footnotetext[8]{Image taken from \href{https://www.thegamer.com/fallout-3-vats-bethesda-nearly-cut/}{thegamer.com/fallout-3-vats-bethesda-nearly-cut}.}
 
-\footnotetext[9]{Image taken from \url{https://www.rockpapershotgun.com/phoenix-point-free-aim-and-part-damage-guide-how-to-use-the-free-aiming-system-for-more-precise-shots}.}
+\footnotetext[9]{Image taken from \href{https://www.rockpapershotgun.com/phoenix-point-free-aim-and-part-damage-guide-how-to-use-the-free-aiming-system-for-more-precise-shots}{rockpapershotgun.com/phoenix-point-free-aim-and-part-damage-guide-how-to-use-the-free-aiming-system-for-more-precise-shots}.}
 
 \subsubsection{Summary}
 Body parts most often have a feature bound to them -- an ability (like a weapon attack), protection (armor that protects weak points or targetable body parts from being targeted), or mobility. Attacking such body parts hinders those features, e.g., slowing an enemy down or disabling an attack. Additionally, body parts may serve as weak points, granting the player an advantage when being hit in a particular way (like stunning enemies by hitting their heads with a blunt weapon in Monster Hunter Wilds).
@@ -83,7 +82,7 @@ There are also variable values that modify the way limbs take damage, such as a 
 
 The designs also aim for enemy variance that enforces different strategies to be employed by the player (like in Dead Space).
 
-Game designs should also be mindful of not overwhelming the player. This can be solved by making combat systems more diegetic, meaning embedding mechanics into the \q{narrative world} (the game world as perceived by the game characters). For example, whichever body part the player shoots, that part takes damage, as opposed to the player choosing from several invasive UI popups.
+Game designs should also be mindful of not overwhelming the player. This can be solved by making combat systems more diegetic, meaning embedding mechanics into the \q{narrative world} (the game world as perceived by the game characters). For example, whichever body part the player shoots, that part takes damage, as opposed to the player choosing from several invasive UI popups. Figure~\ref{GameCaseStudies} showcases a diegetic system (Dead Space, top row), a user-interface-based system (Fallout's V.A.T.S., bottom left), and a mix of both (Phoenix Point, bottom right).
 
 
 
@@ -140,7 +139,7 @@ Forward kinematics (traditional animation where known, predefined transformation
 There are many ways to implement decision making in games. This section explains finite state machines, behavior trees, and utility theory.
 
 \subsection{Finite State Machine}
-One of the possible implementations of enemy AI is a finite state machine (FSM). FSMs are an architectural structure that can encapsulate enemy behavior into separate states, such as \emph{Patrol} or \emph{Attack}. A central directing \emph{state machine} controls which state is active and allows for the state to be changed. The \emph{state} itself has the encapsulated behavior logic (e.g., a patrolling enemy walking between two points) and the transition logic like methods to be executed when entering or exiting a state \cite{Graham_FSMlight}. A simple FSM implementation is illustrated in Figure \ref{FSM_illustration}.
+One of the possible implementations of enemy AI is a finite state machine (FSM). FSMs are an architectural structure that can encapsulate enemy behavior into separate states, such as \emph{Patrol} or \emph{Attack}. A central directing \emph{state machine} controls which state is active and allows for the state to be changed. The \emph{state} itself has the encapsulated behavior logic (e.g.,~a~patrolling enemy walking between two points) and the transition logic like methods to be executed when entering or exiting a state \cite{Graham_FSMlight}. A simple FSM implementation is illustrated in Figure \ref{FSM_illustration}.
 
 Finite state machines are a quick and easy implementation of enemy AI where the behavior can be separated into states and where there are clear transitions in each state. It can get convoluted if the transition requirements are complex -- in the most extreme cases, it would be FSMs where each state can transition to any other state.
 
@@ -173,7 +172,7 @@ This basic BT implementation can then be extended by more specialized nodes.
 \end{itemize}
 
 It is useful to have a \texttt{BehaviorTree} object that is built by a \texttt{BehaviorTreeBuilder}. This will serve as the central point for storing and updating the tree.
-The BT has an \texttt{update} method which performs the traversal of the tree and is the entry point of the BT. It is called whenever an update is needed, though it need not be every game frame -- every other frame or 5 frames per second can suffice (to lighten or spread out the processing load). For a more efficient approach, an event-based node traversal implementation is possible where a central scheduler manages the traversal using the observer pattern.
+The BT has an \texttt{update} method which performs the traversal of the tree and is the entry point of the BT. It is called whenever an update is needed, though it need not be every game frame -- every other frame or 5 frames per second can suffice (to lighten or spread out the processing load). For a~more efficient approach, an event-based node traversal implementation is possible where a~central scheduler manages the traversal using the observer pattern.
 
 Actions usually have to interact with other parts of the system. For this purpose, it can fetch data from a blackboard, a shared data storage for the behavior tree.
 It may also be important to have a shutdown mechanism that handles action exits cleanly \cite[Chapter~6]{GameAIPro1}.
@@ -222,7 +221,9 @@ To communicate with each other, nodes use signals, an integrated version of the 
 
 
 \subsection{Engine Extensibility}
-The Godot editor itself runs on the game engine. It can be extended via its native API, using the same language as the game code. It supports hot-reloading, building plugins and extending the editor (using the \texttt{@tool} script annotation), as the game code can run directly inside of it\footnote{Godot Design Philosophy, available at: \url{https://docs.godotengine.org/en/stable/getting_started/introduction/godot_design_philosophy.html}}.
+The Godot editor itself runs on the game engine. It can be extended via its native API, using the same language as the game code. It supports hot-reloading, building plugins and extending the editor (using the \texttt{@tool} script annotation which makes the scripts run live in the editor), as the game code can run directly inside of it\footnote{Godot Design Philosophy, available at: \url{https://docs.godotengine.org/en/stable/getting_started/introduction/godot_design_philosophy.html}}.
+
+Godot's scene and node-based architecture and its tooling API allow for great extensibility. It is possible to create classes by using the \texttt{class\_name} keyword in a script, which also makes them a~custom node type that can be inserted into the scene tree and they will work just like native node types (such as \texttt{CharacterBody3D}, \texttt{Camera3D}, \texttt{CollisionShape3D}, etc.). The scripts' variables can be prepended with \texttt{@export} which makes the values visible and editable directly in the engine's editor. Their visibility can even be toggled or the possible enum values supplied based on the values of other variables. Via~these engine features, Godot provides a toolbox for developing modular, extensible, and encapsulated systems that can then be woven together into a more complex scene.
 
 \subsection{Shading Language}
 Godot uses a shading language similar to GLSL ES 3.0 for its shaders. Most data types and functions are supported.
@@ -239,19 +240,27 @@ It also offers in-built variables like \texttt{UV}, \texttt{COLOR}, \texttt{VERT
 The end goal of this thesis is to create a demo of an enemy system that allows players to target different body parts and destroy them, which affects the enemy's behavior. A~secondary objective is to build up supporting structures and tools that help modularly construct body-part-based enemies in Godot.
 
 
-\section{The Modularity of Godot}
-Godot's scene and node-based architecture and its tooling API allow for great extensibility. It is possible to create classes by using the \texttt{class\_name} keyword in a script, which also makes them a~custom node type that can be inserted into the scene tree and they will work just like native node types (such as \texttt{CharacterBody3D}, \texttt{Camera3D}, \texttt{CollisionShape3D}, etc.). It is even possible to create tool scripts (by using the \texttt{@tool} annotation at the top of a script) which run live in the editor. The scripts' variables can be prepended with \texttt{@export} which makes the values visible and editable directly in the engine's editor. Their visibility can even be toggled or the possible enum values supplied based on the values of other variables. Via~these engine features, Godot provides a toolbox for developing modular, extensible, and encapsulated systems that can then be woven together into a more complex scene.
 
+\section{Enemy Design}
+A manticore was chosen as the enemy for the demo because it offers multiple possibilities for body-part-based abilities (biting, claws, legs, wings, or a stinger). These body parts can be combined as requisites for different movement and attack behaviors, allowing the player to disable them when they destroy the body parts.
+They are split into separate meshes so that their visuals can be controlled individually.
+Each behavior has an animation, including hindered movement animations where the manticore is missing body parts.
+The visual changes are illustrated in Figure~\ref{ManticoreDesign}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{obrazky-figures/manticore_design.png}
+    \caption{The visual changes of the enemy based on injuries.}
+    \label{ManticoreDesign}
+\end{figure}
 
 \section{Body Part Injury System}
 The goal is to develop an injury system with nodes and tooling to facilitate creating enemies with body-part based models and abilities like in the video games in~Chapter~\ref{chap:theory}.
-
-Losing a body part needs to have a meaningful effect on the gameplay, as the player should be able to make choices, the results of which impact the state of the game \cite{schell2019art}. For example, a player that prefers melee combat might target an enemy's wings to prevent it from flying and getting out of melee range or to first disable its fly-and-dive attack which is hard to avoid. Such a system provides dynamic reactivity to the player's actions and choices.
+Losing a body part needs to have a meaningful effect on the gameplay, as the player should be able to make choices, the results of which impact the state of the game \cite{schell2019art}. For example, a~player that prefers melee combat might target an enemy's wings to prevent it from flying and getting out of melee range or to first disable its fly-and-dive attack which is hard to avoid. Such a system provides dynamic reactivity to the player's actions and choices.
 
 The game combines the three sources of unpredictability mentioned in Section~\ref{sec:gamedesign} that make for more engaging systems. The element of chance comes from the enemy's AI, which makes randomized decisions in the behavior tree. The player choice lies in which body parts the player attacks so that they can disable the enemy's abilities that require those parts to be triggered. The complexity comes from the way body parts serve as prerequisites for the enemy's abilities, such as two wings being necessary for flight, at least three limbs for running, or a stinger tail for ranged attacks, and the way they facilitate and limit what actions it has available in its behavior.
 
-A central \texttt{Body} node stores the total health, with \texttt{BodyPart} child nodes that either have their own health or subtract health from the \texttt{Body}.
-
+A central \texttt{Body} stores the total health, with \texttt{BodyPart} children that either have their own health or subtract health from the \texttt{Body}.
 The game also has visual effects and visual feedback to the player's actions. While it has the practical importance of communicating to the player (like whether an attack has hit the enemy or that the player has taken damage), it also serves to make the core of the system -- the dismemberment -- look more impactful (like time slowing down and the camera zooming in communicating that something important has just happened).
 
 Visual feedback is also important to the feel of a game, as every action the player takes should have a noticeable effect on the game world and its state. Players dislike when their actions are not being acknowledged by the game \cite{Orselli_NewellFun}.
@@ -261,13 +270,10 @@ Visual feedback is also important to the feel of a game, as every action the pla
 The behavior system needs to provide a way to define different behaviors depending on the current game state while being able to efficiently and cleanly change from one behavior to another, such as \q{Fly Up}, \q{Descend}, \q{Rake with Claws}, etc. The finite state machine can become difficult to manage when facilitating more complex \emph{adaptive} behavior like an enemy adapting to its injuries, having to define the various state transitions and their conditions. The behavior tree (BT) is a cleaner solution for the decision-making and adaptability requirements of this use case.
 
 \subsection{Behavior Tree}
-The behavior tree has a GUI (graphical user interface) to help streamline not only the creation of BTs, but also their fast editing and iteration. The node-based architecture of Godot is well-suited for the node-based structure of BTs, and thus the BT can live inside the enemy scene as a Root node and its collection of BT child nodes. It is constructed when the enemy node is loaded into the scene via the \texttt{\_ready()} function that runs when a node and its children have entered the scene tree.
-
-The implementation can use Godot's signals for event-based traversal and execution logic. Instead of the branch constantly calling a \texttt{tick()} function, the parents can just connect to the children's \texttt{finished} signal and react when it is emitted. The signalization is done alongside a \emph{return status} passed with the signal emission.
+The behavior tree has a GUI (graphical user interface) to help streamline not only the creation of BTs, but also their fast editing and iteration. The node-based architecture of Godot is well-suited for the node-based structure of BTs, and thus the BT can live inside the enemy scene as a Root node and its collection of BT child nodes. An event-based traversal and execution logic can be done via signals and a return status.
 
 The behavior tree has a unified interface so that each node knows how to interact with all the other nodes. Aside from normal nodes that can have any number of children, decorators provide specific behavior attached to a single node (as per the \emph{decorator} pattern). The behavior tree also needs all the basic nodes for traversal -- root, sequence, selector, and the condition decorator. The action node is another essential node, serving as the leaf node where the actual behavior that a player sees is executed.
-
-A blackboard is essential as a shared data storage that all of the nodes have access to and can communicate through.
+A shared data storage that all of the nodes have access to and can communicate through is also important.
 
 When considering the more specialized nodes, the goal of adaptability needs to be taken into account, and with that -- nodes that can interrupt the current behavior being executed. A priority-based reselector is useful for interrupting the running branch when one with a~higher priority becomes available. Behavior can also be interrupted when a body part is destroyed, as described in Section~\ref{BTBehaviorLimiting}.
 
@@ -276,20 +282,24 @@ Nodes that implement an element of randomness can break up the predictability of
 
 \subsection{Limiting Behavior}
 \label{BTBehaviorLimiting}
-The behavior tree takes into account the state of the enemy's body parts and reacts to it appropriately. This feature is implemented by the two body part filter decorator nodes. One checks once and executes its child or fails, and the other keeps checking continuously, interrupting the current behavior if a required body part is destroyed. This effectively culls the branches of the behavior tree that can no longer be performed due to missing body parts, limiting the enemy's options.
+The behavior tree takes into account the state of the enemy's body parts and reacts to it appropriately. The tree has two ways of filtering -- one checks once and executes its child or fails, and the other keeps checking continuously, interrupting the current behavior if a~required body part is destroyed. This effectively culls the branches of the behavior tree that can no longer be performed due to missing body parts, limiting the enemy's options.
+
+
+
+\section{Mesh Deformation}
+Another way of adding reactivity to some of the more powerful player attacks is to add mesh deformation to the attack's hit location on the enemy body, as illustrated in Figure~\ref{DeformationDesign}. Such deformation is achieved via a vertex shader that displaces vertices around the hit location, which is passed as a parameter to the shader. The deformation strength and radius are adjustable for each projectile. A magnitude mask on the mesh (encoding how much or how little a vertex should be moved when deforming) prevents extreme or awkward deformation in areas sensitive to vertex displacement.
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{obrazky-figures/deformation_design.pdf}
+    \caption{The design of the vertex displacement shader applied to the mesh on a hit.}
+    \label{DeformationDesign}
+\end{figure}
 
 
 \section{Knockback}
 When the player hits the enemy with an attack, the enemy reacts with a jerk to provide the player with visual feedback through the enemy's reactivity. A knockback can be implemented by adjusting the bones of the enemy skeleton rig. The system needs to be able to detect which body part was hit, which is possible by separating the hitboxes of each body part, and then it needs to gradually offset the bone position of that body part and return it back to normal.
-
-\section{Mesh Deformation}
-Another way of adding reactivity to some of the more powerful player attacks is to add mesh deformation to the attack's hit location on the enemy body. Such deformation is achieved via a vertex shader that displaces vertices around the hit location, which is passed as a parameter to the shader. The deformation strength and radius are adjustable for each projectile. A magnitude mask on the mesh (encoding how much or how little a vertex should be moved when deforming) prevents extreme or awkward deformation in areas sensitive to vertex displacement.
-
-
-\section{Enemy Design}
-A manticore was chosen as the enemy for the demo because it offers multiple possibilities for body-part-based abilities (biting, claws, legs, wings, or a stinger). These body parts can be combined as requisites for different movement and attack behaviors, allowing the player to disable them when they destroy the body parts.
-They are split into separate meshes so that their visuals can be controlled individually.
-Each behavior has an animation, including hindered movement animations where the manticore is missing body parts.
 
 
 \section{Player Controller}
@@ -302,8 +312,12 @@ This demo's player controller implements basic movement and camera controls and 
 % ===================================================================
 % ===================================================================
 
-\chapter{Implementation and Demonstration}
+\chapter{Implementation}
 \label{chap:implementation}
+
+This chapter describes how the design was implemented in Godot and demonstrated in a playable game scenario. It covers asset creation, body part logic, the behavior tree, visual effects like mesh deformation and knockback, the player controller, and the final integration into a manticore enemy.
+
+
 \section{Modeling}
 Due to the unique requirements of the enemy model for this game demo, a custom model was designed and created. A simple arena-like desert basin surrounded by mountains was also modeled. Both models were made in Blender.
 
@@ -338,72 +352,115 @@ Controlling the deformation magnitude in sensitive areas can be crucial to preve
 A sandy desert basin arena was modeled to test the enemy behavior in. To avoid the visible repetition of the seamless textures applied to the terrain, two texture shaders were developed that reduce these pattern artifacts. For the sand shader (displayed in Algorithm~\ref{alg_SandTexture}), the same texture was mixed at a different scale and rotation, the results of which can be seen in Figure \ref{TextureBombedSand}. The rotation calculation uses the standard 2D rotation matrix.
 
 
-\begin{lstlisting}[caption={Sand shader -- repeating the same texture with a different scale and rotation.},frame=tb,breaklines,label=alg_SandTexture]
-[*in:*] float scale_1, float scale_2, float angle_offset
+\begin{algorithm}
+\label{alg_SandTexture}
+\caption{Sand fragment shader -- repeating the same texture with a different scale and rotation.}
+\KwIn{float scale$_1$, float scale$_2$, float angle\_offset}
+vec4 albedo$_1$ = texture(texture\_albedo, UV $\cdot$ scale$_1$)\\
+float angle = radians(angle\_offset)\\
+vec2 centered\_uv = UV - 0.5\\
+vec2 rotated\_uv = vec2(\\
+\ \ \ \ centered\_uv.x $\cdot$ cos(angle) - centered\_uv.y $\cdot$ sin(angle),\\
+\ \ \ \ centered\_uv.x $\cdot$ sin(angle) + centered\_uv.y $\cdot$ cos(angle)\\
+)\\
+vec4 albedo$_2$ = texture(texture\_albedo, rotated\_uv $\cdot$ scale$_2$)\\
+ALBEDO = mix(albedo$_1$, albedo$_2$, 0.5).rgb
+\end{algorithm}
 
-void fragment() {
-    vec4 albedo_1 = texture(texture_albedo, UV * scale_1);
-    float angle = radians(angle_offset);
-    vec2 centered_uv = UV - 0.5;
-    vec2 rotated_uv = vec2(
-        centered_uv.x * cos(angle) - centered_uv.y * sin(angle),
-        centered_uv.x * sin(angle) + centered_uv.y * cos(angle)
-    );
-    vec4 albedo_2 = texture(texture_albedo, rotated_uv * scale_2);
-    ALBEDO = mix(albedo_1, albedo_2, 0.5).rgb;
-}
-\end{lstlisting}
+% \begin{lstlisting}[caption={Sand shader -- repeating the same texture with a different scale and rotation.},frame=tb,breaklines,label=alg_SandTexture]
+% [*in:*] float scale_1, float scale_2, float angle_offset
+
+% void fragment() {
+%     vec4 albedo_1 = texture(texture_albedo, UV * scale_1)
+%     float angle = radians(angle_offset)
+%     vec2 centered_uv = UV - 0.5
+%     vec2 rotated_uv = vec2(
+%         centered_uv.x * cos(angle) - centered_uv.y * sin(angle),
+%         centered_uv.x * sin(angle) + centered_uv.y * cos(angle)
+%     )
+%     vec4 albedo_2 = texture(texture_albedo, rotated_uv * scale_2)
+%     ALBEDO = mix(albedo_1, albedo_2, 0.5).rgb
+% }
+% \end{lstlisting}
 
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{obrazky-figures/texture_bombing_sand.png}
-    \caption{The sand environment -- simple texture repetition (left) vs. shader (right).}
+    \caption{The sand environment -- simple texture repetition (left) vs. the same texture mixed at different scale and rotation (right).}
     \label{TextureBombedSand}
 \end{figure}
 
 A slight vertex displacement based on the height map texture of the sand was also added to the shader to roughen the unnaturally smooth ground mesh. The shader code in Algorithm~\ref{alg_SandVertex} was shortened, including omitting the already stated parameters. The \texttt{rotated\_uv} calculation is equal to the one in Algorithm~\ref{alg_SandTexture}, and the same scale and rotation is applied so that the height texture matches the mixed albedo texture.
 
-\begin{lstlisting}[caption={Sand shader -- vertex displacement based on the height texture.},frame=tb,label=alg_SandVertex]
-[*in:*] sampler2D height_map, float max_height_offset
+\begin{algorithm}
+\label{alg_SandVertex}
+\caption{Sand vertex shader -- vertex displacement based on the height texture.}
+\KwIn{sampler2D height\_map, float max\_height\_offset}
+float height$_1$ = texture(height\_map, UV $\cdot$ scale$_1$).r\\
+height$_1$ = height$_1$ $\cdot$ 2.0 - 1.0 \textcolor{gray}{\textit{// normalize to -1 to 1}}\\
+float height$_2$ = texture(height\_map, rotated\_uv $\cdot$ scale$_2$).r\\
+height$_2$ = height$_2$ $\cdot$ 2.0 - 1.0\\
+float height = mix(height$_1$, height$_2$, 0.5)\\
+\textcolor{gray}{\textit{// move vertices up or down on the y axis}}\\
+VERTEX += vec3(0.0, 1.0, 0.0) $\cdot$ height $\cdot$ max\_height\_offset
+\end{algorithm}
 
-void vertex() {
-    float height_1 = texture(height_map, UV * scale_1).r;
-    height_1 = height_1 * 2.0 - 1.0; // normalize to -1 to 1
-    float height_2 = texture(height_map, rotated_uv * scale_2).r;
-    height_2 = height_2 * 2.0 - 1.0;
-    float height = mix(height_1, height_2, 0.5);
-    // move vertices up or down on the y axis
-    VERTEX += vec3(0.0, 1.0, 0.0) * height * max_height_offset;
-}
-\end{lstlisting}
+% \begin{lstlisting}[caption={Sand shader -- vertex displacement based on the height texture.},frame=tb,label=alg_SandVertex]
+% [*in:*] sampler2D height_map, float max_height_offset
+
+% void vertex() {
+%     float height_1 = texture(height_map, UV * scale_1).r
+%     height_1 = height_1 * 2.0 - 1.0 // normalize to -1 to 1
+%     float height_2 = texture(height_map, rotated_uv * scale_2).r
+%     height_2 = height_2 * 2.0 - 1.0
+%     float height = mix(height_1, height_2, 0.5)
+%     // move vertices up or down on the y axis
+%     VERTEX += vec3(0.0, 1.0, 0.0) * height * max_height_offset
+% }
+% \end{lstlisting}
 
 
 
 For the mountains, two different textures were mixed based on noise and slight color darkening, strongest at the transitions, was applied to further break up the monotony.
 
-The shader mixes the two albedo textures based on the seamless noise texture. For the transition regions, we can figure out the extremes (values $0.0$ being fully texture 1, or $1.0$ being fully texture 2) by subtracting $0.5$ from the noise texture, the values of which span $0$ to $1$. That maps the absolute values to $0.0$ (the transition point) to $0.5$ (purely textured by one of the textures). Then we map it back to $0$ to $1$ by multiplying it by $2$ and invert it to get the transition regions (with $0.0$ being no transition), as seen in Algorithm \ref{alg_RocksShader}.
+The shader mixes the two albedo textures based on the seamless noise texture. For the transition regions, the extremes (values $0.0$ being fully texture 1, or $1.0$ being fully texture~2) can be calculated by subtracting $0.5$ from the noise texture, the values of which span $0$~to~$1$. That maps the absolute values to $0.0$ (the transition point) to $0.5$ (purely textured by one of the textures). Then they are mapped back to $0$ to $1$ by multiplying it by $2$ and inverted to get the transition regions (with $0.0$ being no transition), as seen in Algorithm~\ref{alg_RocksShader}.
 
-\begin{lstlisting}[caption={Rocks shader.},frame=tb,breaklines,float,label=alg_RocksShader]
-[*in:*] float scale_1, float scale_2, sampler2D texture_albedo_2, sampler2D texture_normal_2, sampler2D noise, float noise_scale
+\begin{algorithm}
+\label{alg_RocksShader}
+\caption{Rocks fragment shader.}
+\KwIn{float scale$_1$, float scale$_2$, sampler2D texture\_albedo$_1$, sampler2D texture\_albedo$_2$, sampler2D noise, float noise\_scale}
+float noise\_value = texture(noise, base\_uv $\cdot$ noise\_scale).r\\
+vec4 albedo\_tex$_1$ = texture(texture\_albedo$_1$, base\_uv $\cdot$ scale$_1$)\\
+vec4 albedo\_tex$_2$ = texture(texture\_albedo$_2$, base\_uv $\cdot$ scale$_2$)\\
+\textcolor{gray}{\textit{// mix the 2 albedo textures based on noise value}}\\
+vec3 mixed\_albedo = mix(albedo\_tex$_1$, albedo\_tex$_2$, noise\_value).rgb\\
+\textcolor{gray}{\textit{// calculate transition regions}}\\
+transition = 1.0 - abs(noise\_value - 0.5) $\cdot$ 2.0\\
+\textcolor{gray}{\textit{// add some darkening along the transitions for more variation}}\\
+ALBEDO = mix(mixed\_albedo, mixed\_albedo $\cdot$ vec3(0.5), transition)
+\end{algorithm}
 
-void fragment() {
-    float noise_value = texture(noise, base_uv * noise_scale).r;
-    vec4 albedo_tex_1 = texture(texture_albedo, base_uv * scale_1);
-    vec4 albedo_tex_2 = texture(texture_albedo_2, base_uv * scale_2);
-    // mix the 2 albedo textures based on noise value
-    vec3 mixed_albedo = mix(albedo_tex_1, albedo_tex_2, noise_value).rgb;
-    // calculate transition regions
-    transition = 1.0 - abs(noise_value - 0.5) * 2.0;
-    // add some darkening along the transitions for more variation
-    ALBEDO = mix(mixed_albedo, mixed_albedo * vec3(0.5), transition);
-}
-\end{lstlisting}
+% \begin{lstlisting}[caption={Rocks fragment shader.},frame=tb,breaklines,float,label=alg_RocksShader]
+% [*in:*] float scale_1, float scale_2, sampler2D texture_albedo_2, sampler2D texture_normal_2, sampler2D noise, float noise_scale
+
+% void fragment() {
+%     float noise_value = texture(noise, base_uv * noise_scale).r
+%     vec4 albedo_tex_1 = texture(texture_albedo, base_uv * scale_1)
+%     vec4 albedo_tex_2 = texture(texture_albedo_2, base_uv * scale_2)
+%     // mix the 2 albedo textures based on noise value
+%     vec3 mixed_albedo = mix(albedo_tex_1, albedo_tex_2, noise_value).rgb
+%     // calculate transition regions
+%     transition = 1.0 - abs(noise_value - 0.5) * 2.0
+%     // add some darkening along the transitions for more variation
+%     ALBEDO = mix(mixed_albedo, mixed_albedo * vec3(0.5), transition)
+% }
+% \end{lstlisting}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{obrazky-figures/texture_bombing_mountains.png}
-    \caption{The rocks -- simple texture repetition (left) vs. shader (right).}
+    \caption{The rocks -- simple texture repetition (left) vs. two textures mixed via a noise texture with accented transition regions (right).}
     \label{TextureBombedRock}
 \end{figure}
 
@@ -411,39 +468,37 @@ void fragment() {
 All environment textures were taken from StylizedTextures\footnote{Stylized Sand 002, Stylized Rocks 001, Stylized Cliff Rock 006, available at: \url{https://stylizedtextures.com}}. The skybox was taken from FreeStylized\footnote{Skybox 24, available at: \url{https://freestylized.com}}. Both websites offer their works under the CC0 license as of the writing of this thesis.
 
 
+\section{Body Part Nodes}
+\label{BodyParts}
+The logic for the separated body parts is contained within the \texttt{Body}, \texttt{BodyPart}, and \texttt{Hitbox} classes.
+Like the behavior tree nodes, these classes are also meant to be added to the scene tree (see Section \ref{BT_SceneTreeCreation}), with \texttt{Body} being the root node and \texttt{BodyParts} being their direct children. \texttt{BodyPart} nodes should then contain \texttt{BoneAttachment3D} nodes (that copy the transforms of the specified bone onto their children, making them move with the bone) with \texttt{Hitboxes} that contain the desired collision shapes. An example chain of nodes would be: \texttt{Body $\rightarrow$ LegFL (BodyPart) $\rightarrow$ ThighFLBone (BoneAttachment3D) $\rightarrow$\\$\rightarrow$ ThighFLHitbox (Hitbox) $\rightarrow$ CollisionShape3D}.
+
+There can be several \texttt{BoneAttachment3D} nodes, each with its own \texttt{Hitbox}, to detect hits more accurately (since collision shapes are usually simple shapes like capsules).
+
+\subsection{Health Management}
+The \texttt{Body} class tracks the central amount of health the enemy has, which determines whether it is alive or dead. \texttt{BodyParts} have their separate health pools, which determine whether that body part is destroyed or not, but they also have an option to make damage bypass their own health and only damage the central health pool. That option is useful for body parts that themselves cannot be destroyed, but contribute to the overall defeat of the enemy, such as the torso and head.
+
+When a body part reaches 0 health, a notifying signal is emitted. A special camera effect plays and time slows down (described in Section \ref{PlayerController}), the separated mesh turns red for a moment and then the mesh is hidden, the bones and hitboxes freed, and a severed body part scene is spawned in the destroyed part's location with physics independent of the enemy.
+
+When the body reaches 0 health, a notifying signal is emitted, the behavior tree is stopped, and the ragdoll is activated (further described in Section \ref{VisualsAdjustmentsEffects}). After a moment, the manticore's body fades into full transparency and is freed.
+
+\subsection{Hitboxes and Hit Management}
+\texttt{Hitbox} nodes inherit from \texttt{Area3D} nodes, which are able to detect when another area or body (like a projectile) collides with it. The hitboxes receive the hits with parameters wrapped in a \texttt{ProjectileHitData} resource. It contains \texttt{damage\_amount}, \texttt{world\_position}, \texttt{world\_normal}, \texttt{projectile\_direction}, \texttt{decal\_params}, and \texttt{deformation\_params}. The world position and normal of the detected hit are then converted to the local space of the bone that the hitbox is attached to. Then the hitbox emits a signal with the original parameters, except with the world-space hit position and normal replaced for the converted ones.
+
+\texttt{BodyPart} nodes are connected to this signal and whenever it is emitted, they start processing the hit. The global \texttt{enemy\_hit} signal is emitted. Damage is applied to the body part (based on the hit's \texttt{damage\_amount} parameter), the body part's flash effect is played, and the hit decal is added to the body part (both described in Section \ref{HitEffects}). If the body part has a knockback node attached, it applies the knockback using the \texttt{projectile\_direction} vector (see Section \ref{Knockback}). Finally, the hits are registered into the deformation arrays that are supplied to the deformation shader (see Section~\ref{DeformationShader}).
+
+\subsection{Hit Effects}
+\label{HitEffects}
+When the body part is hit, the flash effect is achieved via simple fragment shader code that controls the material's \texttt{emission}, interpolating between $0$ and the flash strength, and back to $0$.
+
+Hit decals are spawned, attaching a \texttt{Decal} node oriented by the hit's normal to the \texttt{BoneAttachment3D} parent of the hitbox that was hit. These nodes project textures onto surfaces that they intersect with, hence why it is important to size and orient the node correctly.
+
+When a body part is destroyed, it starts a continuous spewing of blood particles. The particles themselves, implemented via the \texttt{GPUParticles3D} node and a custom blood texture, are spawned at a predetermined position and rotation on the enemy's body, activated by a \texttt{BodyPart}'s \texttt{body\_part\_destroyed} signal. The blood material's properties are set to \texttt{transparency: alpha scissor}, which, in combination with alpha curves that control the transparency of the material over time, makes it look like the blood congeales into separate strands as the alpha value decreases.
+
 
 \section{Behavior Tree}
-The behavior tree (BT) is the central control unit of the enemy AI. It decides the flow of the decision-making and behavior execution via its node system. Each BT node inherits from the abstract class \texttt{BTNode}, the implementation of which can be seen in the GDScript pseudocode Algorithm~\ref{BTNode}.
+The behavior tree (BT) is the central control unit of the enemy AI. It decides the flow of the decision-making and behavior execution via its node system. Each BT node inherits from the abstract class \texttt{BTNode}.
 It is also where the return status enumeration is defined. Currently, due to the event-based architecture, only \texttt{SUCCESS} and \texttt{FAILURE} are used, but \texttt{RUNNING} is also included should it ever be useful.
-
-
-\begin{lstlisting}[caption={The \texttt{BTNode} class which all behavior tree nodes inherit from.},frame=tb, float, label=BTNode]
-@abstract class_name BTNode
-
-signal finished(status: ReturnStatus)
-
-enum ReturnStatus {	RUNNING, SUCCESS, FAILURE }
-
-var blackboard: Blackboard
-var child_nodes: Array[BTNode] = []
-
-func construct_tree(bb: Blackboard) -> void:
-	blackboard = bb
-	var scene_child_nodes = get_children()
-	add_children_and_call_their_construct()
-	for child in child_nodes:
-		child.finished.connect(_on_child_finished)
-
-# to be overridden by subclasses
-func _on_child_finished(_return_status: ReturnStatus) -> void:
-	pass
-
-# cleanup func for interruptable nodes; to be overridden by subclasses
-func abort() -> void:
-	pass
-
-@abstract func execute() -> void
-\end{lstlisting}
 
 An event-driven behavior tree was implemented over a tick-based one (see Chapter \ref{chap:theory}). It allows the branches to manage their own uptime and just emit the \texttt{finished} signal when they are done, letting the parent nodes that are subscribed to that signal to handle the exit. Signals in Godot are equivalent to \texttt{events} in languages like C\#.
 
@@ -475,15 +530,13 @@ For example, an \texttt{AttackOrIdleReselector} has a \texttt{Condition} child t
 
 \subsubsection{Condition Decorator}
 The condition decorator executes its child node only if its condition evaluates as true. It contains a condition function, which is called whenever this node is executed. If it returns true, it executes its child and is ready to handle its return status as normal. Otherwise, the condition decorator finishes with \texttt{FAILURE}.
-
 This can be used to filter out certain branches based on the given conditions and is generally useful in controlling the decisional flow of the tree traversal.
 
 \subsubsection{Randomizer, WeightedRandomizer, Weight Decorator}
 These nodes serve to randomize the flow of the behavior tree.
-
 \texttt{Randomizer} is a pure randomization node. It chooses which of its child nodes to execute completely at random.
-
 \texttt{WeightedRandomizer} chooses a random child to execute based on the weights of the child. It expects the \texttt{Weight} decorators, which have a settable float \texttt{weight} property, as direct children; otherwise, the default weight is $1.0$.
+Both randomizer nodes account for body part filters, and do not consider branches that are filtered out due to missing body parts in the randomized child selection.
 
 % \begin{lstlisting}[caption={Weighted randomized choice.},frame=tb,label=alg_BT_WeightedRandomizer]
 % # choose random child based on weights
@@ -499,8 +552,6 @@ These nodes serve to randomize the flow of the behavior tree.
 %         selected_child = entry.node
 %         break
 % \end{lstlisting}
-
-Both randomizer nodes account for body part filters, and do not consider branches that are filtered out due to missing body parts in the randomized child selection.
 
 \subsubsection{UtilityRandomizer, Utility}
 Utility randomizers work much like weighted randomizers, except the weights are dynamically calculated via utility functions that often use the variables of the current game state to evaluate which branch would be the most valuable to execute.
@@ -528,7 +579,7 @@ The blackboard is a shared data storage that every behavior tree node has access
 \label{BT_SceneTreeCreation}
 Developing a behavior tree only via code can be confusing and unwieldy. Having a graphic representation in which they can be edited can bring clarity to their structure (since the parent-child hierarchy is clearly visible) and make their creation and iteration faster.
 
-Godot's node architecture is well-suited for this purpose. Adding behavior tree nodes to the scene tree can be an intuitive way of construction. Behavior tree nodes can be created by defining their scripts as classes with \texttt{class\_name} at the top -- they automatically become nodes that can be added to the scene tree. Each node must then have an implementation of the \texttt{construct\_tree} function (obtaining the children from the scene tree and calling the construct function for each of its children) and a unified interface that can be relied on when driving the flow of the behavior tree (such as the \texttt{execute} and \texttt{abort} functions). When the enemy is loaded into the scene, the \texttt{Root} node gets all of its children from the scene tree and starts the behavior tree construction. Once that is finished, it starts executing the behavior tree, so the enemy AI starts immediately. The root script is where any starting variables should be added to the blackboard.
+Godot's node architecture is well-suited for this purpose. Adding behavior tree nodes to the scene tree can be an intuitive way of construction. Behavior tree nodes can be created by defining their scripts as classes with \texttt{class\_name} at the top -- they automatically become nodes that can be added to the scene tree. Each node must then have an implementation of the \texttt{construct\_tree} function which obtains the children from the scene tree and calls the construct function for each of its children. A unified interface is necessary for driving the flow of the behavior tree (such as the \texttt{execute} and \texttt{abort} functions). When the enemy is loaded into the scene, the \texttt{Root} node gets all of its children from the scene tree and starts the behavior tree construction. Once that is finished, it starts executing the behavior tree, so the enemy AI starts immediately. The root script is where any starting variables should be added to the blackboard.
 
 This way, the behavior tree structure can be constructed inside the editor. Each node can then be extended with a script that defines the necessary behavior (such as adding a~condition function to the \texttt{Condition} decorator or attack logic to an \texttt{Action} node).
 
@@ -567,58 +618,49 @@ This vertex displacement modifier mask was necessary due to the need to author t
     \label{AuthoredDeformation}
 \end{figure}
 
-\texttt{BodyPart} duplicates the mesh's active material (to make it unique from other enemies of the same type using the same material) and initializes the shader parameters. Whenever a body part receives a hit, it is appended to the \texttt{hit\_locations} array. When more than $16$~hits are stored, the oldest is removed. Hits that are too close to each other are discarded to prevent awkward and extreme deformation. Each hit has a bone attachment that it is attached to (taken from the \texttt{BoneAttachment3D} node that the hitbox is attached to), the local space of which is used for the hit position and normal vectors. The attachment, position, normal, radius, and strength are then added to the \texttt{hit\_locations} array.
+\texttt{BodyPart} duplicates the mesh's active material (to make it unique from other enemies of the same type using the same material) and initializes the shader parameters. Whenever a body part receives a hit, it is appended to the \texttt{hit\_locations} array. Hits that are too close to each other are discarded to prevent awkward and extreme deformation. Each hit has a bone attachment that it is attached to (taken from the \texttt{BoneAttachment3D} node that the hitbox is attached to), the local space of which is used for the hit position and normal vectors. The attachment, position, normal, radius, and strength are then added to the \texttt{hit\_locations} array.
 
 Due to bone movements, the positions of the hits need to be recalculated every frame. The \texttt{update\_deformation\_shader()} function iterates through the \texttt{hit\_locations} array and first composes an attachment-to-mesh transformation matrix as the mesh's inverse global transform multiplied by the current bone attachment global transform. It then converts the hit position with this matrix and converts the hit normal with the inverse transpose of the matrix's basis (using {$n'=(M^{-1})^T\cdot n$}). The converted position and normal, as well as the hit's radius and strength, are then sent to the shader uniforms.
 
 % - talk about attempts to map it to UV, but unsuccessful. An ideal deformation would be painted directly onto the material, would also produce more stable results (when the same place is hit several time, the dent increases unnaturally) and would avoid the "only x hits" array size issue.
 
-\begin{lstlisting}[caption={Deformation shader.},frame=tb,breaklines,float,label=alg_DeformationShader]
-[*in:*] int hit_count = 0, vec3 hit_positions[16], vec3 hit_normals[16], float hit_radius[16], float hit_strength[16]
-
-void vertex() {
-    float deformation_magnitude = COLOR.r; // vertex color
-    for (int i = 0; i < hit_count; i++) {
-        float radius = hit_radius[i];
-        float strength = hit_strength[i];
-        float dist = distance(VERTEX, hit_positions[i]);
-        if (dist < radius) {
-            float falloff = 1.0 - (dist / radius);
-            falloff = falloff * falloff; // smooth
-            VERTEX -= normalize(hit_normals[i]) * falloff * strength * deformation_magnitude;
-        }
-    }
+\begin{algorithm}
+\label{alg_DeformationShader}
+\caption{Mesh deformation vertex shader.}
+\KwIn{ int hit\_count = 0, vec3 hit\_positions[16], vec3 hit\_normals[16], float hit\_radius[16], float hit\_strength[16]}
+float magnitude = COLOR.r \textcolor{gray}{\textit{// vertex color}}\\
+for (int i = 0 i < hit\_count i++) \\
+\Indent{
+\vspace{-1em}
+float radius = hit\_radius[i]\\
+float strength = hit\_strength[i]\\
+float dist = distance(VERTEX, hit\_positions[i])\\
+if (dist < radius)
+\Indent{
+float falloff = 1.0 - (dist / radius)\\
+falloff = falloff$^2$ \textcolor{gray}{\textit{// smoothen}}\\
+VERTEX -= normalize(hit\_normals[i]) $\cdot$ falloff $\cdot$ strength $\cdot$ magnitude\\
 }
-\end{lstlisting}
+}
+\end{algorithm}
 
+% \begin{lstlisting}[caption={Deformation shader.},frame=tb,breaklines,float,label=alg_DeformationShader]
+% [*in:*] int hit_count = 0, vec3 hit_positions[16], vec3 hit_normals[16], float hit_radius[16], float hit_strength[16]
 
-\section{Body Part Nodes}
-\label{BodyParts}
-The logic for the separated body parts is contained within the \texttt{Body}, \texttt{BodyPart}, and \texttt{Hitbox} classes.
-
-Like the behavior tree nodes, these classes are also meant to be added to the scene tree (see Section \ref{BT_SceneTreeCreation}), with \texttt{Body} being the root node and \texttt{BodyParts} being their direct children. \texttt{BodyPart} nodes should then contain \texttt{BoneAttachment3D} nodes (that copy the transforms of the specified bone onto their children, making them move with the bone) with \texttt{Hitboxes} that contain the desired collision shapes. An example chain of nodes would be: \texttt{Body $\rightarrow$ LegFL (BodyPart) $\rightarrow$ ThighFLBone (BoneAttachment3D) $\rightarrow$\\$\rightarrow$ ThighFLHitbox (Hitbox) $\rightarrow$ CollisionShape3D}.
-
-There can be several \texttt{BoneAttachment3D} nodes, each with its own \texttt{Hitbox}, to detect hits more accurately (since collision shapes are usually simple shapes like capsules).
-
-\subsection{Health Management}
-The \texttt{Body} class tracks the central amount of health the enemy has, which determines whether it is alive or dead. \texttt{BodyParts} have their separate health pools, which determine whether that body part is destroyed or not, but they also have an option to make damage bypass their own health and only damage the central health pool. That option is useful for body parts that themselves cannot be destroyed, but contribute to the overall defeat of the enemy, such as the torso and head.
-
-When a body part reaches 0 health, a notifying signal is emitted. A special camera effect plays and time slows down (described in Section \ref{PlayerController}), the separated mesh turns red for a moment and then the mesh is hidden, the bones and hitboxes freed, and a severed body part scene is spawned in the destroyed part's location with physics independent of the enemy.
-
-When the body reaches 0 health, a notifying signal is emitted, the behavior tree is stopped, and the ragdoll is activated (further described in Section \ref{VisualsAdjustmentsEffects}). After a moment, the manticore's body fades into full transparency and is freed.
-
-\subsection{Hitboxes and Hit Management}
-\texttt{Hitbox} nodes inherit from \texttt{Area3D} nodes, which are able to detect when another area or body (like a projectile) collides with it. The hitboxes receive the hits with parameters wrapped in a \texttt{ProjectileHitData} resource. It contains \texttt{damage\_amount}, \texttt{world\_position}, \texttt{world\_normal}, \texttt{projectile\_direction}, \texttt{decal\_params}, and \texttt{deformation\_params}. The world position and normal of the detected hit are then converted to the local space of the bone that the hitbox is attached to. Then the hitbox emits a signal with the original parameters, except with the world-space hit position and normal replaced for the converted ones.
-
-\texttt{BodyPart} nodes are connected to this signal and whenever it is emitted, they start processing the hit. The global \texttt{enemy\_hit} signal is emitted. Damage is applied to the body part (based on the hit's \texttt{damage\_amount} parameter), the body part's flash effect is played, and the hit decal is added to the body part (both described in Section \ref{HitEffects}). If the body part has a knockback node attached, it applies the knockback using the \texttt{projectile\_direction} vector (see Section \ref{Knockback}). Finally, the hits are registered into the deformation arrays that are supplied to the deformation shader (see Section~\ref{DeformationShader}).
-
-\subsection{Hit Effects}
-\label{HitEffects}
-When the body part is hit, the flash effect is achieved via simple fragment shader code that controls the material's \texttt{emission}, interpolating between $0$ and the flash strength, and back to $0$.
-
-Hit decals are spawned, attaching a \texttt{Decal} node oriented by the hit's normal to the \texttt{BoneAttachment3D} parent of the hitbox that was hit. These nodes project textures onto surfaces that they intersect with, hence why it is important to size and orient the node correctly.
-
-When a body part is destroyed, it starts a continuous spewing of blood particles. The particles themselves, implemented via the \texttt{GPUParticles3D} node and a custom blood texture, are spawned at a predetermined position and rotation on the enemy's body, activated by a \texttt{BodyPart}'s \texttt{body\_part\_destroyed} signal. The blood material's properties are set to \texttt{transparency: alpha scissor}, which, in combination with alpha curves that control the transparency of the material over time, makes it look like the blood congeales into separate strands as the alpha value decreases.
+% void vertex() {
+%     float deformation_magnitude = COLOR.r // vertex color
+%     for (int i = 0 i < hit_count i++) {
+%         float radius = hit_radius[i]
+%         float strength = hit_strength[i]
+%         float dist = distance(VERTEX, hit_positions[i])
+%         if (dist < radius) {
+%             float falloff = 1.0 - (dist / radius)
+%             falloff = falloff * falloff // smooth
+%             VERTEX -= normalize(hit_normals[i]) * falloff * strength * deformation_magnitude
+%         }
+%     }
+% }
+% \end{lstlisting}
 
 
 \section{Knockback \texttt{SkeletonModifier3D}}
@@ -636,7 +678,14 @@ The \texttt{\_process\_modification\_with\_delta} function from \texttt{Skeleton
 \label{PlayerController}
 The player controller implements a simple movement script from Godot's \texttt{CharacterBody3D} template. The player can choose between 3 types of attacks by pressing \texttt{1}, \texttt{2}, or \texttt{3}.
 
-Each projectile has several export variables that can be set. The projectile's type can be slashing (a wide arc), piercing (a point), and bludgeoning (a sphere). This affects the way it detects hits. Slashing projectiles project a number of raycasts along its width, and the middle raycast's hit is preferred. Piercing projectiles have a single raycast from their center. Bludgeoning projectiles use a shapecast (an analogue to a raycast, but uses a shape instead of a line). Each hit's position and normal is recorded and handed off to the \texttt{Hitbox} that was hit. Next, the projectile's damage amount and travel speed can be set, as well as whether it should be affected by gravity. Each also contains decal parameters that are to be spawned on impact and attached to the enemy (see Section~\ref{HitEffects}), impact visual effects (the projectile's break effect and blood particles that are spawned on a hit), and deformation parameters (see Section~\ref{DeformationShader}). For example, the boulder attack is affected by gravity, deforms the enemy's mesh, leaves a bruise decal, and spawns rock fragments and dust particles on impact.
+Each projectile has several export variables that can be set. The projectile's type can be slashing (a wide arc), piercing (a point), and bludgeoning (a sphere). This affects the way it detects hits, as shown in Figure~\ref{ProjectileTypes}. Slashing projectiles project a number of raycasts along its width, and the middle raycast's hit is preferred. Piercing projectiles have a single raycast from their center. Bludgeoning projectiles use a shapecast (an analogue to a raycast, but uses a shape instead of a line). Each hit's position and normal is recorded and handed off to the \texttt{Hitbox} that was hit. Next, the projectile's damage amount and travel speed can be set, as well as whether it should be affected by gravity. Each also contains decal parameters that are to be spawned on impact and attached to the enemy (see Section~\ref{HitEffects}), impact visual effects (the projectile's break effect and blood particles that are spawned on a hit), and deformation parameters (see Section~\ref{DeformationShader}). For example, the boulder attack is affected by gravity, deforms the enemy's mesh, leaves a bruise decal, and spawns rock fragments and dust particles on impact.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{obrazky-figures/projectile_types.pdf}
+    \caption{The hit detection types of the different projectiles.}
+    \label{ProjectileTypes}
+\end{figure}
 
 When a body part is destroyed, the player is notified via the \texttt{body\_part\_destroyed} global signal. The time scale of the game is momentarily lowered so that it slows down, and the player camera zooms in.
 
@@ -645,15 +694,15 @@ When the player hits an enemy, an X-shaped crosshair appears to communicate the 
 
 
 \section{The Manticore Enemy}
-The manticore enemy is a \texttt{CharacterBody3D} node that implements the described systems as child nodes. It has the skeleton rig which contains all of the body part meshes and the knockback skeleton modifier. The \texttt{AnimationTree} allows control over playing animations. Two movement collision shapes for the front and back determine its collisions with the environment. An \texttt{Area3D} node notifies if a player has entered or exited its detection area. \texttt{MovementParticles} and \texttt{SeveringBloodParticles} are parents to nodes in the 3D space that mark where these particles should spawn. The behavior tree drives the enemy decision-making and actions. And finally, the \texttt{Body} and its \texttt{BodyPart} children that keep track of the body parts' state, and their \texttt{BoneKnockback3D} children that contain the knockback information passed to the knockback skeleton modifier.
+The manticore enemy is a \texttt{CharacterBody3D} node that implements the described systems as child nodes. It has the skeleton rig which contains all of the body part meshes and the knockback skeleton modifier. The \texttt{AnimationTree} allows control over playing animations. Two movement collision shapes for the front and back determine its collisions with the environment. An \texttt{Area3D} node notifies if a player has entered or exited its detection area. \texttt{MovementParticles} and \texttt{SeveringBloodParticles} are parents to nodes in the 3D space that mark where these particles should spawn. The behavior tree drives the enemy decision-making and actions. And finally, the \texttt{Body} and its \texttt{BodyPart} children keep track of the body parts' state, and their \texttt{BoneKnockback3D} children contain the knockback information passed to the knockback skeleton modifier. Images from the demonstration can be seen in Appendix~\ref{showcase}.
 
 \subsection{Body Parts}
-The manticore's body contains the legs, the wings, the tail, and a head-and-body part. Each body part usually has many \texttt{hitboxes} to accurately detect collisions and a single \texttt{BoneKnockback3D} node to add reactivity to hits. Each also has the \texttt{RigidBody3D} scene of the severed version of itself which then spawns in its location and applies physics independent of the enemy body. All of the body parts except for the head-and-body one, which is the only node that subtracts from the central health pool, can be destroyed. These body parts are used within filters inside the behavior tree.
+The manticore's body contains the legs, the wings, the tail, and a head-and-body part. Each body part usually has many \texttt{hitboxes} to accurately detect collisions and a single \texttt{BoneKnockback3D} node to add reactivity to hits. Each also contains the \texttt{RigidBody3D} scene of the severed version of itself. All of the body parts except for the head-and-body one, which is the only node that subtracts from the central health pool, can be destroyed. These body parts are used within filters inside the behavior tree.
 
 \subsection{Behavior Tree}
 The manticore is in the \texttt{Idle} state until the \texttt{IsPlayerDetected} condition becomes true, which the Reselector notices during its rechecking and switches to the higher-priority branch. Then the enemy chooses from its different maneuvers based on distance-based utility calculations. When farther from the player, the utility of a ranged stinger attack or the fly and dive maneuver is higher than that of a melee attack, and vice versa. Maneuvers are filtered out from the randomized selections if they are unavailable due to missing body parts via the body part filters. See Figure~\ref{ManticoreBTRoot} for the behavior tree hierarchy.
 
-\begin{figure}[H]
+\begin{figure}
     \centering
     \includegraphics[width=\textwidth]{obrazky-figures/manticore_bt_root.pdf}
     \caption{The base of the manticore's behavior tree.}
@@ -676,14 +725,11 @@ The \texttt{AnimationTree} node contains all of the manticore's imported animati
 \subsection{Visuals, Adjustments, and Effects}
 \label{VisualsAdjustmentsEffects}
 There are many small visual adjustments and effects that contribute to the natural feel of the enemy.
-
-The manticore's model is rotated towards the player. To avoid the rotation being constant and instantaneous, the rotation always has a speed with which it interpolates towards the player. The rotation is also periodically locked for a random time window to allow the player to better maneuver around the enemy. The target rotation around the $y$~axis is calculated as the arctangent of the $x$ (the side axis) and $z$ (the forward direction) components of the vector pointing from the manticore to the player (which yields the angle of that vector in the $xz$ plane). That rotation is then used in \texttt{rotate\_toward()} to interpolate the current rotation towards the target rotation using the turn speed variable.
+The manticore's model is rotated towards the player. To avoid the rotation being constant and instantaneous, the rotation always has a speed with which it interpolates towards the rotation where the model faces the player. The rotation is also periodically locked for a random time window to allow the player to better maneuver around the enemy. The target rotation around the $y$~axis is calculated as the arctangent of the $x$ (the side axis) and $z$ (the forward direction) components of the vector pointing from the manticore to the player (which yields the angle of that vector in the $xz$ plane). That rotation is then used in \texttt{rotate\_toward()} to interpolate the current rotation towards the target rotation using the turn speed variable.
 
 The alignment to the ground is done via two raycasts from the manticore's ground colliders. The normals of the hits are averaged and used to calculate the rotation of the manticore's model. The rotation on the $z$ axis is dampened to give the manticore a more natural upright tilt.
 
 When the enemy moves on the ground, sand particles are spawned at the feet with a~slight random displacement. The particles are only spawned if the enemy reaches a speed threshold. The particle node also keeps track of whether the enemy is in flight and spawns impact particles when it lands.
-
-The visual effects when the enemy is hit are described in Section~\ref{HitEffects}.
 
 The ragdoll is activated when the enemy is killed or when the behavior tree activates it when no movement options are available. The ragdoll uses \texttt{PhysicalBoneSimulator3D}, generated from the skeleton rig, to simulate the physics of the enemy's body parts. The joints' type is set to \texttt{6DOF} which gives the ragdoll a more natural feel.
 
@@ -699,10 +745,6 @@ In various classes, the export variables are shown or hidden based on other vari
 \end{figure}
 
 
-\section{Demonstration in Various Test Cases/Situations}
-% like even a different model, like a robotic capsule, to showcase the deformation
-TODO
-
 
 % % ===================================================================
 % % ===================================================================
@@ -710,12 +752,12 @@ TODO
 
 \chapter{Performance Testing}
 \label{chap:testing}
-Godot offers the profiler, visual profiler, and monitors as integrated performance tools. Custom monitors are used to test the problematic areas of the game performance, and a loading screen is implemented to better the performance.
+Godot offers the profiler, visual profiler, and monitors as integrated performance tools. Custom monitors are used to test the problematic areas of the game performance, and a~loading screen is implemented to better the performance.
 
 \section{Projectile and Shader Stutters}
 The biggest stutters were encountered when a new projectile type or its impact visual effects were spawned into the game or when the manticore's hit flash effect was triggered.
 
-To test these specific stutters, monitors were set up that measure the time it takes to execute the code that spawns the projectile, its impact visual effects, and the enemy's hit flash effect. The testing scenario was as follows: all 3 projectile types were spawned (which also spawns the their visual effects), the enemy was hit with a projectile (which activates the hit shader), one body part was destroyed, and the enemy was killed. The project's cached shaders were deleted before every test to prevent caching inconsistencies. As can be seen in Figure~\ref{ProfilerDuration1} and Figure~\ref{ProfilerStutter1}, the stutters have been detected by the profiler, which considers $16.67$ms (1 frame at 60FPS) as the threshold for a stutter, which the peak durations are above several times over.
+To test these specific stutters, monitors were set up that measure the time it takes to execute the code that spawns the projectile, its impact visual effects, and the enemy's hit flash effect. The testing scenario was as follows: all 3 projectile types were spawned (which also spawns their visual effects), the enemy was hit with a projectile (which activates the hit shader), one body part was destroyed, and the enemy was killed. The project's cached shaders were deleted before every test to prevent caching inconsistencies. As can be seen in Figure~\ref{ProfilerDuration1} and Figure~\ref{ProfilerStutter1}, the stutters have been detected by the profiler, which considers $16.67$ ms (1 frame at 60FPS) as the threshold for a stutter, and the measured peak durations are multiple times higher than this limit.
 
 % - Projectile spawn peak 121 120 117 114 327 121ms, count 5 11 3 4 6 5
 
@@ -725,24 +767,24 @@ To test these specific stutters, monitors were set up that measure the time it t
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{obrazky-figures/profiler_duration_1.png}
-    \caption{.}
+    \includegraphics[width=\textwidth]{obrazky-figures/profiler_duration_1.pdf}
+    \caption{The highest duration of problematic scenes or effects during the testing scenario across multiple runs before the loading screen implementation.}
     \label{ProfilerDuration1}
 \end{figure}
 
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{obrazky-figures/profiler_stutters_1.png}
-    \caption{.}
+    \includegraphics[width=\textwidth]{obrazky-figures/profiler_stutters_1.pdf}
+    \caption{The stutter counts of problematic scenes or effects during the testing scenario across multiple runs before the loading screen implementation.}
     \label{ProfilerStutter1}
 \end{figure}
 
 
 \section{Loading Screen}
-To bypass the stutters when certain scenes are first loaded, a loading screen was implemented. The loading screen covers the entire screen while specified scenes are being loaded into the game and quickly removed. After all of the problematic scenes are loaded and removed, the loading screen is removed.
+To bypass the stutters that happened when certain scenes were first loaded during gameplay, a loading screen was implemented. While the loading screen is shown, the specified problematic scenes are loaded once at startup, briefly instantiated, and removed again. This forces first-time initialization to happen before gameplay. After all of these scenes are preloaded and removed, the loading screen is hidden.
 
-As seen in the results of the profiler monitors in Figure~\ref{ProfilerDuration2} and Figure~\ref{ProfilerStutter2} after the loading screen was implemented, the stutters were eliminated or greatly reduced. Even though the peak duration for the impact visual effects remained the same, its count of stutters was reduced to 1 thanks to the loading screen, and it no longer stutters in-game.
+As seen in the profiler monitor results in Figure~\ref{ProfilerDuration2} and Figure~\ref{ProfilerStutter2}, after the preloading was implemented, the stutters were eliminated or greatly reduced. Even though the peak duration for the impact visual effects remained similar, its stutter count was reduced to 1, and it no longer causes visible in-game stutters.
 
 % - Projectile spawn peak 17 17 17 18 17 17ms, count 3 1 4 4 2 1
 
@@ -752,15 +794,15 @@ As seen in the results of the profiler monitors in Figure~\ref{ProfilerDuration2
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{obrazky-figures/profiler_duration_2.png}
-    \caption{.}
+    \includegraphics[width=\textwidth]{obrazky-figures/profiler_duration_2.pdf}
+    \caption{The highest duration of problematic scenes or effects during the testing scenario across multiple runs after the loading screen implementation.}
     \label{ProfilerDuration2}
 \end{figure}
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{obrazky-figures/profiler_stutters_2.png}
-    \caption{.}
+    \includegraphics[width=\textwidth]{obrazky-figures/profiler_stutters_2.pdf}
+    \caption{The stutter counts of problematic scenes or effects during the testing scenario across multiple runs after the loading screen implementation.}
     \label{ProfilerStutter2}
 \end{figure}
 
@@ -776,6 +818,21 @@ As seen in the results of the profiler monitors in Figure~\ref{ProfilerDuration2
 % % ===================================================================
 % % ===================================================================
 
-\chapter{Documentation, Publication, Conclusion}
+\chapter{Conclusion}
 \label{chap:conclusion}
+The goal of this thesis was to design and implement a modular injury system for game characters in the Godot Engine, where damage to specific body parts has a direct effect on gameplay. The resulting solution models enemies as sets of targetable body parts with independent states. Destroying a part can remove abilities that depend on it, alter movement, and limit the enemy's capabilities.
+
+The implementation combines several systems into one cohesive whole. A reusable event-driven behavior tree was developed, its construction possible inside the Godot editor's scene tree. It includes body-part-aware nodes which allow the enemy to dynamically react to its injuries. The body part and hit logic was implemented via reusable scene components meant to be added to the scene tree and edited in the editor. Visual and physical feedback were integrated through skeleton-based knockback impulses, localized mesh deformation through a vertex shader, and visual effects like decals and particles.
+
+The systems were demonstrated in a playable 3D game demo with a manticore enemy that uses multiple body parts for its different types of movement and attacks. It showcases how targeting the different body parts disables the abilities that depend on them, and how the enemy adapts to the sustained injuries. The enemy's capabilities become more limited as it loses body parts, which grants the player tactical choices in deciding which parts to destroy first.
+
+Performance-oriented improvements were also addressed in the project. Profiling identified sources of stuttering related to loading scenes for the first time. The stutter was mitigated by a loading screen, during which the problematic scenes were loaded and cached. This reduced or removed the observed runtime stutters during gameplay.
+
+From a software design perspective, the thesis contributes not just a demo enemy, but mainly a reusable architecture for creating similar enemies in Godot. The implemented scene nodes, signal-based communication, and enemy AI integration provide a practical base for further development.
+
+There are several ways this work could be improved. The body part and behavior systems can react even more granularly, such as staggered movement when the body part is damaged (but not yet destroyed), specialized body parts like armor pieces that can be destroyed to reveal the enemy's weak spot body part. Further visual improvements are possible through position-based or attack-type-based severing of the body part mesh (being severed precisely where hit with a specific type of attack), procedural animation adapting to the enemy's injuries, injury-specific visual effects, and additional deformation  detail.
+
+% Overall, the thesis objective was fulfilled: a localized injury system was implemented in Godot as a modular system where gameplay logic, enemy behavior, and visual feedback interact to create a dynamic combat experience where the enemy's injuries have an immediate and meaningful effect on combat.
+
+
 % + video

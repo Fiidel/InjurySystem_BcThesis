@@ -119,6 +119,10 @@
 % self-added svg packages
 \usepackage{svg}
 \usepackage{listings}
+\usepackage{xcolor}
+\usepackage[vlined]{algorithm2e}
+\SetKwBlock{Indent}{}{}
+\RestyleAlgo{ruled}
 \renewcommand\lstlistingname{Algorithm}
 \lstset{morecomment=[l]{//}}
 \lstset{commentstyle=\color{gray}\itshape}
@@ -160,7 +164,7 @@
   keywords.en={Godot, Godot Engine, GDScript, injury system, behavior tree, enemy AI, inverse kinematics, mesh deformation, game design, game development}, % klíčová slova v anglickém jazyce / keywords in english
   %keywords.en={Here, individual keywords separated by commas will be written in English.},
   % Abstrakt / Abstract
-  abstract.cs={Tato bakalářská práce se zabývá návrhem a implementací modulárního systému zranění herních postav v herním enginu Godot. Nepřátelé se skládají z částí těl, které lze zasáhnout a zničit. Ztráta částí odebírá schopnosti, které na nich závisí, a mění chování v souboji. Teoretická část shrnuje mechaniky zranění založené na částech těla v různých hrách a představuje koncepty využité v implementaci. Praktická část popisuje znovupoužitelné scénové uzly a nástroje orientované na editor -- událostmi řízený behaviorální strom s uzly beroucími vpotaz stav částí těla, herní logiku částí těla a zásahů, impulsy úderů ovlivňující kostru modelu, lokalizovanou deformaci meshe prostřednictvím vertex shaderu a ovládání hráče. Kombinace těchto systémů je předvedena v herní ukázce s nepřátelskou mantikorou.}, % abstrakt v českém či slovenském jazyce / abstract in czech or slovak language
+  abstract.cs={Tato bakalářská práce se zabývá návrhem a implementací modulárního systému zranění herních postav v herním enginu Godot. Nepřátelé se skládají z částí těl, které lze zasáhnout a zničit. Ztráta částí odebírá schopnosti, které na nich závisí, a mění chování v~souboji. Teoretická část shrnuje mechaniky zranění založené na částech těla v~různých hrách a~představuje koncepty využité v implementaci. Praktická část popisuje znovupoužitelné scénové uzly a nástroje orientované na editor -- událostmi řízený behaviorální strom s uzly beroucími v potaz stav částí těla, herní logiku částí těla a zásahů, impulsy úderů ovlivňující kostru modelu, lokalizovanou deformaci meshe prostřednictvím vertex shaderu a ovládání hráče. Kombinace těchto systémů je předvedena v herní ukázce s nepřátelskou mantikorou.}, % abstrakt v českém či slovenském jazyce / abstract in czech or slovak language
   abstract.en={This Bachelor's thesis deals with the design and implementation of a modular injury system for game characters in the Godot Engine. Enemies are built from targetable body parts that can be destroyed. Losing parts removes abilities that depend on them and changes combat behavior. The theoretical part summarizes body-part-based injury mechanics in games and introduces concepts used in the implementation. The practical part describes reusable scene nodes and editor-oriented tooling -- an event-driven behavior tree with body-part-aware nodes, body part and hit logic, skeleton-based knockback, localized mesh deformation through a vertex shader, and the player controller. The combination of these systems is demonstrated in a game demo with a manticore enemy.}, % abstrakt v anglickém jazyce / abstract in english
   %abstract.en={An abstract of the work in English will be written in this paragraph.},
   % Prohlášení (u anglicky psané práce anglicky, u slovensky psané práce slovensky; u projektové praxe lze zakomentovat). Pokud použijete nástroje umělé inteligence, uveďte je podobně jako v příkladu. / Declaration (for thesis in english should be in english; for project practice can be commented out). If you use any AI tools, acknowledge them like in the provided example.
@@ -169,9 +173,9 @@
 %Pro jazykovou revizi technické zprávy a
 %při tvorbě odevzdaného programového kódu jsem využíval nástroj Cursor.},
   declaration={I hereby declare that this Bachelor's thesis was prepared as an original work by the author under the supervision of Ing. Tomáš Chlubna, Ph.D.
- I have listed all the literary sources, publications and other sources, which were used during the preparation of this thesis. I have used Cursor to correct spelling and other language mistakes and when working on the software.},
+ I have listed all the literary sources, publications and other sources, which were used during the preparation of this thesis. I~have used Cursor to correct spelling and other language mistakes and when working on the software.},
   % Poděkování (nepovinné, nejlépe v jazyce práce; nechcete-li, zakomentujte pro skrytí nadpisu. / Acknowledgement (optional, ideally in the language of the thesis; comment out to hide it including a heading.) 
-  %acknowledgment={},
+  acknowledgment={I would like to express my gratitude to Ing. Tomáš Chlubna, Ph.D. for his lightning-fast responses and poignant feedback during the writing of this thesis.},
   %acknowledgment={Here it is possible to express thanks to the supervisor and to the people which provided professional help
 %(external submitter, consultant, etc.).},
   % Rozšířený abstrakt (cca 3 normostrany) - lze definovat zde nebo níže / Extended abstract (approximately 3 standard pages) - can be defined here or below
@@ -181,11 +185,11 @@ Teoretická část shrnuje přístupy ke zraněním ve vybraných hrách, které
 
 Praktická část realizuje znovupoužitelné třídy, ze kterých lze ve stromě scén skládat nepřátele. Programy jsou psány v jazyce GDScript, použítá verze Godotu je 4.6.2. Nepřítel je rozdělen na různé části těla, kde každá má svůj stav s nastavitelnými parametry. Systém zásahů mapuje útoky na konkrétní části těla a aktualizuje jejich stav. Pokud části nezbývají žádné životy, je zničena, což se odrazí nejen vizuálně, ale i v herní logice.
 
-Klíčovým aspektem práce je přímé napojení stavu zranění na rozhodování nepřítele. Behaviorální strom je rozšířen o uzly, které se stavy částí těla pracují. Pokud je například zničena část potřebná pro patřičný útok, chování daný útok nebere vpotaz jako možnost nebo přepne na záložní chování. To umožňuje zavést chování nepřítele, který se dynamicky adaptuje na svá zranění.
+Klíčovým aspektem práce je přímé napojení stavu zranění na rozhodování nepřítele. Behaviorální strom je rozšířen o uzly, které se stavy částí těla pracují. Pokud je například zničena část potřebná pro patřičný útok, chování daný útok nebere v potaz jako možnost nebo přepne na záložní chování. To umožňuje zavést chování nepřítele, který se dynamicky adaptuje na svá zranění.
 
 Práce zároveň propojuje herní logiku zranění s vizuální odezvou. Zásahy se promítají do animace pomocí impulsů aplikovaných na kostru modelu, vizuální efekty hráči dávají najevo, že se mění stav herního světa, a lokální deformace meshe dává větší váhu silnějším útokům hráče. Vizuální změny tak podporují odezvu na hráčovy činy.
 
-Navržené řešení demonstrováno v hratelné 3D ukázce pomocí boje s nepřátelskou mantikorou, která kombinuje části těla k různým typům pohybu a útoků. Cílení na různé části těla během boje mění boj tím, že odebírá konkrétní možnosti nepřítele (např. zpomalení nebo odebrání specifického útoku). Výsledkem je souboj, ve kterém se hráč může takticky rozhodovat místo pouhého ubírání životů nepříteli.
+Navržené řešení je demonstrováno v hratelné 3D ukázce pomocí boje s nepřátelskou mantikorou, která kombinuje části těla k různým typům pohybu a útoků. Cílení na různé části těla během boje mění boj tím, že odebírá konkrétní možnosti nepřítele (např. zpomalení nebo odebrání specifického útoku). Výsledkem je souboj, ve kterém se hráč může takticky rozhodovat místo pouhého ubírání životů nepříteli.
 
 Z pohledu návrhu softwaru práce klade důraz na modularitu, znovupoužitelnost a práci v editoru. Vytvořené scénové uzly a jejich struktura umožňují použití na další typy nepřátel s minimem duplicitní logiky. Práce tak přináší nejen funkční prototyp, ale i praktický základ pro další vývoj nepřátel založených na zranění částí těla v Godotu.},
   %extabstract.odd={true}, % Začít rozšířený abstrakt na liché stránce? / Should extended abstract start on the odd page?
