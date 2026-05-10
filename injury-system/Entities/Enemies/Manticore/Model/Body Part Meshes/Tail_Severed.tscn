@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://cjnu0dxt0osqi"]
 
 [ext_resource type="Material" uid="uid://d0usofhye0iif" path="res://Entities/Enemies/Manticore/Model/SplitModel/Tail.tres" id="1_ypi8b"]
-[ext_resource type="Shader" uid="uid://ob6b3igd351g" path="res://Entities/Enemies/Manticore/Model/body_part_shader.gdshader" id="2_f6cj0"]
+[ext_resource type="Shader" uid="uid://ob6b3igd351g" path="res://Entities/Enemies/body_part_shader.gdshader" id="2_f6cj0"]
 [ext_resource type="Texture2D" uid="uid://3jgpx1meqfet" path="res://Entities/Enemies/Manticore/Model/manticore_split_SplitParts.png" id="3_y4dsn"]
 [ext_resource type="PackedScene" uid="uid://c2xnm6ekl0fic" path="res://Entities/Enemies/Manticore/Model/Body Part Meshes/tail_spikes.tscn" id="4_lak1d"]
 

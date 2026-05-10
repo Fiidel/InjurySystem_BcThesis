@@ -27,27 +27,20 @@ func preload_manticore_hit_flash() -> void:
 	if manticore_scene == null:
 		return
 
-	var manticore_instance := manticore_scene.instantiate()
+	var manticore_instance := manticore_scene.instantiate() as BodyPart
+	if manticore_instance == null:
+		return
 	add_child(manticore_instance)
 	await get_tree().process_frame
+	
+	var flash_tween := manticore_instance.play_hit_flash()
+	if flash_tween:
+		await flash_tween.finished
 
-	var body := manticore_instance.get_node_or_null("Body")
-	var body_part := find_first_body_part(body)
-	if body_part:
-		body_part.play_hit_flash()
-		await get_tree().process_frame
-		await RenderingServer.frame_post_draw
+	if manticore_instance.mesh:
+		var fade_tween := create_tween()
+		fade_tween.tween_property(manticore_instance.mesh, "transparency", 1.0, 0.1)
+		await fade_tween.finished
 
 	manticore_instance.queue_free()
 	await get_tree().process_frame
-
-
-func find_first_body_part(body: Node) -> BodyPart:
-	if body == null:
-		return null
-
-	for child in body.get_children():
-		if child is BodyPart:
-			return child as BodyPart
-
-	return null

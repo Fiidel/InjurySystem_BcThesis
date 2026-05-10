@@ -2,7 +2,7 @@
 @icon("uid://cvv6g76quclal")
 
 class_name BodyPart
-extends Node
+extends Node3D
 
 signal damage_central_health(amount: float)
 signal zero_health_reached
@@ -153,7 +153,7 @@ func take_damage(amount: float) -> void:
 		zero_health_reached.emit()
 
 
-func play_hit_flash() -> void:
+func play_hit_flash() -> Tween:
 	var hit_flash_activation_start_usec := ProfilerMonitors.m_now_usec() # monitoring
 	# get the mesh material and kill any existing tween
 	var mat := mesh.get_surface_override_material(0)
@@ -167,6 +167,7 @@ func play_hit_flash() -> void:
 	hit_flash_tween.tween_property(mat, "shader_parameter/hit_flash", 0.0, HIT_FLASH_UNWIND)
 	# monitor activation cost after one rendered frame
 	m_track_hit_flash_activation_after_draw(hit_flash_activation_start_usec)
+	return hit_flash_tween
 
 
 func m_track_hit_flash_activation_after_draw(hit_flash_activation_start_usec: int) -> void:

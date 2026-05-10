@@ -1,13 +1,14 @@
 @icon("uid://bsvaohwdo2u17")
 
 class_name Body
-extends Node
+extends Node3D
 
 signal enemy_killed
 
 @export var central_health: float = 1.0
 @export var bt_root: BTRoot
 @export var animation_tree: AnimationTree
+@export var enable_ragdoll: bool = true
 @export var skeleton_simulator: PhysicalBoneSimulator3D
 @export var movement_collision_shapes: Array[CollisionShape3D]
 @export_range(1, 32, 1) var ragdoll_collision_layer_to_enable: int = 1
@@ -23,18 +24,29 @@ func take_central_damage(amount: float) -> void:
 		return
 	central_health -= amount
 	if central_health <= 0:
-		is_dead = true
-		enemy_killed.emit()
-		if bt_root:
-			bt_root.abort()
-		call_deferred("activate_ragdoll") # must be called deferred
+		trigger_death()
+
+
+func trigger_death() -> void:
+	if is_dead:
+		return
+	is_dead = true
+	enemy_killed.emit()
+	if bt_root:
+		bt_root.abort()
+	call_deferred("activate_ragdoll") # must be called deferred
 
 
 func activate_ragdoll() -> void:
+	if not enable_ragdoll:
+		return
 	if animation_tree:
 		animation_tree.active = false
 	for shape in movement_collision_shapes:
-		shape.disabled = true
+		if is_instance_valid(shape):
+			shape.disabled = true
+	if not is_instance_valid(skeleton_simulator):
+		return
 	set_physical_bone_collision_layer(skeleton_simulator)
 	skeleton_simulator.physical_bones_start_simulation()
 

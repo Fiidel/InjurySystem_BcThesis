@@ -15,6 +15,11 @@ signal hitbox_hit(
 )
 
 
+func _ready() -> void:
+	collision_layer = 2
+	collision_mask = 2
+
+
 func receive_hit(hit_data: ProjectileHitData) -> void:
 	var attachment := get_parent() as BoneAttachment3D
 	if attachment == null:

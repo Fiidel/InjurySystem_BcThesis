@@ -6,7 +6,7 @@ extends BTAction
 
 func execute() -> void:
 	if not pursue_body_part_filters.is_empty() and is_missing_all_parts() and body != null:
-		body.call_deferred("activate_ragdoll")
+		body.trigger_death()
 	finished.emit(ReturnStatus.FAILURE)
 
 

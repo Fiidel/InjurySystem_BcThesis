@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://cvgr07xchptaj"]
 
-[ext_resource type="Shader" uid="uid://ob6b3igd351g" path="res://Entities/Enemies/Manticore/Model/body_part_shader.gdshader" id="1_11e0p"]
+[ext_resource type="Shader" uid="uid://ob6b3igd351g" path="res://Entities/Enemies/body_part_shader.gdshader" id="1_11e0p"]
 [ext_resource type="Texture2D" uid="uid://ddqygwu6uccnd" path="res://Entities/Enemies/Manticore/Model/manticore_split_Material Layer.png" id="2_wsdh1"]
 
 [resource]
