@@ -97,7 +97,7 @@ func on_hitbox_hit(
 		local_point: Vector3,
 		local_normal: Vector3,
 		projectile_direction: Vector3,
-		bone_attachment: BoneAttachment3D,
+		attachment: Node3D,
 		decal_params: Variant,
 		deformation_params: Variant
 	) -> void:
@@ -112,11 +112,11 @@ func on_hitbox_hit(
 	# update deformation array and shader
 	var do_deform : bool = deformation_params != null and deformation_params.apply_deformation
 	if do_deform:
-		if can_register_deformation_hit(bone_attachment, local_point, deformation_params):
+		if can_register_deformation_hit(attachment, local_point, deformation_params):
 			if hit_locations.size() >= MAX_HITS:
 				hit_locations.pop_front()
 			hit_locations.append({
-				"attachment": bone_attachment,
+				"attachment": attachment,
 				"pos": local_point,
 				"normal": local_normal,
 				"radius": deformation_params.hit_radius,
@@ -125,11 +125,11 @@ func on_hitbox_hit(
 			update_deformation_shader()
 	# spawn a decal
 	if decal_params:
-		spawn_hit_decal(bone_attachment, local_point, local_normal, decal_params)
+		spawn_hit_decal(attachment, local_point, local_normal, decal_params)
 
 
 # check if the new hit location is too close to any existing hit location
-func can_register_deformation_hit(attachment: BoneAttachment3D, new_local_point: Vector3, deformation_params: DeformationParameters) -> bool:
+func can_register_deformation_hit(attachment: Node3D, new_local_point: Vector3, deformation_params: DeformationParameters) -> bool:
 	if hit_locations.is_empty() or deformation_params.min_hit_separation <= 0.0:
 		return true
 
@@ -276,10 +276,10 @@ func update_deformation_shader() -> void:
 			continue
 		if not is_instance_valid(attachment_ref):
 			continue
-		if not (attachment_ref is BoneAttachment3D):
+		if not (attachment_ref is Node3D):
 			continue
 		# hit is stored in bone-attachment local space; convert to mesh local so the mesh deformation shader can use it
-		var attachment: BoneAttachment3D = attachment_ref
+		var attachment: Node3D = attachment_ref
 		# recalculate the attachment-to-mesh transform each frame so the hits follow the bone animation
 		var attachment_to_mesh := mesh_inv * attachment.global_transform
 		positions.append(attachment_to_mesh * hit["pos"])
@@ -298,7 +298,7 @@ func update_deformation_shader() -> void:
 	mat.set("shader_parameter/hit_strength", strength)
 
 
-func spawn_hit_decal(attachment: BoneAttachment3D, local_point: Vector3, local_normal: Vector3, hit_decal_params: DecalParameters) -> void:
+func spawn_hit_decal(attachment: Node3D, local_point: Vector3, local_normal: Vector3, hit_decal_params: DecalParameters) -> void:
 	if hit_decal_params == null or hit_decal_params.texture == null:
 		return
 	if decals.size() >= MAX_DECALS:
@@ -330,7 +330,7 @@ func spawn_hit_decal(attachment: BoneAttachment3D, local_point: Vector3, local_n
 
 
 # spawn a debug cylinder matching the decal's transforms
-func _spawn_debug_cylinder(attachment: BoneAttachment3D, decal: Decal) -> void:
+func _spawn_debug_cylinder(attachment: Node3D, decal: Decal) -> void:
 	var debug_mesh := CylinderMesh.new()
 	debug_mesh.top_radius = 0.1
 	debug_mesh.bottom_radius = 0.1
@@ -342,7 +342,7 @@ func _spawn_debug_cylinder(attachment: BoneAttachment3D, decal: Decal) -> void:
 
 
 # spawn a debug sphere at the given hit position
-func _spawn_debug_sphere(hit_pos: Vector3, attachment: BoneAttachment3D) -> void:
+func _spawn_debug_sphere(hit_pos: Vector3, attachment: Node3D) -> void:
 	var debug_mesh := SphereMesh.new()
 	debug_mesh.radius = 0.1
 	debug_mesh.height = 0.2

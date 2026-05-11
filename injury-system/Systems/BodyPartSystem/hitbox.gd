@@ -9,7 +9,7 @@ signal hitbox_hit(
 	local_point: Vector3,
 	local_normal: Vector3,
 	projectile_direction: Vector3,
-	bone_attachment: BoneAttachment3D,
+	attachment: Node3D,
 	decal_params: Variant,
 	deformation_params: Variant
 )
@@ -21,10 +21,13 @@ func _ready() -> void:
 
 
 func receive_hit(hit_data: ProjectileHitData) -> void:
-	var attachment := get_parent() as BoneAttachment3D
+	var attachment: Node3D = get_parent() as BoneAttachment3D
 	if attachment == null:
-		push_warning("Hitbox has no BoneAttachment3D parent")
-		return
+		push_warning("Hitbox has no BoneAttachment3D parent; using Node3D parent as fallback")
+		attachment = get_parent() as Node3D
+		if attachment == null:
+			push_warning("Hitbox has no Node3D parent")
+			return
 	# convert the world point and normal to local space as attached to the bone
 	var bone_inv := attachment.global_transform.affine_inverse() # affine_inverse() rather than inverse() is used so that the hits are detected correctly when the character is scaled
 	var local_point := bone_inv * hit_data.world_position
