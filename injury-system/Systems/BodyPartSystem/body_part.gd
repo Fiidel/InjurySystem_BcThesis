@@ -9,6 +9,11 @@ signal zero_health_reached
 
 const MAX_HITS: int = 16
 const MAX_DECALS: int = 16
+
+static var debug_spawn_hit_sphere: bool = false
+static var debug_spawn_decal_cylinder: bool = false
+const DEBUG_HIT_SPHERE_GROUP := &"body_part_debug_hit_sphere"
+const DEBUG_DECAL_CYLINDER_GROUP := &"body_part_debug_decal_cylinder"
 const HIT_FLASH_INTENSITY: float = 0.15
 const HIT_FLASH_WINDUP: float = 0.03
 const HIT_FLASH_UNWIND: float = 0.1
@@ -86,6 +91,23 @@ func _ready() -> void:
 	zero_health_reached.connect(on_zero_health_reached)
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if Engine.is_editor_hint():
+		return
+	if event is InputEventKey:
+		var e: InputEventKey = event as InputEventKey
+		if not e.pressed or e.echo:
+			return
+		if e.keycode == KEY_O:
+			debug_spawn_hit_sphere = not debug_spawn_hit_sphere
+			if not debug_spawn_hit_sphere:
+				_free_debug_nodes_in_group(DEBUG_HIT_SPHERE_GROUP)
+		elif e.keycode == KEY_P:
+			debug_spawn_decal_cylinder = not debug_spawn_decal_cylinder
+			if not debug_spawn_decal_cylinder:
+				_free_debug_nodes_in_group(DEBUG_DECAL_CYLINDER_GROUP)
+
+
 func _process(_delta: float) -> void:
 	# update shader with parameters following the bone animation
 	if not hit_locations.is_empty():
@@ -126,6 +148,8 @@ func on_hitbox_hit(
 	# spawn a decal
 	if decal_params:
 		spawn_hit_decal(attachment, local_point, local_normal, decal_params)
+	if debug_spawn_hit_sphere:
+		_spawn_debug_sphere(local_point, attachment)
 
 
 # check if the new hit location is too close to any existing hit location
@@ -307,6 +331,7 @@ func spawn_hit_decal(attachment: Node3D, local_point: Vector3, local_normal: Vec
 
 	# create a new decal and set its parameters
 	var decal := Decal.new()
+	decal.cull_mask = 1
 	decal.texture_albedo = hit_decal_params.texture
 	decal.texture_normal = hit_decal_params.texture_normal
 	decal.size = Vector3(hit_decal_params.width, hit_decal_params.depth, hit_decal_params.height)
@@ -327,6 +352,8 @@ func spawn_hit_decal(attachment: Node3D, local_point: Vector3, local_normal: Vec
 	decal.rotate_object_local(Vector3(1, 0, 0), -PI / 2.0) # rotate the decal along the X axis by -90 degrees so that the decal texture is the correct orientation on the surface
 
 	decals.append(decal)
+	if debug_spawn_decal_cylinder:
+		_spawn_debug_cylinder(attachment, decal)
 
 
 # spawn a debug cylinder matching the decal's transforms
@@ -337,6 +364,7 @@ func _spawn_debug_cylinder(attachment: Node3D, decal: Decal) -> void:
 	debug_mesh.height = 0.2
 	var cylinder := MeshInstance3D.new()
 	cylinder.mesh = debug_mesh
+	cylinder.add_to_group(DEBUG_DECAL_CYLINDER_GROUP)
 	attachment.add_child(cylinder)
 	cylinder.global_transform = decal.global_transform
 
@@ -348,5 +376,16 @@ func _spawn_debug_sphere(hit_pos: Vector3, attachment: Node3D) -> void:
 	debug_mesh.height = 0.2
 	var sphere := MeshInstance3D.new()
 	sphere.mesh = debug_mesh
+	sphere.add_to_group(DEBUG_HIT_SPHERE_GROUP)
 	add_child(sphere)
 	sphere.global_position = attachment.global_transform * hit_pos
+
+
+func _free_debug_nodes_in_group(group: StringName) -> void:
+	var tree := get_tree()
+	if tree == null:
+		return
+	var nodes: Array[Node] = tree.get_nodes_in_group(group)
+	for n: Node in nodes:
+		if is_instance_valid(n):
+			n.queue_free()

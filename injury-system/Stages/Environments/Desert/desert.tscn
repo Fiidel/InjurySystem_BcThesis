@@ -157,6 +157,7 @@ size = Vector2(0.1, 0.1)
 navigation_mesh = SubResource("NavigationMesh_01ioh")
 
 [node name="Ground" type="MeshInstance3D" parent="NavigationRegion3D" unique_id=1421528548]
+layers = 2
 mesh = SubResource("ArrayMesh_3ug23")
 skeleton = NodePath("")
 
@@ -232,6 +233,7 @@ transform = Transform3D(0.99433494, 0, -0.10629908, 0, 1, 0, 0.10629908, 0, 0.99
 shape = SubResource("BoxShape3D_lwio1")
 
 [node name="Mountains" type="MeshInstance3D" parent="." unique_id=341816465]
+layers = 2
 mesh = SubResource("ArrayMesh_01ioh")
 skeleton = NodePath("")
 
