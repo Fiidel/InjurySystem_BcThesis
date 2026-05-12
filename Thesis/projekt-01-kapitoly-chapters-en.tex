@@ -124,15 +124,10 @@ A \emph{model} is a series of \emph{links} connected by \emph{joints}. Joints ar
     \caption{An inverse kinematics chain description and examples of the chain bending so that the end effector reaches the red dot target, showing two reachable and one unreachable target point positions.}
 \end{figure}
 
-% \subsubsection{IK Solvers}
-% @TODO ?
 
 \subsubsection{Usage of Inverse Kinematics}
 Forward kinematics (traditional animation where known, predefined transformations are applied to the model) can fall short in situations where dynamic adjustment of the target locations may be needed, such as characters standing on slopes or an appendage reaching for a target that can be a variable distance or height away. The bending of the links (such as limbs) is dynamically calculated, making for more natural-looking and adaptive movement, which is a desirable trait for our dynamic body part injury system that needs to account for the injuries made.
 
-%\subsubsection{Animation Blending in Godot}
-% @TODO
-% since this work is also about animation, add anim blending section?
 
 \newpage
 \section{Enemy AI}
@@ -188,11 +183,6 @@ It may also be important to have a shutdown mechanism that handles action exits 
 Utility theory in enemy AI design refers to the evaluation of \emph{utility} across multiple choices. Utility is the usefulness of the choice within the given context. The AI calculates a utility score for each action, and the action with the highest score is then chosen. The calculation of utility can be simple if the decision factors are comparable, like only taking into account a price of the same item from two sellers. However, more complex situations require the conversion and revaluation of values from one context to another, unified context. Utility scores should also be consistent and on the same scale, as they are directly compared to each other. Normalized utility scores are a good baseline for consistency \cite[Chapter~9]{GameAIPro1}.
 
 Utility calculations can also be integrated into behavior tree traversal. The behavior tree implementation can be extended by a \emph{utility selector} node. It first queries its children for a utility score, and then decides which child to enter based on that score. For an AI aimed towards optimal decision making, the child with the highest score would be picked. Alternatively, the choice could be randomized, but still weighted towards the higher scored children \cite[Chapter~10]{GameAIPro1}.
-
-
-% % from the:
-% % Initialization -- All but the simplest of actions will need to interface with other systems and objects to do the work. For example, a particular action may need to fetch data from a blackboard, or make a request of the animation systems. In a well-defined modular architecture getting access to these other games systems can be problematic. Extra work is required during the setup of behavior tree actions to provide the systems that those actions will use. This is often solved by passing extra parameters during node instantiation or through the use of the Visitor software design pattern.
-% % Shutdown—Like initialization, the shutdown of actions can be problematic due to the dependencies on external systems. Special care must be taken when shutting down an action to ensure that freeing resources does not interfere with other behaviors. For example, you cannot simply reset the animation system once an action shuts down as another instance of that action may have recently been activated elsewhere.
 
 
 % \section{Pathfinding and Navigation}
@@ -622,7 +612,6 @@ This vertex displacement modifier mask was necessary due to the need to author t
 
 Due to bone movements, the positions of the hits need to be recalculated every frame. The \texttt{update\_deformation\_shader()} function iterates through the \texttt{hit\_locations} array and first composes an attachment-to-mesh transformation matrix as the mesh's inverse global transform multiplied by the current bone attachment global transform. It then converts the hit position with this matrix and converts the hit normal with the inverse transpose of the matrix's basis (using {$n'=(M^{-1})^T\cdot n$}). The converted position and normal, as well as the hit's radius and strength, are then sent to the shader uniforms.
 
-% - talk about attempts to map it to UV, but unsuccessful. An ideal deformation would be painted directly onto the material, would also produce more stable results (when the same place is hit several time, the dent increases unnaturally) and would avoid the "only x hits" array size issue.
 
 \begin{algorithm}
 \label{alg_DeformationShader}
@@ -733,8 +722,6 @@ When the enemy moves on the ground, sand particles are spawned at the feet with 
 
 The ragdoll is activated when the enemy is killed or when the behavior tree activates it when no movement options are available. The ragdoll uses \texttt{PhysicalBoneSimulator3D}, generated from the skeleton rig, to simulate the physics of the enemy's body parts. The joints' type is set to \texttt{6DOF} which gives the ragdoll a more natural feel.
 
-% TODO IK pro umístění nohou, řízeno přes keyframes animace (v momentu animace, kdy se noha usadí na zem - spuštění IK připevnění, obdobně při vznesení nohy a odpoutání IK) - WIP
-
 In various classes, the export variables are shown or hidden based on other variables (usually based on boolean flags or chosen enum options). For example, in the \texttt{BodyPart} class, the export variables are shown or hidden based on the \texttt{remove\_part\_if\_destroyed} variable, as shown in Figure~\ref{EditorExportToggles}. When using a skeleton, the bone options are supplied after the skeleton is loaded as a list of bone names. When the type of projectile is chosen, the relevant export variables are shown and hidden accordingly.
 
 \begin{figure}[H]
@@ -831,8 +818,3 @@ Performance-oriented improvements were also addressed in the project. Profiling 
 From a software design perspective, the thesis contributes not just a demo enemy, but mainly a reusable architecture for creating similar enemies in Godot. The implemented scene nodes, signal-based communication, and enemy AI integration provide a practical base for further development.
 
 There are several ways this work could be improved. The body part and behavior systems can react even more granularly, such as staggered movement when the body part is damaged (but not yet destroyed), specialized body parts like armor pieces that can be destroyed to reveal the enemy's weak spot body part. Further visual improvements are possible through position-based or attack-type-based severing of the body part mesh (being severed precisely where hit with a specific type of attack), procedural animation adapting to the enemy's injuries, injury-specific visual effects, and additional deformation  detail.
-
-% Overall, the thesis objective was fulfilled: a localized injury system was implemented in Godot as a modular system where gameplay logic, enemy behavior, and visual feedback interact to create a dynamic combat experience where the enemy's injuries have an immediate and meaningful effect on combat.
-
-
-% + video
