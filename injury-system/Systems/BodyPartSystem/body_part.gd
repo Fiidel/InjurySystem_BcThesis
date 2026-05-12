@@ -237,7 +237,10 @@ func spawn_severed_limb() -> void:
 	mesh.hide()
 	if severed_body_scene != null:
 		var severed_body: RigidBody3D = severed_body_scene.instantiate()
-		get_parent().add_child(severed_body)
+		var world_root: Node = get_tree().current_scene
+		if world_root == null:
+			world_root = get_tree().root
+		world_root.add_child(severed_body)
 		severed_body.global_transform = mesh.global_transform
 
 
